@@ -1,0 +1,35 @@
+Meeting Type: Team-Only
+Date: 2026-09-15
+Start–End Time: 7:00 PM - ~9:30 PM
+Location/Mode: Online (Discord call)
+
+Attendees:
+- Anukrithi Myadala
+- Larry Nguyen
+- Matthew Tang
+
+1) Accomplished Since Last Meeting
+- Everyone did weekend research on domains and datasets (DeathStarBench apps, GAIA, Alibaba cluster traces, OTel demo apps)
+- researched the datasets question the prof raised and put together a comparison of the options with what's actually usable
+- Collected the prof's asks from last week: pick a real domain, find real datasets with NO injected faults, compare the papers vs our plan, bring a fall sprint plan
+
+2) Accomplished During This Meeting
+- Picked e-commerce transaction processing as our domain (real production trace data exists for it, and it's latency sensitive). Can adjust if prof pushes back
+- Decided NOT to build our own sample app - we evaluate on real datasets replayed as a stream. OTel demo shop only as a live-demo option
+- Alibaba cluster traces = primary dataset, GAIA = labeled backup
+- Hashed out the end goal question: this year = detect + explain the bottleneck service, fix suggestions are a stretch goal later
+- Agreed we need a simple baseline to compare our ranking against
+- pulling all of this info together into docs for the Wednesday advisor meeting (scope, schedule, sprint plan, papers comparison)
+
+3) Issues / Blockers
+- Still figuring out how to measure accuracy without injecting faults
+- Exact metrics we improve over the papers still need defining before Workbook 1
+
+4) Action Items
+- Action: write up scope + schedule + sprint plan + papers comparison docs | Owner: Anukrithi | Due: 2026-09-16
+- Action: keep digging into the Alibaba data format (rebuild call graphs) and other datasets + papers| Owner: Larry | Due: 2026-09-16
+- Action: dataset comparison writeup + aechitecture +slide sections | Owner: Matthew | Due: 2026-09-16
+
+5) Plans / Goals for Next Meeting
+- Get prof's sign-off on domain, datasets and approach on Wednesday
+- Start Sprint 1 work properly (AWS account, repo, schema, prototypes)

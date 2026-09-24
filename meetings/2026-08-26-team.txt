@@ -1,0 +1,33 @@
+Meeting Type: Team-Only
+Date: 2026-08-26
+Start–End Time: 7:00 PM - ~9:30 PM
+Location/Mode: Online (Discord call)
+
+Attendees:
+- Anukrithi Myadala
+- Larry Nguyen
+- Matthew Tang
+
+1) Accomplished Since Last Meeting
+- Team formed, group chat made (Aug 25). Topic picked: Intelligent serverless distributed tracing + bottleneck Analyzer
+- Anukrithi: wrote the first abstract draft + the project formation doc, shared both in the group
+- Larry: made the private github repo and added everyone
+
+2) Accomplished During This Meeting
+- Went through the abstract together, everyone gave edits and wording suggestions
+- Planned the ppt for the in-class project formation presentation - what sections we need and who talks about what
+- asked a bunch of questions about what the prof will expect in the first meeting, so we started collecting talking points
+- Talked about how the 3 of us should split the project areas roughly
+
+3) Issues / Blockers
+- Have to follow a required template/format for the class presentation
+- Our working title is a little different from the officially registered one, need to check if that's ok
+
+4) Action Items
+- Action: finish abstract edits | Owner: everyone | Due: 2026-09-03
+- Action: draft the class presentation slides | Owner: everyone | Due: 2026-09-04
+- Action: put together briefing points for the advisor convo | Owner: Anukrithi | Due: 2026-09-02
+
+5) Plans / Goals for Next Meeting
+- Meet before the first advisor meeting to prep
+- Finalize + submit the abstract, present in class Friday

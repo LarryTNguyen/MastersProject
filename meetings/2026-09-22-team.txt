@@ -1,0 +1,35 @@
+Meeting Type: Team-Only
+Date: 2026-09-22
+Start–End Time: 9:00 PM - ~10:30 PM
+Location/Mode: Online (Discord call)
+
+Attendees:
+- Anukrithi Myadala
+- Larry Nguyen
+- Matthew Tang
+
+1) Accomplished Since Last Meeting
+- Presentation deck drafted (problem statement, architecture, papers table, datasets, sprint plan, work split)
+- Anukrithi: built out the planning package for the advisor meeting - fall sprint plan (weekly, per person), two-semester schedule, scope + system design doc, AWS cost plan, and an architecture-decisions writeup shared in the channel
+- Larry: researched bottleneck ranking signals (FIRM paper + a signal list he shared), planned the sprints
+- Matthew: drafted a bottleneck score equation (weighted sum of baseline deviation, critical path, self time, errors), crafted all slides and architecture explanation and put it in the deck
+
+2) Accomplished During This Meeting
+- Went through the deck together and finalized the plan for Wednesday
+- Talked through the architecture - the dataset upload path (Matthew's design) and the live streaming path need to feed the same pipeline, slide still only shows upload
+- Compared the three versions of the bottleneck score floating around (Matthew's equation, Larry's list, the one in the docs) - realized they're mostly the same thing and started merging them into one
+- Split up who presents what to the advisor
+
+3) Issues / Blockers
+- Architecture slide still shows only the upload path, not real-time - needs the merged diagram before the meeting
+- Score weights need a tuning + freeze plan before Workbook 2
+
+4) Action Items
+- Action: update the ranking slide to the merged score | Owner: Matthew | Due: 2026-09-23
+- Action: swap the architecture slide to the merged diagram | Owner: Matthew | Due: 2026-09-23
+- Action: add the missing slides (research questions, evaluation, real data stats, cost, questions for prof) | Owner: Larry, Anukrithi | Due: 2026-09-23
+- Action: final read-through before the meeting | Owner: everyone | Due: 2026-09-23
+
+5) Plans / Goals for Next Meeting
+- Advisor meeting Wednesday: lock domain/datasets/score design, ask about the evaluation benchmark
+- Keep moving on Sprint 1 toward Workbook 1 (Oct 1, 8am)

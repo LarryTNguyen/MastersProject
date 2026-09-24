@@ -1,0 +1,28 @@
+Meeting Type: Team-Only
+Date: 2026-09-11
+Start–End Time: 12:42 PM - ~2:45 PM
+Location/Mode: Online (Discord call)
+
+Attendees:
+- Anukrithi Myadala
+- Larry Nguyen
+- Matthew Tang
+
+1) Accomplished Since Last Meeting
+- Everyone started on their assigned reference papers from last night
+
+2) Accomplished During This Meeting
+- Went through the Canopy paper together properly - the pipeline stages, and the fact that a human still does the actual digging in their system
+- Brainstormed where we go beyond it: cheap serverless pipeline + actually automating the bottleneck-finding part
+- kept pushing the uncomfortable questions - what's the end goal exactly (just detect? or suggest fixes too), how do we measure if we're right, what do we compare against. Wrote these down as open questions to settle
+- Made a list of candidate datasets/testbeds to research over the weekend (sample microservice apps, labeled datasets, real production traces)
+
+3) Issues / Blockers
+- Accuracy measurement is the big open problem since prof doesn't want injected faults
+
+4) Action Items
+- Action: weekend research on datasets and domains | Owner: everyone | Due: 2026-09-14
+- Action: bring findings to the Tuesday planning call | Owner: everyone | Due: 2026-09-15
+
+5) Plans / Goals for Next Meeting
+- Tuesday: pick the domain, settle datasets + approach, plan the Wednesday advisor meeting

@@ -1,0 +1,31 @@
+Meeting Type: Team-Only
+Date: 2026-09-01
+Start–End Time: 7:00 PM - ~9:30 PM
+Location/Mode: Online (Discord call)
+
+Attendees:
+- Anukrithi Myadala
+- Larry Nguyen
+- Matthew Tang
+
+1) Accomplished Since Last Meeting
+- Abstract got revised after the Aug 26 discussion
+- Matthew: found the class slide template and started on the slides
+- Repo is up and everyone has access
+
+2) Accomplished During This Meeting
+- Worked on the presentation slides together. We all went over the deck and suggested trimming the bullet points down - agreed to keep slides simple and say the details out loud in class
+- raised python vs java - team leaning python
+- Prepped for tomorrow's advisor meeting - she said to be ready to discuss the proposal, base paper and presentation. Confirmed it's at 11:30am
+
+3) Issues / Blockers
+- Not sure what questions the advisor will ask, going in with a high level idea
+- Tight timing between advisor feedback and the abstract deadline the next morning
+
+4) Action Items
+- Action: final slide pass before class | Owner: Matthew | Due: 2026-09-04
+- Action: bring the title question + proposal to the advisor meeting | Owner: everyone | Due: 2026-09-02
+- Action: re-read the base paper before the meeting | Owner: everyone | Due: 2026-09-02
+
+5) Plans / Goals for Next Meeting
+- Advisor meeting Wed 11:30am, then class presentation Friday

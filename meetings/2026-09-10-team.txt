@@ -1,0 +1,31 @@
+Meeting Type: Team-Only
+Date: 2026-09-10
+Start–End Time: 9:20 PM - ~10:00 PM
+Location/Mode: Online - Discord call, moved to Google Meet because Discord kept dropping
+
+Attendees:
+- Anukrithi Myadala
+- Larry Nguyen
+- Matthew Tang
+
+1) Accomplished Since Last Meeting
+- Did the in-class project formation presentation (Sep 4)
+- submitted the abstract and emailed it to Prof. Trivedi
+- Base paper presentation for the advisor prepped/delivered
+- set up a proper Discord server with channels for notes, links and due dates
+
+2) Accomplished During This Meeting
+- Debriefed how the base paper (Canopy) presentation went and what feedback we got
+- Split the reference papers between the 3 of us to read and take notes on
+- asked what exactly we're improving over Canopy - we didn't have a clean answer yet so that became the homework
+- Agreed everyone researches datasets/papers/ideas before the weekend session
+
+3) Issues / Blockers
+- Still no decision on dataset/domain, and "what's our improvement" is fuzzy
+
+4) Action Items
+- Action: read assigned papers + drop notes in the notes channel | Owner: everyone | Due: 2026-09-11
+- Action: continue working session tomorrow | Owner: everyone | Due: 2026-09-11
+
+5) Plans / Goals for Next Meeting
+- Long session tomorrow to go deep on the base paper and start shaping our approach
