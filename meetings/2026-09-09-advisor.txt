@@ -1,0 +1,41 @@
+Meeting Type: Advisor
+Date: 2026-09-09
+Start–End Time: 12:00 PM - 1:00 PM
+Location/Mode: In person
+
+Attendees:
+- Prof. Bhargavi Trivedi (advisor)
+- Anukrithi Myadala
+- Larry Nguyen
+- Matthew Tang
+
+1) Accomplished Since Last Meeting
+- In-class project formation presentation delivered (Fri Sep 4)
+- Abstract finalized and submitted
+- Team roles posted (Matthew - team lead / pipeline & AWS, Larry - instrumentation & trace reconstruction, Anukrithi - bottleneck analysis & dashboard)
+- Started reading the base paper more deeply for the base paper presentation
+
+2) Accomplished During This Meeting
+- Prof pushed us to pick a concrete DOMAIN to target, the way Canopy targets Facebook - we hadn't committed to one yet
+- She wants us testing on a REAL-TIME dataset - real data, not injecting bottlenecks ourselves
+- She asked for a comparison of what Canopy did vs what we're planning for our project - what they did, what we want to do, why, what our end goal is and how we optimize
+- She asked for a fall sprint plan through the end of the semester, with work split equally between the 3 of us (she said she checks for equal contribution)
+- She stressed it's important to find the base + real datasets to use and test on early
+- She suggested using more recent papers that match our project idea, not just Canopy (2017)
+- Set the follow-up: come back with domain, datasets, papers comparison, approach, and the sprint plan
+
+3) Issues / Blockers
+- No domain locked yet, and we still need to find real datasets that work without fault injection
+- How to measure accuracy without injecting faults is an open problem
+- Papers comparison and sprint plan don't exist yet - short runway to the follow-up
+
+4) Action Items
+- Action: research candidate domains + real datasets (no injected faults) | Owner: everyone | Due: 2026-09-14
+- Action: papers comparison table (Canopy + recent papers vs our plan) | Owner: Anukrithi | Due: 2026-09-16
+- Action: draft the fall sprint plan with equal 3-way split | Owner: Anukrithi | Due: 2026-09-16
+- Action: find recent papers that match our idea better than Canopy | Owner: Larry | Due: 2026-09-16
+- Action: dataset research + comparison writeup | Owner: Matthew | Due: 2026-09-16
+
+5) Plans / Goals for Next Meeting
+- Team call Tue Sep 15 to lock our proposals for everything above
+- Advisor follow-up: present domain, datasets, papers comparison, approach and sprint plan

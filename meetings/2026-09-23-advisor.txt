@@ -1,0 +1,40 @@
+Meeting Type: Advisor
+Date: 2026-09-23
+Start–End Time: 12:00 PM - 1:00 PM
+Location/Mode: In person (professor's office)
+
+Attendees:
+- Prof. Bhargavi Trivedi (advisor)
+- Larry Nguyen
+- Matthew Tang
+- Anukrithi Myadala
+
+1) Accomplished Since Last Meeting
+- Domain picked (e-commerce transaction processing), datasets chosen (Alibaba cluster traces primary, GAIA backup)
+- Presentation deck built out: problem statement, architecture, papers comparison, datasets, bottleneck ranking + score equation, research questions, evaluation approach, cost, sprint plan + work split
+- Fall sprint plan and planning docs (scope, schedule, cost, architecture decisions) done
+- Team meeting notes pushed to the github /meetings folder
+
+2) Accomplished During This Meeting
+- Presented the current state of the project to Prof. Trivedi
+- Her overall read: we're in a good place
+- Main feedback / what she wants us to nail down:
+  1. Figure out what the PARAMETERS are when we try to find what's wrong with a service (i.e. pin down the exact signals/thresholds in the bottleneck score)
+  2. Be able to EXPLAIN our architectural decisions (why each component, not just what)
+  3. Keep COMPARISONS TO A BASELINE throughout the evaluation
+- Also split up Workbook 1 between us: Anukrithi does ch. 1, 2, 3 - Matthew does ch. 4 and 6 - Larry does ch. 5 and 9. Target: everyone's chapters ready by Sunday
+
+3) Issues / Blockers
+- Score parameters (signals, weights, thresholds) not fully pinned down yet - needs to happen before Workbook 2 freezes the design
+
+4) Action Items
+- Action: define the score parameters concretely (signals + how weights get set) | Owner: Larry | Due: 2026-09-29
+- Action: keep the architecture-decisions rationale ready to present (why serverless, why each component) | Owner: Matthew | Due: 2026-09-29
+- Action: make sure every evaluation result has a baseline comparison next to it | Owner: Anukrithi | Due: 2026-09-29
+- Action: Workbook 1 ch. 1, 2, 3 drafted | Owner: Anukrithi | Due: 2026-09-27
+- Action: Workbook 1 ch. 4 and 6 drafted | Owner: Matthew | Due: 2026-09-27
+- Action: Workbook 1 ch. 5 and 9 drafted | Owner: Larry | Due: 2026-09-27
+
+5) Plans / Goals for Next Meeting
+- Assemble Workbook 1 from everyone's chapters and do a full review pass (due Oct 1, 8 AM with Meeting Log 1)
+- Come back with the score parameters nailed down

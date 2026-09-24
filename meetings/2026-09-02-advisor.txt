@@ -1,0 +1,36 @@
+Meeting Type: Advisor
+Date: 2026-09-02
+Start–End Time: 11:30 AM - ~12:00 PM
+Location/Mode: In person with advisor (Anukrithi joined online)
+
+Attendees:
+- Prof. Bhargavi Trivedi (advisor)
+- Anukrithi Myadala
+- Larry Nguyen
+- Matthew Tang
+
+1) Accomplished Since Last Meeting
+- Abstract drafted and revised as a team
+- In-class presentation slides drafted (following the class template Matthew found)
+- Base paper (Canopy) reviewed by team members
+
+2) Accomplished During This Meeting
+- Presented the proposal, base paper, and presentation plan to Prof. Trivedi
+- Advisor liked the topic; suggested adding one more component: a recommended change / suggested fix for whatever bottleneck the system finds (not just pointing it out)
+- Advisor asked the team to genuinely read and understand the base papers, and to put things in our own words
+- Agreed on a recurring advisor meeting slot: Wednesdays at 12 PM going forward
+- Clarified logistics: abstract to be emailed/submitted (Overleaf), advisor shared her email for Overleaf access; Friday's presentation is to the class and Prof. Harkey, using the current format
+
+3) Issues / Blockers
+- Abstract due the next morning - tight turnaround for edits
+- Presentation rubric discovered late; template constraints on what we can include
+
+4) Action Items
+- Action: Final edits to the abstract ("make it our own words") | Owner: Larry | Due: 2026-09-03 morning
+- Action: Submit abstract + email to Prof. Trivedi | Owner: Anukrithi | Due: 2026-09-03 morning
+- Action: Submit/finish presentation slides | Owner: Matthew | Due: 2026-09-04
+- Action: Post team roles in the group | Owner: All | Due: 2026-09-02 (done same evening: Matthew - Team Lead, Serverless Pipeline & AWS Infrastructure; Larry - Sample Application, Instrumentation & Trace Reconstruction; Anukrithi - Bottleneck Analysis Engine & Dashboard)
+
+5) Plans / Goals for Next Meeting
+- Deliver the in-class project formation presentation (Fri Sep 4)
+- Start deeper reading of base + reference papers for the base paper presentation
