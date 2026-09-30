@@ -1,0 +1,22 @@
+Meeting Type: Team Only
+Date: 2026-09-30
+Start–End Time: 10:30 am – 11:20 am
+Location/Mode: Discord
+Attendees:
+-  Anukrithi
+-  Matthew
+-  Larry
+1) Accomplished Since Last Meeting
+Workbook 1
+Trace schema research
+Going through more research papers
+2) Accomplished During This Meeting
+Went over the workbook for proofreading and editing
+3) Issues / Blockers
+N/A
+4) Action Items
+- Action: Create trace schema and experiment with sample service | Owner: Larry | Due: 10/6
+- Action: Configure AWS settings| Owner: Matthew | Due: 10/6
+- Action: Create trace replayer skeleton | Owner: Anukrithi | Due: 10/6
+5) Plans / Goals for Next Meeting
+Begin implementing
