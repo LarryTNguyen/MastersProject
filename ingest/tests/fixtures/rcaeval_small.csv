@@ -1,0 +1,7 @@
+traceID,spanID,parentSpanID,serviceName,operationName,methodName,startTime,duration,statusCode
+4bf92f3577b34da6a3ce929d0e0e4736,00f067aa0ba902b7,,frontend,HTTP GET /cart/checkout,,1712000000000000,250000,200
+4bf92f3577b34da6a3ce929d0e0e4736,1a2b3c4d5e6f7081,00f067aa0ba902b7,checkoutservice,PlaceOrder,hipstershop.CheckoutService/PlaceOrder,1712000000010000,230000,0
+4bf92f3577b34da6a3ce929d0e0e4736,2b3c4d5e6f708192,1a2b3c4d5e6f7081,paymentservice,Charge,hipstershop.PaymentService/Charge,1712000000020000,200000,13
+4bf92f3577b34da6a3ce929d0e0e4736,3c4d5e6f708192a3,1a2b3c4d5e6f7081,cartservice,GetCart,,1712000000015000,4000,
+5c0f00d1e1a24b6e9f3d2c1b0a998877,4d5e6f708192a3b4,,frontend,HTTP GET /product,,1712000001000000,12000,503
+5c0f00d1e1a24b6e9f3d2c1b0a998877,5e6f708192a3b4c5,4d5e6f708192a3b4,productcatalogservice,GetProduct,,1712000001001000,9000,0
