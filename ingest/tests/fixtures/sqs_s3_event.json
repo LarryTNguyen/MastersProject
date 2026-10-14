@@ -1,0 +1,22 @@
+{
+  "Records": [
+    {
+      "messageId": "msg-1",
+      "receiptHandle": "r1",
+      "body": "{\"Records\": [{\"eventSource\": \"aws:s3\", \"eventName\": \"ObjectCreated:Put\", \"s3\": {\"bucket\": {\"name\": \"sta-raw-dev\"}, \"object\": {\"key\": \"uploads/my+trace+file.json\", \"size\": 1234}}}]}",
+      "eventSource": "aws:sqs"
+    },
+    {
+      "messageId": "msg-2",
+      "receiptHandle": "r2",
+      "body": "{\"Records\": [{\"s3\": {\"bucket\": {\"name\": \"sta-raw-dev\"}, \"object\": {\"key\": \"uploads/broken.csv\"}}}]}",
+      "eventSource": "aws:sqs"
+    },
+    {
+      "messageId": "msg-3",
+      "receiptHandle": "r3",
+      "body": "{\"Service\": \"Amazon S3\", \"Event\": \"s3:TestEvent\", \"Bucket\": \"sta-raw-dev\"}",
+      "eventSource": "aws:sqs"
+    }
+  ]
+}

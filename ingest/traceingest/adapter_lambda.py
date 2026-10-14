@@ -1,0 +1,100 @@
+"""Dataset Adapter Lambda.
+
+Trigger: SQS queue that receives S3 "object created" events from the raw bucket.
+For each new raw object it detects the format (Alibaba CSV, RCAEval CSV, OTLP
+JSON from an upload or the live collector, or common-span JSONL), converts it to
+common spans, and writes them as JSONL to the normalized location, where the
+trace reconstruction Lambda picks them up.
+
+Environment:
+  NORMALIZED_BUCKET   bucket for normalized spans (default: same as the raw bucket)
+  NORMALIZED_PREFIX   key prefix for normalized output (default: "normalized/")
+  BASE_EPOCH_US       anchor for Alibaba's relative timestamps (default: 0)
+
+Safe to retry: the output key is derived from the input key, so processing the
+same object twice overwrites the same file instead of duplicating spans (N4).
+Failed messages are reported individually (SQS partial batch response), so one
+bad file does not make the whole batch retry. Enable ReportBatchItemFailures on
+the event source mapping.
+"""
+from __future__ import annotations
+
+import io
+import json
+import os
+import urllib.parse
+from typing import Optional
+
+from . import formats
+from .spans import validate, write_jsonl
+
+_s3 = None
+
+
+def _client():
+    global _s3
+    if _s3 is None:
+        import boto3  # provided by the Lambda Python runtime
+        _s3 = boto3.client("s3")
+    return _s3
+
+
+def output_key(raw_key: str, prefix: str) -> str:
+    stem, _ = os.path.splitext(raw_key)
+    return f"{prefix.rstrip('/')}/{stem}.jsonl"
+
+
+def normalize_object(s3, bucket: str, key: str, out_bucket: str, out_prefix: str,
+                     base_epoch_us: int = 0) -> dict:
+    obj = s3.get_object(Bucket=bucket, Key=key)
+    data = obj["Body"].read()
+    head = formats.first_bytes_text(data)
+    if head is None:
+        raise ValueError("Parquet uploads are not supported in the Lambda; convert to CSV or OTLP JSON first")
+    fmt = formats.detect_format(head, key)
+    result = formats.load_text(io.StringIO(data.decode("utf-8", errors="replace")), fmt=fmt,
+                               name=key, base_epoch_us=base_epoch_us)
+    good = []
+    invalid = 0
+    for s in result.spans:
+        if validate(s):
+            invalid += 1
+        else:
+            good.append(s)
+    buf = io.StringIO()
+    write_jsonl(good, buf)
+    out_key = output_key(key, out_prefix)
+    s3.put_object(Bucket=out_bucket, Key=out_key, Body=buf.getvalue().encode("utf-8"),
+                  ContentType="application/x-ndjson",
+                  Metadata={"source-key": key[:1000], "format": fmt, "spans": str(len(good))})
+    return {"input": f"s3://{bucket}/{key}", "output": f"s3://{out_bucket}/{out_key}",
+            "format": fmt, "spans": len(good), "invalid_dropped": invalid, "stats": result.stats}
+
+
+def _s3_records(message_body: str):
+    event = json.loads(message_body)
+    if event.get("Event") == "s3:TestEvent":
+        return []
+    return event.get("Records", [])
+
+
+def handler(event, context=None, s3=None):
+    s3 = s3 or _client()
+    out_prefix = os.environ.get("NORMALIZED_PREFIX", "normalized/")
+    out_bucket_env: Optional[str] = os.environ.get("NORMALIZED_BUCKET")
+    base_epoch_us = int(os.environ.get("BASE_EPOCH_US", "0"))
+    failures, results = [], []
+    for msg in event.get("Records", []):
+        try:
+            for rec in _s3_records(msg["body"]):
+                bucket = rec["s3"]["bucket"]["name"]
+                key = urllib.parse.unquote_plus(rec["s3"]["object"]["key"])
+                if key.startswith(out_prefix):
+                    continue        # never re-process our own output
+                r = normalize_object(s3, bucket, key, out_bucket_env or bucket, out_prefix, base_epoch_us)
+                results.append(r)
+                print(json.dumps({"msg": "normalized", **{k: v for k, v in r.items() if k != "stats"}}))
+        except Exception as e:  # report this message as failed, keep going with the rest
+            print(json.dumps({"msg": "failed", "messageId": msg.get("messageId"), "error": repr(e)}))
+            failures.append({"itemIdentifier": msg.get("messageId")})
+    return {"batchItemFailures": failures, "results": results}
