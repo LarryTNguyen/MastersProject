@@ -1,0 +1,42 @@
+{
+  "resourceSpans": [
+    {
+      "resource": {"attributes": [
+        {"key": "service.name", "value": {"stringValue": "frontend"}},
+        {"key": "telemetry.sdk.language", "value": {"stringValue": "python"}}
+      ]},
+      "scopeSpans": [{
+        "scope": {"name": "opentelemetry.instrumentation.flask"},
+        "spans": [{
+          "traceId": "5b8efff798038103d269b633813fc60c",
+          "spanId": "eee19b7ec3c1b174",
+          "name": "GET /cart",
+          "kind": 2,
+          "startTimeUnixNano": "1712000002000000000",
+          "endTimeUnixNano": "1712000002080000000",
+          "attributes": [
+            {"key": "http.method", "value": {"stringValue": "GET"}},
+            {"key": "http.status_code", "value": {"intValue": "200"}}
+          ],
+          "status": {"code": 1}
+        }]
+      }]
+    },
+    {
+      "resource": {"attributes": [{"key": "service.name", "value": {"stringValue": "cartservice"}}]},
+      "scopeSpans": [{
+        "scope": {"name": "opentelemetry.instrumentation.grpc"},
+        "spans": [{
+          "traceId": "5b8efff798038103d269b633813fc60c",
+          "spanId": "eee19b7ec3c1b175",
+          "parentSpanId": "eee19b7ec3c1b174",
+          "name": "GetCart",
+          "kind": "SPAN_KIND_SERVER",
+          "startTimeUnixNano": "1712000002005000000",
+          "endTimeUnixNano": "1712000002075000000",
+          "status": {"code": "STATUS_CODE_ERROR", "message": "redis timeout"}
+        }]
+      }]
+    }
+  ]
+}
