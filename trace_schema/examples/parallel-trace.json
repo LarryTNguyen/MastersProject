@@ -1,0 +1,203 @@
+[
+  {
+    "schema_version": "1.0.0",
+    "run_id": "00000000-0000-4000-8000-000000000001",
+    "identity_kind": "OTEL",
+    "record_kind": "SPAN",
+    "trace_id": "11111111111111111111111111111111",
+    "span_id": "0000000000000001",
+    "parent_span_id": null,
+    "parent_relation": "ROOT",
+    "service_namespace": "shop",
+    "service_name": "checkout",
+    "service_instance_id": null,
+    "operation_name": "POST /checkout",
+    "span_kind": "SERVER",
+    "start_time_ns": "1791936000000000000",
+    "end_time_ns": "1791936001000000000",
+    "duration_ns": "1000000000",
+    "time_domain": "UNIX",
+    "timing_quality": "MEASURED",
+    "status": {
+      "code": "UNSET",
+      "message": null
+    },
+    "span_flags": 1,
+    "trace_state": null,
+    "attributes": {
+      "http.route": {
+        "type": "string",
+        "value": "/checkout"
+      },
+      "http.request.method": {
+        "type": "string",
+        "value": "POST"
+      }
+    },
+    "resource": {
+      "attributes": {
+        "service.name": {
+          "type": "string",
+          "value": "checkout"
+        },
+        "service.namespace": {
+          "type": "string",
+          "value": "shop"
+        }
+      },
+      "schema_url": null
+    },
+    "scope": {
+      "name": "example.instrumentation",
+      "version": "1.0.0",
+      "attributes": {},
+      "schema_url": null
+    },
+    "events": [],
+    "links": [],
+    "dropped_counts": {
+      "span_attributes": 0,
+      "events": 0,
+      "links": 0,
+      "resource_attributes": 0,
+      "scope_attributes": 0
+    },
+    "received_at_unix_ns": "1791936002000000000",
+    "source": {
+      "format": "otlp_json",
+      "adapter_version": "example-1",
+      "record_key": "0000000000000001",
+      "raw_reference": null,
+      "details": {}
+    },
+    "quality_flags": []
+  },
+  {
+    "schema_version": "1.0.0",
+    "run_id": "00000000-0000-4000-8000-000000000001",
+    "identity_kind": "OTEL",
+    "record_kind": "SPAN",
+    "trace_id": "11111111111111111111111111111111",
+    "span_id": "0000000000000002",
+    "parent_span_id": "0000000000000001",
+    "parent_relation": "EXPLICIT",
+    "service_namespace": "shop",
+    "service_name": "payment",
+    "service_instance_id": null,
+    "operation_name": "authorize",
+    "span_kind": "SERVER",
+    "start_time_ns": "1791936000100000000",
+    "end_time_ns": "1791936000800000000",
+    "duration_ns": "700000000",
+    "time_domain": "UNIX",
+    "timing_quality": "MEASURED",
+    "status": {
+      "code": "UNSET",
+      "message": null
+    },
+    "span_flags": 1,
+    "trace_state": null,
+    "attributes": {},
+    "resource": {
+      "attributes": {
+        "service.name": {
+          "type": "string",
+          "value": "payment"
+        },
+        "service.namespace": {
+          "type": "string",
+          "value": "shop"
+        }
+      },
+      "schema_url": null
+    },
+    "scope": {
+      "name": "example.instrumentation",
+      "version": "1.0.0",
+      "attributes": {},
+      "schema_url": null
+    },
+    "events": [],
+    "links": [],
+    "dropped_counts": {
+      "span_attributes": 0,
+      "events": 0,
+      "links": 0,
+      "resource_attributes": 0,
+      "scope_attributes": 0
+    },
+    "received_at_unix_ns": "1791936002000000000",
+    "source": {
+      "format": "otlp_json",
+      "adapter_version": "example-1",
+      "record_key": "0000000000000002",
+      "raw_reference": null,
+      "details": {}
+    },
+    "quality_flags": []
+  },
+  {
+    "schema_version": "1.0.0",
+    "run_id": "00000000-0000-4000-8000-000000000001",
+    "identity_kind": "OTEL",
+    "record_kind": "SPAN",
+    "trace_id": "11111111111111111111111111111111",
+    "span_id": "0000000000000003",
+    "parent_span_id": "0000000000000001",
+    "parent_relation": "EXPLICIT",
+    "service_namespace": "shop",
+    "service_name": "inventory",
+    "service_instance_id": null,
+    "operation_name": "checkStock",
+    "span_kind": "SERVER",
+    "start_time_ns": "1791936000200000000",
+    "end_time_ns": "1791936000600000000",
+    "duration_ns": "400000000",
+    "time_domain": "UNIX",
+    "timing_quality": "MEASURED",
+    "status": {
+      "code": "UNSET",
+      "message": null
+    },
+    "span_flags": 1,
+    "trace_state": null,
+    "attributes": {},
+    "resource": {
+      "attributes": {
+        "service.name": {
+          "type": "string",
+          "value": "inventory"
+        },
+        "service.namespace": {
+          "type": "string",
+          "value": "shop"
+        }
+      },
+      "schema_url": null
+    },
+    "scope": {
+      "name": "example.instrumentation",
+      "version": "1.0.0",
+      "attributes": {},
+      "schema_url": null
+    },
+    "events": [],
+    "links": [],
+    "dropped_counts": {
+      "span_attributes": 0,
+      "events": 0,
+      "links": 0,
+      "resource_attributes": 0,
+      "scope_attributes": 0
+    },
+    "received_at_unix_ns": "1791936002000000000",
+    "source": {
+      "format": "otlp_json",
+      "adapter_version": "example-1",
+      "record_key": "0000000000000003",
+      "raw_reference": null,
+      "details": {}
+    },
+    "quality_flags": []
+  }
+]

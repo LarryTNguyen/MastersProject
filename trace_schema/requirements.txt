@@ -1,0 +1,3 @@
+jsonschema>=4.26,<5
+# Optional SQL syntax verification, used by check_schema.py:
+pglast>=8.5,<9

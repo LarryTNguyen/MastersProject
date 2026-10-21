@@ -9,7 +9,8 @@ import urllib.request
 from typing import List, Optional
 
 from . import otlp
-from .spans import Span, write_jsonl
+from .canonical import NormalizationContext, write_jsonl as write_canonical_jsonl
+from .spans import Span
 
 
 class Sink:
@@ -38,13 +39,14 @@ class MemorySink(Sink):
 
 
 class FileSink(Sink):
-    """Writes each batch as its own file: OTLP JSON (upload-ready) or common-span JSONL."""
+    """Writes each batch as its own file: OTLP JSON (upload-ready) or canonical JSONL."""
 
-    def __init__(self, out_dir: str, fmt: str = "otlp", prefix: str = "batch"):
+    def __init__(self, out_dir: str, fmt: str = "otlp", prefix: str = "batch", run_id: Optional[str] = None):
         if fmt not in ("otlp", "jsonl"):
             raise ValueError("fmt must be 'otlp' or 'jsonl'")
         os.makedirs(out_dir, exist_ok=True)
         self.out_dir, self.fmt, self.prefix, self.count = out_dir, fmt, prefix, 0
+        self.context = NormalizationContext.for_source(f"replay:{os.path.abspath(out_dir)}", run_id=run_id)
 
     def send(self, batch):
         self.count += 1
@@ -54,7 +56,7 @@ class FileSink(Sink):
             if self.fmt == "otlp":
                 fh.write(json.dumps(otlp.to_otlp(batch), separators=(",", ":")))
             else:
-                write_jsonl(batch, fh)
+                write_canonical_jsonl(batch, fh, self.context)
 
 
 class HttpSink(Sink):

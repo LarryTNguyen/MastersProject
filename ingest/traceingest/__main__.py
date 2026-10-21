@@ -1,6 +1,6 @@
 """Command line: python -m traceingest <command> ...
 
-  convert   dataset file (or RCAEval case folder) -> OTLP JSON or common-span JSONL
+  convert   dataset file (or RCAEval case folder) -> OTLP JSON or canonical JSONL
   replay    play a dataset back to a collector URL or into batch files
   upload    send a file to the raw S3 bucket with a presigned URL
   inspect   print format, counts and data-quality stats for a file
@@ -13,10 +13,10 @@ import os
 import sys
 import urllib.error
 
-from . import formats, otlp, rcaeval
+from . import canonical, formats, otlp, rcaeval
 from .replay import Replayer
 from .sinks import FileSink, HttpSink
-from .spans import validate, write_jsonl
+from .spans import validate
 from .upload import upload
 
 
@@ -47,7 +47,9 @@ def cmd_convert(a):
     os.makedirs(os.path.dirname(os.path.abspath(a.output)) or ".", exist_ok=True)
     if a.to == "jsonl":
         with open(a.output, "w", encoding="utf-8") as fh:
-            write_jsonl(spans, fh)
+            context = canonical.NormalizationContext.for_source(
+                f"file:{os.path.abspath(a.input)}", run_id=a.run_id)
+            canonical.write_jsonl(spans, fh, context)
         written = [a.output]
     else:
         written = []
@@ -71,7 +73,7 @@ def cmd_replay(a):
         sink = HttpSink(a.url, token=a.token or os.environ.get("STA_INGEST_TOKEN"),
                         header=a.auth_header, scheme=a.auth_scheme)
     else:
-        sink = FileSink(a.out_dir, fmt=a.out_format)
+        sink = FileSink(a.out_dir, fmt=a.out_format, run_id=a.run_id)
     speed = float("inf") if a.speed == "max" else float(a.speed)
 
     def progress(batches, spans):
@@ -101,12 +103,13 @@ def main(argv=None):
         sp.add_argument("--format", default="auto", choices=("auto",) + formats.FORMATS)
         sp.add_argument("--base-epoch-us", type=int, default=0,
                         help="anchor for Alibaba's relative timestamps (microseconds since 1970)")
+        sp.add_argument("--run-id", help="UUID shared by all normalized records in this replay/experiment")
 
     sp = sub.add_parser("inspect", help="show format, counts and data-quality stats")
     add_input(sp)
     sp.set_defaults(fn=cmd_inspect)
 
-    sp = sub.add_parser("convert", help="convert a dataset to OTLP JSON or common-span JSONL")
+    sp = sub.add_parser("convert", help="convert a dataset to OTLP JSON or canonical JSONL")
     add_input(sp)
     sp.add_argument("-o", "--output", required=True)
     sp.add_argument("--to", choices=("otlp", "jsonl"), default="otlp")
