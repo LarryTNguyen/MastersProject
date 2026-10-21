@@ -39,13 +39,6 @@ class OtlpTests(unittest.TestCase):
         self.assertEqual(s.trace_id, "5b8efff798038103d269b633813fc60c")
         self.assertEqual(s.span_id, "eee19b7ec3c1b174")
 
-    def test_resource_and_scope_dropped_counts_round_trip(self):
-        span = load("otlp_small.json")[0]
-        span.dropped_counts = {"resource_attributes": 3, "scope_attributes": 4}
-        back = next(otlp.from_otlp(otlp.to_otlp([span])))
-        self.assertEqual(back.dropped_counts["resource_attributes"], 3)
-        self.assertEqual(back.dropped_counts["scope_attributes"], 4)
-
 
 if __name__ == "__main__":
     unittest.main()

@@ -2,15 +2,14 @@
 
 Trigger: SQS queue that receives S3 "object created" events from the raw bucket.
 For each new raw object it detects the format (Alibaba CSV, RCAEval CSV, OTLP
-JSON from an upload or the live collector, or normalized JSONL), converts it to
-working spans, and writes canonical schema v1 JSONL to the normalized location, where the
+JSON from an upload or the live collector, or common-span JSONL), converts it to
+common spans, and writes them as JSONL to the normalized location, where the
 trace reconstruction Lambda picks them up.
 
 Environment:
   NORMALIZED_BUCKET   bucket for normalized spans (default: same as the raw bucket)
   NORMALIZED_PREFIX   key prefix for normalized output (default: "normalized/")
   BASE_EPOCH_US       anchor for Alibaba's relative timestamps (default: 0)
-  TRACE_RUN_ID        optional UUID shared by several objects in one experiment
 
 Safe to retry: the output key is derived from the input key, so processing the
 same object twice overwrites the same file instead of duplicating spans (N4).
@@ -24,12 +23,10 @@ import io
 import json
 import os
 import urllib.parse
-from datetime import datetime, timezone
 from typing import Optional
 
 from . import formats
-from .canonical import NormalizationContext, write_jsonl as write_canonical_jsonl
-from .spans import validate
+from .spans import validate, write_jsonl
 
 _s3 = None
 
@@ -48,7 +45,7 @@ def output_key(raw_key: str, prefix: str) -> str:
 
 
 def normalize_object(s3, bucket: str, key: str, out_bucket: str, out_prefix: str,
-                     base_epoch_us: int = 0, received_at_unix_ns: int = 0) -> dict:
+                     base_epoch_us: int = 0) -> dict:
     obj = s3.get_object(Bucket=bucket, Key=key)
     data = obj["Body"].read()
     head = formats.first_bytes_text(data)
@@ -65,15 +62,11 @@ def normalize_object(s3, bucket: str, key: str, out_bucket: str, out_prefix: str
         else:
             good.append(s)
     buf = io.StringIO()
-    run_id = os.environ.get("TRACE_RUN_ID")
-    context = NormalizationContext.for_source(f"s3://{bucket}/{key}", run_id=run_id,
-                                              received_at_unix_ns=received_at_unix_ns)
-    write_canonical_jsonl(good, buf, context)
+    write_jsonl(good, buf)
     out_key = output_key(key, out_prefix)
     s3.put_object(Bucket=out_bucket, Key=out_key, Body=buf.getvalue().encode("utf-8"),
                   ContentType="application/x-ndjson",
-                  Metadata={"source-key": key[:1000], "format": fmt, "spans": str(len(good)),
-                            "schema-version": "1.0.0", "run-id": context.run_id})
+                  Metadata={"source-key": key[:1000], "format": fmt, "spans": str(len(good))})
     return {"input": f"s3://{bucket}/{key}", "output": f"s3://{out_bucket}/{out_key}",
             "format": fmt, "spans": len(good), "invalid_dropped": invalid, "stats": result.stats}
 
@@ -83,18 +76,6 @@ def _s3_records(message_body: str):
     if event.get("Event") == "s3:TestEvent":
         return []
     return event.get("Records", [])
-
-
-def _event_time_ns(value: Optional[str]) -> int:
-    """Convert an S3 event's RFC3339 timestamp to epoch nanoseconds."""
-    if not value:
-        return 0
-    parsed = datetime.fromisoformat(value.replace("Z", "+00:00"))
-    if parsed.tzinfo is None:
-        raise ValueError("S3 eventTime must include a timezone")
-    delta = parsed.astimezone(timezone.utc) - datetime(1970, 1, 1, tzinfo=timezone.utc)
-    return ((delta.days * 86400 + delta.seconds) * 1_000_000_000
-            + delta.microseconds * 1000)
 
 
 def handler(event, context=None, s3=None):
@@ -110,8 +91,7 @@ def handler(event, context=None, s3=None):
                 key = urllib.parse.unquote_plus(rec["s3"]["object"]["key"])
                 if key.startswith(out_prefix):
                     continue        # never re-process our own output
-                r = normalize_object(s3, bucket, key, out_bucket_env or bucket, out_prefix, base_epoch_us,
-                                     _event_time_ns(rec.get("eventTime")))
+                r = normalize_object(s3, bucket, key, out_bucket_env or bucket, out_prefix, base_epoch_us)
                 results.append(r)
                 print(json.dumps({"msg": "normalized", **{k: v for k, v in r.items() if k != "stats"}}))
         except Exception as e:  # report this message as failed, keep going with the rest
