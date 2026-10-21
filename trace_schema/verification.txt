@@ -1,0 +1,39 @@
+Trace schema version 1.0.0
+Verified on October 13, 2026, America/Los_Angeles
+
+PASS: 16 Python contract checks, including Draft 2020-12 schema validation,
+fixture validation, exact nanosecond arithmetic, signed BIGINT limits,
+malformed/all-zero IDs, invalid durations, missing parents, cycles,
+multiple roots, unknown/inferred parents, out-of-bounds intervals,
+typed attribute values, base64, resource identity, PostgreSQL-incompatible
+strings, and PostgreSQL SQL syntax parsing.
+
+PASS: All six canonical example records passed validate.py.
+The expected-parallel-analysis file is an explanatory output fixture,
+not a canonical input record.
+
+PASS: schema.sql applied successfully to a fresh isolated PostgreSQL 18 cluster.
+PASS: Database integration checks for child-before-parent ingestion,
+duplicate equality despite arrival metadata changes, revision stability,
+semantic conflict detection without overwriting accepted data,
+repeat-conflict stability, premature/stale settlement rejection,
+end-of-input settlement, publishing a current analysis,
+late-span reopening, hiding stale analysis, rejecting stale publication,
+duration constraints, accepting missing parents, and hard timeout.
+Integration test data was rolled back.
+
+The temporary database was stopped and removed after verification.
+No existing user database or project planning artifact was modified.
+
+Not exercised: AWS ingestion/streaming, actual OTLP decoding,
+an Alibaba dataset adapter, a dashboard, a critical-path algorithm,
+baseline generation, or bottleneck-ranking computation.
+The package provides their contracts and documented policies.
+Intended PostgreSQL baseline is 14+; only PostgreSQL 18 was run here.
+
+Repository integration verification, October 14, 2026:
+PASS: ingestion unit suite after schema integration.
+PASS: Alibaba, RCAEval, and OTLP fixture conversion to canonical schema v1.
+PASS: 15 resulting ingestion records against JSON Schema and cross-field rules.
+PASS: adapter Lambda output includes deterministic run ID, raw S3 provenance,
+schema version, and canonical records while retaining retry idempotence.

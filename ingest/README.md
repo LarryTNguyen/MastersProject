@@ -4,7 +4,7 @@ Owner: Anukrithi (Sprint 3)
 
 This folder covers the "data in" side of the pipeline:
 
-- **Normalize** Alibaba call-graph CSVs, RCAEval traces, and OTLP JSON into one common span format.
+- **Normalize** Alibaba call-graph CSVs, RCAEval traces, and OTLP JSON into the canonical trace schema.
 - **Replay** a dataset as if it were live traffic, at 1x, 2x, 10x or max speed (E2).
 - **Upload** a trace file straight to the raw S3 bucket with a presigned URL (E3).
 - **Dataset Adapter Lambda**: SQS (S3 events) → read raw object → normalize → write JSONL to `normalized/`.
@@ -15,7 +15,7 @@ Plain Python 3.10+, standard library only. boto3 is only needed for self-signed 
 
 ```bash
 cd ingest
-python -m unittest discover -s tests -t .        # 45 tests, one file per module
+python -m unittest discover -s tests -t .        # 52 tests, one file per module
 
 python -m traceingest inspect tests/fixtures/alibaba_small.csv
 python -m traceingest convert tests/fixtures/alibaba_small.csv -o out/alibaba.json          # OTLP JSON
@@ -33,25 +33,25 @@ python -m traceingest upload out/alibaba.json --bucket sta-raw-dev --key uploads
 python -m traceingest upload out/alibaba.json --presign-endpoint "$DASHBOARD_URL/uploads"
 ```
 
-## Common span format (draft, Larry please confirm)
+## Canonical trace schema
 
-One JSON object per line (`.jsonl`). This is the contract between the adapter and trace reconstruction.
+Normalized JSONL now uses the repository's version 1 canonical contract in
+[`../trace_schema`](../trace_schema/README.md). The adapters use a compact
+`Span` object internally for parsing and replay scheduling, then
+`traceingest.canonical` adds run identity, nanosecond fields, time domain,
+timing quality, typed attributes, resource/scope data, events, links, source
+provenance, and quality flags before reconstruction receives the record.
 
-| field | type | notes |
-|---|---|---|
-| `trace_id` | string | original ID from the source |
-| `span_id` | string | Alibaba: hash of (trace, rpcid), since rows have no span ID |
-| `parent_span_id` | string or null | null for a root span |
-| `service` | string | the service doing the work (Alibaba: the downstream `dm`) |
-| `operation` | string | endpoint / method name |
-| `start_us` | int | microseconds; epoch for RCAEval/OTLP, relative for Alibaba unless `--base-epoch-us` is set |
-| `duration_us` | int or null | null when the source did not record it (Alibaba negative `rt`) |
-| `status` | `"unset"` / `"ok"` / `"error"` | HTTP ≥ 500 or gRPC ≠ 0 → error |
-| `kind` | string or null | server / client / internal / producer / consumer |
-| `peer_service` | string or null | caller service (Alibaba `um`) |
-| `source` | string | `alibaba` / `rcaeval` / `otlp` |
-| `attributes` | object | source extras, e.g. `alibaba.rpcid`, `rcaeval.status_code`, `http.method` |
-| `v` | int | schema version (1) |
+The two output paths intentionally differ:
+
+- `--to otlp` and HTTP replay produce a standard OTLP `ExportTraceServiceRequest`.
+- `--to jsonl`, JSONL replay files, and the adapter Lambda produce canonical
+  schema v1 records for reconstruction and PostgreSQL ingestion.
+
+Use `--run-id <uuid>` to put multiple inputs or replay batches in one explicit
+experiment. Without it, local files and S3 objects receive a deterministic UUID
+derived from their source reference, so retries are idempotent. Set
+`TRACE_RUN_ID` on the adapter Lambda when several objects belong to one run.
 
 ## How each source is handled
 
@@ -59,6 +59,9 @@ One JSON object per line (`.jsonl`). This is the contract between the adapter an
 - The same call can be logged by both caller and callee, so we keep one record per (traceid, rpcid). We prefer a known response time, and the larger one, since the caller side includes the network. The earliest start time is kept.
 - A negative `rt` means the response time is missing, so `duration_us` is null.
 - Calls whose parent rpcid is not in the file are counted as orphans. The stitcher will mark those traces incomplete.
+- Canonical output classifies these as `CALL_OBSERVATION` records. `rt` becomes
+  `DURATION_ONLY`; the dataset timestamp remains replay provenance and is not
+  claimed as a measured interval.
 - Note: dedup holds the file in memory, so split a full-day file by hour before converting.
 
 **RCAEval (RE2/RE3).** Uses the same columns RCAEval's own trace methods read: traceID, spanID, parentSpanID, serviceName, operationName, methodName, startTime, duration, and a status code column if present.
@@ -93,8 +96,7 @@ One JSON object per line (`.jsonl`). This is the contract between the adapter an
 
 ## Open questions for the team
 
-1. **Larry:** does this span format work for reconstruction? Any fields missing?
-2. **Matthew:**
+1. **Matthew:**
    - Which header does the collector Lambda expect for the token? (Default here: `Authorization: Bearer <token>`, configurable with `--auth-header` / `--auth-scheme`.)
    - Does the dashboard API presign endpoint shape (`POST {filename, content_type}` → `{url, key}`) work for you?
-3. **Adapter Lambda setup:** S3 event → SQS → this Lambda, with `ReportBatchItemFailures` on. Env: `NORMALIZED_PREFIX` (default `normalized/`), optional `NORMALIZED_BUCKET`, `BASE_EPOCH_US`. Handler: `traceingest.adapter_lambda.handler`.
+2. **Adapter Lambda setup:** S3 event → SQS → this Lambda, with `ReportBatchItemFailures` on. Env: `NORMALIZED_PREFIX` (default `normalized/`), optional `NORMALIZED_BUCKET`, `BASE_EPOCH_US`, and `TRACE_RUN_ID`. Handler: `traceingest.adapter_lambda.handler`.

@@ -1,0 +1,8 @@
+{
+  "trace_duration_ns": "1000000000",
+  "root_observed_self_time_ns": "300000000",
+  "explanation": "Child intervals [100,800) and [200,600) ms have union length 700 ms. Root residual is 1000 - 700 = 300 ms.",
+  "critical_path": null,
+  "critical_path_unavailable_reason": "Parent links alone do not establish blocking dependencies.",
+  "note": "This is a synthetic test fixture, not a measured result from an application."
+}
