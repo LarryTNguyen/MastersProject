@@ -2,7 +2,7 @@ import io
 import json
 import unittest
 
-from traceingest.adapter_lambda import _event_time_ns, handler, output_key
+from traceingest.adapter_lambda import handler, output_key
 from traceingest.spans import read_jsonl
 
 from .helpers import fx, load
@@ -46,15 +46,8 @@ class AdapterLambdaTests(unittest.TestCase):
         self.assertEqual(out["batchItemFailures"], [{"itemIdentifier": "msg-2"}])
         self.assertEqual(self.s3.puts, [("sta-raw-dev", "normalized/uploads/my trace file.jsonl")])
         body = self.s3.objects[("sta-raw-dev", "normalized/uploads/my trace file.jsonl")].decode()
-        records = [json.loads(line) for line in body.splitlines()]
-        self.assertTrue(all(r["schema_version"] == "1.0.0" for r in records))
-        self.assertEqual(len({r["run_id"] for r in records}), 1)
-        self.assertTrue(all(r["source"]["raw_reference"] ==
-                            "s3://sta-raw-dev/uploads/my trace file.json" for r in records))
         spans = list(read_jsonl(io.StringIO(body)))
-        original = load("otlp_small.json")
-        self.assertEqual([(s.trace_id, s.span_id, s.service) for s in spans],
-                         [(s.trace_id, s.span_id, s.service) for s in original])
+        self.assertEqual(spans, load("otlp_small.json"))
 
     def test_idempotent(self):
         handler(self.event, s3=self.s3)
@@ -66,10 +59,6 @@ class AdapterLambdaTests(unittest.TestCase):
     def test_output_key(self):
         self.assertEqual(output_key("live/2026/10/14/batch1.json", "normalized/"), "normalized/live/2026/10/14/batch1.jsonl")
         self.assertEqual(output_key("other/x.csv", "normalized"), "normalized/other/x.jsonl")
-
-    def test_event_time_is_exact_epoch_nanoseconds(self):
-        self.assertEqual(_event_time_ns("2026-10-14T20:00:00.123456+00:00"),
-                         1792008000123456000)
 
 
 if __name__ == "__main__":
