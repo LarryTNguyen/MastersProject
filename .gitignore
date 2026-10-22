@@ -1,4 +1,7 @@
-.astronomy-smoke/
-reconstruction/.astronomy-smoke/
 __pycache__/
 *.pyc
+.snapshots/
+*.db
+dashboard/data/
+experiments/results/
+replay_out/
