@@ -55,12 +55,24 @@ class AdapterLambdaTests(unittest.TestCase):
         original = load("otlp_small.json")
         self.assertEqual([(s.trace_id, s.span_id, s.service) for s in spans],
                          [(s.trace_id, s.span_id, s.service) for s in original])
+        for r in records:                     # the adapter stamps when it wrote the record
+            self.assertGreater(int(r["attributes"]["sta.normalized_us"]["value"]), 1_700_000_000_000_000)
 
     def test_idempotent(self):
+        key = ("sta-raw-dev", "normalized/uploads/my trace file.jsonl")
+
+        def records_without_stamp():
+            out = []
+            for line in self.s3.objects[key].decode().splitlines():
+                r = json.loads(line)
+                r["attributes"].pop("sta.normalized_us", None)
+                out.append(r)
+            return out
+
         handler(self.event, s3=self.s3)
-        first = self.s3.objects[("sta-raw-dev", "normalized/uploads/my trace file.jsonl")]
+        first = records_without_stamp()
         handler(self.event, s3=self.s3)
-        self.assertEqual(self.s3.objects[("sta-raw-dev", "normalized/uploads/my trace file.jsonl")], first)
+        self.assertEqual(records_without_stamp(), first)     # same records, same key, no duplicates
         self.assertEqual(len(set(self.s3.puts)), 1)
 
     def test_output_key(self):

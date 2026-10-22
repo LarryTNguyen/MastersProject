@@ -1,28 +1,23 @@
 """Dataset Adapter Lambda.
 
-Trigger: SQS queue that receives S3 "object created" events from the raw bucket.
-For each new raw object it detects the format (Alibaba CSV, RCAEval CSV, OTLP
-JSON from an upload or the live collector, or normalized JSONL), converts it to
-working spans, and writes canonical schema v1 JSONL to the normalized location, where the
-trace reconstruction Lambda picks them up.
+SQS hands us S3 "object created" events. For each new raw file: detect the
+format, convert to spans, write canonical JSONL to normalized/ for the
+reconstruction step.
 
-Environment:
-  NORMALIZED_BUCKET   bucket for normalized spans (default: same as the raw bucket)
-  NORMALIZED_PREFIX   key prefix for normalized output (default: "normalized/")
-  BASE_EPOCH_US       anchor for Alibaba's relative timestamps (default: 0)
-  TRACE_RUN_ID        optional UUID shared by several objects in one experiment
+Env: NORMALIZED_BUCKET, NORMALIZED_PREFIX (default normalized/), BASE_EPOCH_US,
+TRACE_RUN_ID.
 
-Safe to retry: the output key is derived from the input key, so processing the
-same object twice overwrites the same file instead of duplicating spans (N4).
-Failed messages are reported individually (SQS partial batch response), so one
-bad file does not make the whole batch retry. Enable ReportBatchItemFailures on
-the event source mapping.
+Each span gets sta.normalized_us so the dashboard can measure adapter lag.
+Retries are safe: same input key -> same output key, so nothing gets duplicated.
+Bad files are reported per SQS message (ReportBatchItemFailures), so one bad
+file does not retry the whole batch.
 """
 from __future__ import annotations
 
 import io
 import json
 import os
+import time
 import urllib.parse
 from datetime import datetime, timezone
 from typing import Optional
@@ -59,10 +54,12 @@ def normalize_object(s3, bucket: str, key: str, out_bucket: str, out_prefix: str
                                name=key, base_epoch_us=base_epoch_us)
     good = []
     invalid = 0
+    normalized_us = int(time.time() * 1_000_000)
     for s in result.spans:
         if validate(s):
             invalid += 1
         else:
+            s.attributes["sta.normalized_us"] = normalized_us
             good.append(s)
     buf = io.StringIO()
     run_id = os.environ.get("TRACE_RUN_ID")

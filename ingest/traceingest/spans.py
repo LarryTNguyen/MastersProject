@@ -11,7 +11,7 @@ using the repository's nanosecond trace-schema contract.
 from __future__ import annotations
 
 import json
-from dataclasses import MISSING, asdict, dataclass, field, fields
+from dataclasses import MISSING, dataclass, field, fields
 from typing import IO, Iterable, Iterator, List, Optional
 
 SCHEMA_VERSION = 1
