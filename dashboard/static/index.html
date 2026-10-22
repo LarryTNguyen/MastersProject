@@ -67,6 +67,14 @@
   .drop { border: 2px dashed var(--line); border-radius: 8px; padding: 24px; text-align: center; color: var(--muted); }
   .drop.over { border-color: var(--accent); background: #f0f4ff; }
   progress { width: 100%; }
+  .flame { position: relative; overflow: hidden; }
+  .flame .fr { display: block; position: relative; height: 22px; margin-bottom: 1px; }
+  .flame .fb { position: absolute; top: 0; height: 20px; border-radius: 2px; font-size: 11px; line-height: 20px; padding: 0 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: #1f2328; cursor: pointer; box-sizing: border-box; border: 1px solid rgba(255,255,255,.7); }
+  .flame .fb:hover { outline: 2px solid #1f2328; z-index: 1; }
+  .bars { display: flex; align-items: flex-end; gap: 2px; height: 120px; border-bottom: 1px solid var(--line); padding-bottom: 2px; }
+  .bars > .b { flex: 1; background: var(--accent); min-width: 3px; border-radius: 2px 2px 0 0; position: relative; }
+  .bars > .b:hover::after { content: attr(data-l); position: absolute; bottom: 100%; left: 0; background: #1f2328; color: #fff; font-size: 11px; padding: 2px 6px; border-radius: 4px; white-space: nowrap; }
+  .conf { font-size: 12px; color: var(--muted); }
 </style>
 </head>
 <body>
@@ -76,6 +84,8 @@
     <button data-view="overview" class="active">Overview</button>
     <button data-view="traces">Traces</button>
     <button data-view="rankings">Bottlenecks</button>
+    <button data-view="flame">Flame graph</button>
+    <button data-view="pipeline">Pipeline</button>
     <button data-view="upload">Upload</button>
   </nav>
   <span class="status" id="status">connecting…</span>
@@ -149,6 +159,53 @@
       <p class="muted" style="margin-top:0">One block per analysis window. Score and evidence come from the diagnosis step; click a service to see its slowest traces.</p>
       <div id="rankings-list"></div>
     </div>
+    <div class="panel">
+      <h2>Slow versus normal</h2>
+      <form class="filters" onsubmit="return false" style="margin-bottom:10px">
+        <label>Endpoint <select id="cp-endpoint"><option value="">all endpoints</option></select></label>
+        <label>Slow means longer than (ms) <input id="cp-threshold" type="number" min="0" placeholder="slowest 10%" size="10"></label>
+        <button class="primary" id="cp-go">Compare</button>
+      </form>
+      <p class="muted" id="cp-summary" style="margin:0 0 8px"></p>
+      <table>
+        <thead><tr><th>Service</th><th>Self time, slow (p50)</th><th>Self time, normal (p50)</th><th>Added</th><th>Ratio</th><th>On critical path, slow (p50)</th><th style="width:28%">Added (relative)</th></tr></thead>
+        <tbody id="cp-body"><tr><td colspan="7" class="empty">pick an endpoint and press Compare</td></tr></tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- ---------------- Flame graph ---------------- -->
+  <section id="view-flame" hidden>
+    <div class="panel">
+      <h2>Flame graph</h2>
+      <form class="filters" onsubmit="return false" style="margin-bottom:10px">
+        <label>Endpoint <select id="fl-endpoint"><option value="">all endpoints</option></select></label>
+        <label>Traces <select id="fl-subset"><option value="all">all</option><option value="slow">slowest 10% only</option><option value="normal">normal only</option></select></label>
+        <label>Most recent <input id="fl-limit" type="number" value="300" min="10" max="5000" size="6"></label>
+        <button class="primary" id="fl-go">Draw</button>
+      </form>
+      <p class="muted" style="margin:0 0 8px">Many traces merged into one tree. Width is self time summed across the traces, so the widest boxes are where the time actually goes. Hover for numbers; click a box to zoom, click the top bar to reset.</p>
+      <div id="flame" class="flame"></div>
+    </div>
+  </section>
+
+  <!-- ---------------- Pipeline ---------------- -->
+  <section id="view-pipeline" hidden>
+    <div class="grid">
+      <div class="panel">
+        <h2>Freshness</h2>
+        <div class="kv" id="pl-fresh"></div>
+        <p class="muted" style="font-size:12px;margin:8px 0 0">Staleness is how old a span is when it becomes visible here (normalized time minus span end). Target: p95 under 60 s at 1x replay. Lag is the time between the raw file landing in S3 and the adapter writing it out.</p>
+      </div>
+      <div class="panel">
+        <h2>Health</h2>
+        <div class="kv" id="pl-health"></div>
+      </div>
+    </div>
+    <div class="panel">
+      <h2>Spans normalized per minute <span class="muted" id="pl-window"></span></h2>
+      <div id="pl-chart" class="bars"></div>
+    </div>
   </section>
 
   <!-- ---------------- Upload ---------------- -->
@@ -180,15 +237,19 @@
   const colorOf = (() => { const m = new Map(); return (svc) => { if (!m.has(svc)) m.set(svc, `var(${colors[m.size % colors.length]})`); return m.get(svc); }; })();
 
   // ---------- navigation ----------
-  const views = ['overview', 'traces', 'rankings', 'upload'];
-  function show(view) {
+  const views = ['overview', 'traces', 'rankings', 'flame', 'pipeline', 'upload'];
+  function show(view, setHash = true) {
     views.forEach(v => { $('view-' + v).hidden = v !== view; });
     document.querySelectorAll('nav button').forEach(b => b.classList.toggle('active', b.dataset.view === view));
-    location.hash = view;
-    if (view === 'overview') loadOverview();
-    if (view === 'traces') search();
-    if (view === 'rankings') loadRankings();
+    if (setHash) history.replaceState(null, '', '#' + view);
+    guard(view === 'overview' && loadOverview());
+    guard(view === 'traces' && search());
+    guard(view === 'rankings' && loadRankings());
+    guard(view === 'flame' && loadFlame());
+    guard(view === 'pipeline' && loadPipeline());
   }
+  // one place to turn a failed request into a visible message instead of a silent console error
+  function guard(p) { if (p && p.catch) p.catch(e => { $('status').textContent = 'error: ' + e.message; $('status').style.color = 'var(--err)'; }); }
   document.querySelectorAll('nav button').forEach(b => b.onclick = () => show(b.dataset.view));
 
   // ---------- overview ----------
@@ -223,11 +284,12 @@
     return p;
   }
   async function search() {
+    $('traces-body').innerHTML = '<tr><td colspan="8" class="empty">loading…</td></tr>';
     const res = await api('/api/traces?' + params());
     $('traces-body').innerHTML = res.items.map(t => `<tr class="row" data-id="${t.trace_id}">
       <td class="mono">${short(t.trace_id)}</td><td>${esc(t.root_service)} <span class="muted">·</span> ${esc(t.root_operation)}</td>
       <td class="muted">${when(t.start_us)}</td><td>${ms(t.duration_us)}</td><td>${t.span_count}</td><td>${t.service_count}</td>
-      <td>${pill(t.status)}${t.complete ? '' : ' ' + '<span class="pill incomplete">incomplete</span>'}</td><td class="muted">${esc(t.source)}</td></tr>`).join('')
+      <td>${pill(t.status)}${t.complete ? '' : ' ' + '<span class="pill incomplete">incomplete</span>'}${t.state && t.state !== 'SETTLED' ? ` <span class="pill ${t.state === 'OPEN' ? 'unset' : 'incomplete'}">${t.state.toLowerCase()}</span>` : ''}</td><td class="muted">${esc(t.source)}</td></tr>`).join('')
       || '<tr><td colspan="8" class="empty">no traces match</td></tr>';
     $('traces-body').querySelectorAll('tr.row').forEach(tr => tr.onclick = () => openTrace(tr.dataset.id));
     const from = res.total ? res.offset + 1 : 0, to = Math.min(res.total, res.offset + res.limit);
@@ -268,23 +330,30 @@
     roots.sort((a, b) => a.start_us - b.start_us).forEach(r => walk(r, 0));
     return out;
   }
-  async function openTrace(id) {
-    show('traces');
-    const d = await api('/api/traces/' + encodeURIComponent(id));
+  const MAX_ROWS = 600;   // waterfall rows drawn before we fall back to the table only
+  async function openTrace(id, push = true) {
+    show('traces', false);
+    if (push) history.replaceState(null, '', '#trace=' + encodeURIComponent(id));
+    let d;
+    try { d = await api('/api/traces/' + encodeURIComponent(id)); }
+    catch (e) { $('trace-detail').hidden = false; $('td-id').textContent = id; $('td-summary').innerHTML = `<span style="color:var(--err)">${esc(e.message)}</span>`; $('td-waterfall').innerHTML = ''; $('td-spans').innerHTML = ''; $('td-legend').innerHTML = ''; return; }
     const t = d.summary, spans = d.spans;
     $('trace-detail').hidden = false;
     $('td-id').textContent = t.trace_id;
     $('td-summary').innerHTML = [['Endpoint', `${esc(t.root_service)} · ${esc(t.root_operation)}`], ['Start', when(t.start_us)],
       ['Duration', ms(t.duration_us)], ['Spans', `${t.span_count} across ${t.service_count} services`],
       ['Status', pill(t.status) + (t.complete ? '' : ' <span class="pill incomplete">incomplete — a parent span or duration is missing</span>')],
-      ['Source', esc(t.source)]].map(([k, v]) => `<b>${k}</b><span>${v}</span>`).join('');
+      ['Source', esc(t.source) + (t.state ? ` · ${esc(t.state.toLowerCase())}${t.settlement_reason ? ' (' + esc(t.settlement_reason.toLowerCase().replace('_', ' ')) + ')' : ''}` : '')]].map(([k, v]) => `<b>${k}</b><span>${v}</span>`).join('');
     const t0 = t.start_us, total = Math.max(1, t.duration_us);
     const self = selfTimes(spans);
     const svcs = [...new Set(spans.map(s => s.service))];
     $('td-legend').innerHTML = svcs.map(s => `<span><i style="background:${colorOf(s)}"></i>${esc(s)}</span>`).join('') +
       '<span><i style="background:repeating-linear-gradient(45deg,#ccc 0 3px,#eee 3px 6px)"></i>duration unknown</span><span><i style="background:rgba(0,0,0,.45);height:3px"></i>self time</span>';
     const ticks = [0, .25, .5, .75, 1].map(f => `<span class="wf-time" style="left:${f * 100}%">${(total * f / 1000).toFixed(1)} ms</span>`).join('');
-    $('td-waterfall').innerHTML = `<div class="wf-axis">${ticks}</div>` + treeOrder(spans).map(([s, depth]) => {
+    const rows = treeOrder(spans);
+    const tooBig = rows.length > MAX_ROWS;
+    $('td-waterfall').innerHTML = (tooBig ? `<div class="note" style="margin-bottom:8px">This trace has ${rows.length} spans; showing the first ${MAX_ROWS} in the waterfall. The span table below has all of them.</div>` : '') +
+      `<div class="wf-axis">${ticks}</div>` + rows.slice(0, MAX_ROWS).map(([s, depth]) => {
       const left = 100 * (s.start_us - t0) / total;
       const width = s.duration_us == null ? 100 * Math.min(total, 0.03 * total) / total : 100 * s.duration_us / total;
       const selfW = self.get(s.span_id) == null ? 0 : 100 * self.get(s.span_id) / total;
@@ -310,7 +379,7 @@
       <td class="mono">${esc(s.span_id)}</td><td class="mono muted">${esc(s.parent_span_id || '')}</td></tr>`).join('');
     $('trace-detail').scrollIntoView({ behavior: 'smooth', block: 'start' });
   }
-  $('td-close').onclick = () => { $('trace-detail').hidden = true; };
+  $('td-close').onclick = () => { $('trace-detail').hidden = true; history.replaceState(null, '', '#traces'); };
 
   // ---------- rankings ----------
   function rankingBlock(w, compact) {
@@ -322,8 +391,11 @@
         ${compact ? '' : `<div class="ev">${Object.entries(r.evidence || {}).map(([k, v]) => `${esc(k)}: <b>${typeof v === 'number' ? +v.toFixed(3) : esc(v)}</b>`).join(' · ') || 'no evidence recorded'}</div>`}
       </div>
       <span class="mono" style="text-align:right">${r.score.toFixed(2)}</span></div>`).join('');
+    const r1 = w.rankings[0], r2 = w.rankings[1];
+    const conf = w.confidence != null ? `confidence ${(w.confidence * 100).toFixed(0)}%`
+               : (r1 && r2 && r1.score > 0) ? `score gap ${(100 * (r1.score - r2.score) / r1.score).toFixed(0)}% (no confidence reported)` : '';
     return `<div style="margin-bottom:14px">
-      <div class="muted" style="font-size:12px">${when(w.window_start_us)} → ${when(w.window_end_us)}${w.endpoint ? ' · ' + esc(w.endpoint) : ''} · ${esc(w.method)}</div>
+      <div class="muted" style="font-size:12px">${when(w.window_start_us)} → ${when(w.window_end_us)}${w.endpoint ? ' · ' + esc(w.endpoint) : ''} · ${esc(w.method)}${conf ? ' · <span class="conf">' + conf + '</span>' : ''}</div>
       ${w.note ? `<div class="note" style="margin:6px 0">${esc(w.note)}</div>` : ''}
       ${rows || '<div class="empty">empty window</div>'}</div>`;
   }
@@ -331,9 +403,100 @@
     root.querySelectorAll('a.link[data-svc]').forEach(a => a.onclick = () => { $('f-service').value = a.dataset.svc; $('f-sort').value = 'duration_desc'; page.offset = 0; show('traces'); });
   }
   async function loadRankings() {
+    if ($('cp-endpoint').options.length <= 1) fillEndpoints($('cp-endpoint')).then(() => loadCompare()).catch(() => {});
     const ws = await api('/api/rankings?limit=10');
     $('rankings-list').innerHTML = ws.length ? ws.map(w => rankingBlock(w, false)).join('') : '<div class="empty">no rankings yet — the diagnosis step has not run</div>';
     bindRankClicks($('rankings-list'));
+  }
+
+  // ---------- slow vs normal ----------
+  async function fillEndpoints(sel) {
+    const ops = await api('/api/operations');
+    const roots = (await api('/api/traces?limit=200&sort=duration_desc')).items.map(t => t.root_operation);
+    const list = [...new Set(roots.concat(ops.filter(o => roots.includes(o))))];
+    sel.innerHTML = '<option value="">all endpoints</option>' + list.map(o => `<option>${esc(o)}</option>`).join('');
+  }
+  async function loadCompare() {
+    const p = new URLSearchParams();
+    if ($('cp-endpoint').value) p.set('endpoint', $('cp-endpoint').value);
+    if ($('cp-threshold').value) p.set('threshold_ms', $('cp-threshold').value);
+    const c = await api('/api/compare?' + p);
+    $('cp-summary').textContent = c.slow_traces
+      ? `${c.slow_traces} slow traces (≥ ${c.threshold_ms.toFixed(1)} ms) versus ${c.normal_traces} normal ones`
+      : `${c.normal_traces} traces, none counted as slow${c.normal_traces < 10 ? ' (need at least 10 traces, or set a threshold)' : ''}`;
+    const maxAdd = Math.max(0.001, ...c.services.map(r => Math.max(0, r.added_ms)));
+    const f = (v) => v == null ? '–' : v.toFixed(1) + ' ms';
+    $('cp-body').innerHTML = c.services.length ? c.services.map(r => `<tr>
+      <td><i style="display:inline-block;width:10px;height:10px;border-radius:2px;background:${colorOf(r.service)};margin-right:6px"></i>${esc(r.service)}</td>
+      <td>${f(r.slow_self_ms_p50)}</td><td>${f(r.normal_self_ms_p50)}</td>
+      <td style="color:${r.added_ms > 0 ? 'var(--err)' : 'inherit'}">${r.added_ms >= 0 ? '+' : ''}${r.added_ms.toFixed(1)} ms</td>
+      <td>${r.ratio == null ? '–' : r.ratio.toFixed(1) + '×'}</td><td>${f(r.slow_critical_ms_p50)}</td>
+      <td><div class="bar"><span style="width:${100 * Math.max(0, r.added_ms) / maxAdd}%;background:${r.added_ms > 0 ? 'var(--err)' : 'var(--line)'}"></span></div></td></tr>`).join('')
+      : '<tr><td colspan="7" class="empty">no data</td></tr>';
+  }
+  $('cp-go').onclick = () => guard(loadCompare());
+
+  // ---------- flame graph ----------
+  let flameRoot = null;
+  async function loadFlame() {
+    if (!$('fl-endpoint').options.length || $('fl-endpoint').options.length === 1) await fillEndpoints($('fl-endpoint'));
+    const p = new URLSearchParams({ subset: $('fl-subset').value, limit: $('fl-limit').value || 300 });
+    if ($('fl-endpoint').value) p.set('endpoint', $('fl-endpoint').value);
+    flameRoot = await api('/api/flame?' + p);
+    drawFlame(flameRoot);
+  }
+  $('fl-go').onclick = () => guard(loadFlame());
+  function drawFlame(focus) {
+    const el = $('flame');
+    if (!flameRoot || !flameRoot.count) { el.innerHTML = '<div class="empty">no traces to draw</div>'; return; }
+    const total = Math.max(0.001, focus.total);
+    const minPx = 2;
+    // lay the tree out row by row; each box remembers its node so clicks can zoom
+    const rows = [];
+    const place = (node, depth, x) => {
+      const w = node.total / total;
+      if (w * el.clientWidth >= minPx) (rows[depth] = rows[depth] || []).push({ node, x, w });
+      let cx = x;
+      for (const c of node.children) { place(c, depth + 1, cx); cx += c.total / total; }
+    };
+    place(focus, 0, 0);
+    el.innerHTML = '';
+    rows.forEach((row, depth) => {
+      const rowEl = document.createElement('div'); rowEl.className = 'fr';
+      row.forEach(({ node, x, w }) => {
+        const b = document.createElement('div'); b.className = 'fb';
+        b.style.left = (x * 100) + '%'; b.style.width = (w * 100) + '%';
+        b.style.background = node.service ? colorOf(node.service) : '#d0d7de';
+        b.textContent = depth === 0 ? `${node.name} · ${node.count} traces · ${node.total.toFixed(1)} ms total` : node.name;
+        b.title = `${node.name}\ntotal ${node.total.toFixed(2)} ms · self ${node.value.toFixed(2)} ms · in ${node.count} traces · ${(100 * w).toFixed(1)}% of view`;
+        b.onclick = () => drawFlame(node === focus ? flameRoot : node);
+        rowEl.appendChild(b);
+      });
+      el.appendChild(rowEl);
+    });
+  }
+
+  // ---------- pipeline ----------
+  async function loadPipeline() {
+    const p = await api('/api/pipeline?window_s=900');
+    const f = (v) => v == null ? '–' : v >= 1000 ? (v / 1000).toFixed(1) + ' s' : v.toFixed(0) + ' ms';
+    const okFresh = p.staleness_ms.p95 != null && p.staleness_ms.p95 < 60000;
+    $('pl-fresh').innerHTML = [
+      ['Staleness p50', f(p.staleness_ms.p50)], ['Staleness p95', `${f(p.staleness_ms.p95)} ${p.staleness_ms.p95 == null ? '' : okFresh ? pill('ok') : '<span class="pill error">over 60 s</span>'}`],
+      ['Staleness p99', f(p.staleness_ms.p99)], ['Adapter lag p50 / p95', `${f(p.lag_ms.p50)} / ${f(p.lag_ms.p95)}`],
+      ['Last span normalized', p.last_normalized_us ? `${when(p.last_normalized_us)} (${p.seconds_since_last < 120 ? p.seconds_since_last.toFixed(0) + ' s ago' : (p.seconds_since_last / 60).toFixed(0) + ' min ago'})` : 'never'],
+    ].map(([k, v]) => `<b>${k}</b><span>${v}</span>`).join('');
+    const incOk = p.incomplete_rate < 0.05;
+    $('pl-health').innerHTML = [
+      ['Traces', p.traces], ['Spans', p.spans],
+      ['Spans with ingest stamps', `${p.spans_with_stamps} (${p.spans ? (100 * p.spans_with_stamps / p.spans).toFixed(0) : 0}%)`],
+      ['Incomplete traces', `${p.incomplete_traces} (${(100 * p.incomplete_rate).toFixed(1)}%) ${p.traces ? (incOk ? pill('ok') : '<span class="pill incomplete">high</span>') : ''}`],
+      ['Ingest rate (last 15 min)', `${p.ingest_rate_per_min.toFixed(1)} spans/min`],
+    ].map(([k, v]) => `<b>${k}</b><span>${v}</span>`).join('');
+    $('pl-window').textContent = `(last ${p.window_s / 60} minutes)`;
+    const max = Math.max(1, ...p.series.map(b => b.spans));
+    $('pl-chart').innerHTML = p.series.length ? p.series.map(b => `<div class="b" style="height:${100 * b.spans / max}%" data-l="${new Date(b.t_s * 1000).toLocaleTimeString()} · ${b.spans} spans"></div>`).join('')
+      : '<div class="empty" style="width:100%">nothing normalized in this window — stamps appear once data flows through the adapter</div>';
   }
 
   // ---------- upload ----------
@@ -366,12 +529,15 @@
   async function boot() {
     try {
       const h = await api('/api/health');
-      $('status').textContent = `${h.traces} traces · ${h.store} store`;
+      let runText = '';
+      try { const rs = await api('/api/runs'); if (rs.length) runText = ` · run ${rs[0].application} / ${rs[0].environment} (${rs[0].run_id.slice(0, 8)})`; } catch (e) {}
+      $('status').textContent = `${h.traces} traces · ${h.store} store${runText}`;
       const svcs = await api('/api/services');
       $('f-service').innerHTML = '<option value="">any</option>' + svcs.map(s => `<option>${esc(s.service)}</option>`).join('');
     } catch (e) { $('status').textContent = 'API unreachable: ' + e.message; }
-    const v = location.hash.replace('#', '');
-    show(views.includes(v) ? v : 'overview');
+    const h = location.hash.replace('#', '');
+    if (h.startsWith('trace=')) { await search(); openTrace(decodeURIComponent(h.slice(6)), false); return; }
+    show(views.includes(h) ? h : 'overview');
   }
   boot();
 })();
