@@ -69,6 +69,24 @@ class ApiTests(unittest.TestCase):
             main._presign_put = real
             os.environ.pop("RAW_BUCKET", None)
 
+    def test_compare(self):
+        c = self.c.get("/api/compare", params={"threshold_ms": 100}).json()
+        self.assertEqual((c["slow_traces"], c["normal_traces"]), (1, 2))
+        self.assertEqual(c["services"][0]["service"], "paymentservice")
+        self.assertEqual(self.c.get("/api/compare", params={"endpoint": "GET /cart"}).json()["normal_traces"], 1)
+
+    def test_flame(self):
+        f = self.c.get("/api/flame", params={"endpoint": "POST /checkout"}).json()
+        self.assertEqual(f["count"], 1)
+        self.assertEqual(f["children"][0]["name"], "frontend POST /checkout")
+        self.assertEqual(self.c.get("/api/flame", params={"subset": "sideways"}).status_code, 422)
+
+    def test_pipeline(self):
+        p = self.c.get("/api/pipeline").json()
+        self.assertEqual(p["traces"], 3)
+        self.assertEqual(p["incomplete_traces"], 1)
+        self.assertEqual(p["spans_with_stamps"], 0)      # fixture spans carry no ingest stamps
+
     def test_index_page(self):
         r = self.c.get("/")
         self.assertEqual(r.status_code, 200)

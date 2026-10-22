@@ -93,6 +93,25 @@ class StoreContract:
         self.assertEqual(len(self.store.rankings(endpoint="GET /other")), 1)
 
 
+    def test_traces_with_spans(self):
+        pairs = self.store.traces_with_spans()
+        self.assertEqual([t["trace_id"] for t, _ in pairs], ["t-inc", "t-slow", "t-fast"])
+        self.assertEqual(len(pairs[1][1]), 4)
+        self.assertEqual([t["trace_id"] for t, _ in self.store.traces_with_spans("POST /checkout")], ["t-slow"])
+        self.assertEqual([t["trace_id"] for t, _ in self.store.traces_with_spans(limit=1)], ["t-inc"])
+        # three traces is too few for a "slowest 10%" tail, so the slow subset is empty
+        self.assertEqual(self.store.traces_with_spans(subset="slow"), [])
+        self.assertEqual(len(self.store.traces_with_spans(subset="normal")), 3)
+
+    def test_compare_and_flame_and_pipeline(self):
+        c = self.store.compare(threshold_ms=100)
+        self.assertEqual(c["services"][0]["service"], "paymentservice")
+        f = self.store.flame("GET /cart")
+        self.assertEqual(f["children"][0]["children"][0]["name"], "cartservice GetCart")
+        p = self.store.pipeline(now_us=2_000_000_000_000_000)
+        self.assertEqual(p["traces"], 3)
+
+
 class JsonlStoreTests(StoreContract, unittest.TestCase):
     def setUp(self):
         self.store = JsonlStore(FX)
@@ -106,6 +125,8 @@ class JsonlStoreTests(StoreContract, unittest.TestCase):
             with open(os.path.join(tmp, "more.jsonl"), "w") as f:
                 f.write(json.dumps({"trace_id": "t-new", "span_id": "z", "parent_span_id": None, "service": "x",
                                     "operation": "y", "start_us": 1, "duration_us": 1, "status": "ok"}) + "\n")
+            self.assertEqual(store.count_traces(), 3)        # not re-checked within CHECK_INTERVAL_S
+            store.reload(force=True)
             self.assertEqual(store.count_traces(), 4)
         finally:
             shutil.rmtree(tmp)

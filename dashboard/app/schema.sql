@@ -20,6 +20,8 @@ CREATE TABLE IF NOT EXISTS spans (
     peer_service    TEXT,
     source          TEXT NOT NULL DEFAULT 'unknown',
     attributes      TEXT,
+    received_us     BIGINT,                   -- when the raw file landed in S3 (sta.received_us)
+    normalized_us   BIGINT,                   -- when the adapter wrote the span (sta.normalized_us)
     PRIMARY KEY (trace_id, span_id)
 );
 CREATE INDEX IF NOT EXISTS spans_service_idx ON spans (service, start_us);
@@ -51,6 +53,7 @@ CREATE TABLE IF NOT EXISTS ranking_windows (
     window_end_us   BIGINT NOT NULL,
     endpoint        TEXT,
     method          TEXT NOT NULL DEFAULT 'bottleneck_score',
+    confidence      REAL,
     note            TEXT
 );
 CREATE INDEX IF NOT EXISTS ranking_windows_end_idx ON ranking_windows (window_end_us);

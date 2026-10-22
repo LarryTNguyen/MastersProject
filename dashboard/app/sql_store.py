@@ -1,13 +1,7 @@
-"""SQL-backed store (SQLite locally, Aurora PostgreSQL in the cloud).
+"""SQLite-backed store for local development without Docker.
 
-Queries use ``?`` placeholders and are rewritten to ``%s`` for psycopg, so the
-same code runs against both. Connect with::
-
-    SqlStore(sqlite3.connect("traces.db"))                   # local
-    SqlStore(psycopg.connect(DATABASE_URL), paramstyle="%s") # Aurora
-
-``load_spans`` fills the tables from normalized spans, for local development
-and tests; in the cloud the reconstruction step writes them.
+Same queries would run on Postgres with placeholders swapped from ? to %s.
+load_spans fills the tables from span files (tools/load_sqlite.py).
 """
 from __future__ import annotations
 
@@ -20,7 +14,8 @@ from .store import Store, TraceQuery
 
 SCHEMA = open(os.path.join(os.path.dirname(__file__), "schema.sql"), encoding="utf-8").read()
 SPAN_COLS = ("trace_id", "span_id", "parent_span_id", "service", "operation", "start_us",
-             "duration_us", "status", "kind", "peer_service", "source", "attributes")
+             "duration_us", "status", "kind", "peer_service", "source", "attributes",
+             "received_us", "normalized_us")
 TRACE_COLS = ("trace_id", "root_service", "root_operation", "start_us", "duration_us",
               "span_count", "service_count", "status", "complete", "source")
 _ORDER = {"start_desc": "start_us DESC", "start_asc": "start_us ASC",
@@ -56,8 +51,11 @@ class SqlStore(Store):
         n = 0
         for tid, lst in groups.items():
             for s in lst:
+                attrs = s.get("attributes") or {}
                 row = [s.get(c) for c in SPAN_COLS]
-                row[-1] = json.dumps(s.get("attributes") or {})
+                row[SPAN_COLS.index("attributes")] = json.dumps(attrs)
+                row[SPAN_COLS.index("received_us")] = attrs.get("sta.received_us")
+                row[SPAN_COLS.index("normalized_us")] = attrs.get("sta.normalized_us")
                 cur.execute(self._q(
                     f"INSERT OR REPLACE INTO spans ({','.join(SPAN_COLS)}) VALUES ({','.join('?' * len(SPAN_COLS))})"
                     if self.ph == "?" else
@@ -91,11 +89,12 @@ class SqlStore(Store):
         for w in windows:
             wid = self.window_id(w)
             cur.execute(self._q(
-                "INSERT OR REPLACE INTO ranking_windows (window_id, window_start_us, window_end_us, endpoint, method, note) "
-                "VALUES (?, ?, ?, ?, ?, ?)" if self.ph == "?" else
-                "INSERT INTO ranking_windows (window_id, window_start_us, window_end_us, endpoint, method, note) "
-                "VALUES (?, ?, ?, ?, ?, ?) ON CONFLICT (window_id) DO UPDATE SET note = EXCLUDED.note"),
-                (wid, w["window_start_us"], w["window_end_us"], w.get("endpoint"), w.get("method", "bottleneck_score"), w.get("note")))
+                "INSERT OR REPLACE INTO ranking_windows (window_id, window_start_us, window_end_us, endpoint, method, confidence, note) "
+                "VALUES (?, ?, ?, ?, ?, ?, ?)" if self.ph == "?" else
+                "INSERT INTO ranking_windows (window_id, window_start_us, window_end_us, endpoint, method, confidence, note) "
+                "VALUES (?, ?, ?, ?, ?, ?, ?) ON CONFLICT (window_id) DO UPDATE SET note = EXCLUDED.note, confidence = EXCLUDED.confidence"),
+                (wid, w["window_start_us"], w["window_end_us"], w.get("endpoint"), w.get("method", "bottleneck_score"),
+                 w.get("confidence"), w.get("note")))
             cur.execute(self._q("DELETE FROM rankings WHERE window_id = ?"), (wid,))
             for r in w.get("rankings", []):
                 cur.execute(self._q("INSERT INTO rankings (window_id, rank, service, score, evidence) VALUES (?, ?, ?, ?, ?)"),
@@ -114,13 +113,17 @@ class SqlStore(Store):
             "SUM(CASE WHEN status = 'error' THEN 1 ELSE 0 END), "
             "SUM(CASE WHEN status IN ('ok', 'error') THEN 1 ELSE 0 END) "
             "FROM spans GROUP BY service ORDER BY service")
+        # one pass over durations for every service (sorted, so percentiles are a slice)
+        durs: dict = {}
+        for service, d in self._rows("SELECT service, duration_us FROM spans WHERE duration_us IS NOT NULL "
+                                     "ORDER BY service, duration_us"):
+            durs.setdefault(service, []).append(d / 1000)
         out = []
         for service, span_count, trace_count, errors, with_status in rows:
-            durs = [r[0] / 1000 for r in self._rows(
-                "SELECT duration_us FROM spans WHERE service = ? AND duration_us IS NOT NULL", (service,))]
+            ds = durs.get(service, [])
             out.append({"service": service, "span_count": span_count, "trace_count": trace_count,
                         "error_rate": (errors / with_status) if with_status else 0.0,
-                        "p50_ms": percentile(durs, 0.5), "p99_ms": percentile(durs, 0.99)})
+                        "p50_ms": percentile(ds, 0.5), "p99_ms": percentile(ds, 0.99)})
         return out
 
     def operations(self, service: Optional[str] = None) -> List[str]:
@@ -173,30 +176,61 @@ class SqlStore(Store):
         t["complete"] = bool(t["complete"])
         return t
 
+    @staticmethod
+    def _span_row(r) -> dict:
+        s = dict(zip(SPAN_COLS, r))
+        s["attributes"] = json.loads(s["attributes"]) if s["attributes"] else {}
+        if s.pop("received_us", None) is not None:
+            s["attributes"]["sta.received_us"] = r[SPAN_COLS.index("received_us")]
+        if s.pop("normalized_us", None) is not None:
+            s["attributes"]["sta.normalized_us"] = r[SPAN_COLS.index("normalized_us")]
+        return s
+
+    def _spans_for(self, trace_ids: List[str]) -> dict:
+        out: dict = {t: [] for t in trace_ids}
+        for i in range(0, len(trace_ids), 500):
+            chunk = trace_ids[i:i + 500]
+            marks = ",".join("?" * len(chunk))
+            for r in self._rows(f"SELECT {','.join(SPAN_COLS)} FROM spans WHERE trace_id IN ({marks}) "
+                                "ORDER BY trace_id, start_us, span_id", chunk):
+                out[r[0]].append(self._span_row(r))
+        return out
+
     def get_trace(self, trace_id: str) -> Optional[dict]:
         rows = self._rows(f"SELECT {','.join(TRACE_COLS)} FROM traces WHERE trace_id = ?", (trace_id,))
         if not rows:
             return None
-        spans = []
-        for r in self._rows(f"SELECT {','.join(SPAN_COLS)} FROM spans WHERE trace_id = ? ORDER BY start_us, span_id",
-                            (trace_id,)):
-            s = dict(zip(SPAN_COLS, r))
-            s["attributes"] = json.loads(s["attributes"]) if s["attributes"] else {}
-            spans.append(s)
-        return {"summary": self._trace_row(rows[0]), "spans": spans}
+        return {"summary": self._trace_row(rows[0]), "spans": self._spans_for([trace_id])[trace_id]}
+
+    def traces_with_spans(self, endpoint=None, limit=2000, subset="all"):
+        where, params = ("", [])
+        if endpoint:
+            where, params = " WHERE root_operation = ?", [endpoint]
+        rows = self._rows(f"SELECT {','.join(TRACE_COLS)} FROM traces{where} ORDER BY start_us DESC LIMIT ?",
+                          params + [limit])
+        ts = [self._trace_row(r) for r in rows]
+        spans = self._spans_for([t["trace_id"] for t in ts])
+        return self._pick_subset([(t, spans[t["trace_id"]]) for t in ts], subset)
+
+    def all_spans(self):
+        return (self._span_row(r) for r in self._rows(f"SELECT {','.join(SPAN_COLS)} FROM spans"))
+
+    def all_traces(self):
+        return (self._trace_row(r) for r in self._rows(f"SELECT {','.join(TRACE_COLS)} FROM traces"))
 
     def rankings(self, endpoint: Optional[str] = None, limit: int = 10) -> List[dict]:
-        sql = "SELECT window_id, window_start_us, window_end_us, endpoint, method, note FROM ranking_windows"
+        sql = "SELECT window_id, window_start_us, window_end_us, endpoint, method, confidence, note FROM ranking_windows"
         params: list = []
         if endpoint:
             sql += " WHERE endpoint = ? OR endpoint IS NULL"
             params.append(endpoint)
         sql += " ORDER BY window_end_us DESC"
         out = []
-        for wid, ws, we, ep, method, note in self._rows(sql, params):
+        for wid, ws, we, ep, method, confidence, note in self._rows(sql, params):
             rows = self._rows("SELECT rank, service, score, evidence FROM rankings WHERE window_id = ? ORDER BY rank LIMIT ?",
                               (wid, limit))
-            out.append({"window_start_us": ws, "window_end_us": we, "endpoint": ep, "method": method, "note": note,
+            out.append({"window_start_us": ws, "window_end_us": we, "endpoint": ep, "method": method,
+                        "confidence": confidence, "note": note,
                         "rankings": [{"rank": r, "service": svc, "score": sc, "evidence": json.loads(ev) if ev else {}}
                                      for r, svc, sc, ev in rows]})
         return out

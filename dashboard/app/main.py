@@ -1,26 +1,32 @@
 """Dashboard API.
 
-Routes (all JSON, under /api):
+Routes (JSON, under /api):
   GET  /api/health
-  GET  /api/services                      per-service counts, error rate, p50/p99
-  GET  /api/operations?service=           operation names for the filter dropdown
-  GET  /api/traces?...                    trace search (see TraceQuery for filters)
-  GET  /api/traces/{trace_id}             one trace with all its spans
+  GET  /api/runs                          ingestion runs (trace_v1 store)
+  GET  /api/services                      counts, error rate, p50/p99 per service
+  GET  /api/operations?service=           operation names for the dropdown
+  GET  /api/traces?...                    trace search, filters in TraceQuery
+  GET  /api/traces/{trace_id}             one trace with its spans
   GET  /api/rankings?endpoint=&limit=     bottleneck rankings per window
+  GET  /api/compare?endpoint=&threshold_ms= slow vs normal self time per service
+  GET  /api/flame?endpoint=&subset=&limit= merged flame graph tree
+  GET  /api/pipeline?window_s=            freshness and health numbers
   POST /api/uploads                       presigned PUT URL for the raw bucket
-  GET  /                                  the dashboard page
+  GET  /                                  the page
 
-Configuration (environment):
-  STORE=jsonl|sqlite        default jsonl
-  DATA_DIR=./data           folder of normalized *.jsonl (+ rankings.json) for the jsonl store
-  SQLITE_PATH=./traces.db   for the sqlite store
-  RAW_BUCKET, RAW_PREFIX    where uploads go (presign needs these plus AWS credentials)
-  UPLOAD_EXPIRES=900        seconds a presigned URL stays valid
+Env:
+  STORE=jsonl|sqlite|trace_v1   (default jsonl)
+  DATA_DIR=./data               jsonl store: folder of normalized *.jsonl (+ rankings.json)
+  SQLITE_PATH=./traces.db       sqlite store
+  DATABASE_URL=postgresql://trace:trace@localhost:55432/trace   trace_v1 store
+  RUN_ID=<uuid>                 trace_v1: which run to show (default newest)
+  RAW_BUCKET, RAW_PREFIX, UPLOAD_EXPIRES   uploads
 
-Run locally:  uvicorn app.main:app --reload
+Run locally: uvicorn app.main:app --reload
 """
 from __future__ import annotations
 
+import logging
 import os
 import re
 import time
@@ -34,6 +40,7 @@ from pydantic import BaseModel
 from . import models
 from .store import JsonlStore, Store, TraceQuery
 
+log = logging.getLogger("dashboard")
 STATIC_DIR = os.path.join(os.path.dirname(os.path.dirname(__file__)), "static")
 SAFE_NAME = re.compile(r"[^A-Za-z0-9._-]+")
 
@@ -50,6 +57,11 @@ def get_store() -> Store:
 
 def make_store() -> Store:
     kind = os.environ.get("STORE", "jsonl")
+    if kind == "trace_v1":
+        import psycopg
+        from .tracev1_store import TraceV1Store
+        conn = psycopg.connect(os.environ["DATABASE_URL"], autocommit=True)
+        return TraceV1Store(conn, run_id=os.environ.get("RUN_ID"))
     if kind == "sqlite":
         import sqlite3
         from .sql_store import SqlStore
@@ -61,7 +73,7 @@ def make_store() -> Store:
 
 
 def use_store(store: Store) -> None:
-    """Swap the store (tests)."""
+    """Swap the store, used by tests."""
     global _store
     _store = store
 
@@ -70,6 +82,13 @@ def use_store(store: Store) -> None:
 def health():
     s = get_store()
     return {"ok": True, "store": s.name, "traces": s.count_traces()}
+
+
+@app.get("/api/runs")
+def runs():
+    """Ingestion runs (trace_v1 store only); other stores have a single implicit run."""
+    s = get_store()
+    return getattr(s, "runs", lambda: [])()
 
 
 @app.get("/api/services", response_model=List[models.ServiceStats])
@@ -115,6 +134,23 @@ def rankings(endpoint: Optional[str] = None, limit: int = Query(10, ge=1, le=100
     return get_store().rankings(endpoint, limit)
 
 
+@app.get("/api/compare", response_model=models.Compare)
+def compare(endpoint: Optional[str] = None, threshold_ms: Optional[float] = Query(None, ge=0),
+            limit: int = Query(2000, ge=10, le=20000)):
+    return get_store().compare(endpoint, threshold_ms, limit)
+
+
+@app.get("/api/flame", response_model=models.FlameNode)
+def flame(endpoint: Optional[str] = None, subset: str = Query("all", pattern="^(all|slow|normal)$"),
+          limit: int = Query(500, ge=1, le=5000)):
+    return get_store().flame(endpoint, subset, limit)
+
+
+@app.get("/api/pipeline", response_model=models.PipelineStats)
+def pipeline(window_s: int = Query(900, ge=60, le=86400)):
+    return get_store().pipeline(int(time.time() * 1_000_000), window_s)
+
+
 class UploadRequest(BaseModel):
     filename: str
     content_type: str = "application/json"
@@ -149,4 +185,5 @@ def index():
 
 @app.exception_handler(Exception)
 async def unhandled(request, exc):
-    return JSONResponse(status_code=500, content={"detail": f"{type(exc).__name__}: {exc}"})
+    log.exception("unhandled error on %s %s", request.method, request.url.path)
+    return JSONResponse(status_code=500, content={"detail": "internal error, see the server log"})

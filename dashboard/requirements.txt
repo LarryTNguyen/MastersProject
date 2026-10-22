@@ -1,6 +1,7 @@
 fastapi>=0.110
 mangum>=0.17
 pydantic>=2
+psycopg[binary]>=3.2      # trace_v1 store (the reconstruction tables)
 # local development and tests only
 uvicorn>=0.27
 httpx>=0.27
