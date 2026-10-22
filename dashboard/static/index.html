@@ -1,0 +1,380 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Trace Dashboard</title>
+<style>
+  :root {
+    --bg: #f6f7f9; --panel: #ffffff; --line: #e1e4e8; --text: #1f2328; --muted: #656d76;
+    --accent: #2563eb; --ok: #16a34a; --err: #dc2626; --warn: #d97706;
+    --c1:#4e79a7; --c2:#f28e2b; --c3:#59a14f; --c4:#e15759; --c5:#76b7b2; --c6:#edc948; --c7:#b07aa1; --c8:#ff9da7; --c9:#9c755f; --c10:#bab0ac;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; font: 14px/1.45 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; color: var(--text); background: var(--bg); }
+  header { display: flex; align-items: center; gap: 16px; padding: 10px 20px; background: var(--panel); border-bottom: 1px solid var(--line); }
+  header h1 { font-size: 16px; margin: 0; }
+  header .status { color: var(--muted); font-size: 12px; margin-left: auto; }
+  nav button { background: none; border: 0; padding: 8px 10px; cursor: pointer; color: var(--muted); border-bottom: 2px solid transparent; font: inherit; }
+  nav button.active { color: var(--accent); border-color: var(--accent); }
+  main { padding: 16px 20px; max-width: 1400px; margin: 0 auto; }
+  .panel { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 14px 16px; margin-bottom: 16px; }
+  .panel h2 { font-size: 14px; margin: 0 0 10px; }
+  .filters { display: flex; flex-wrap: wrap; gap: 10px; align-items: end; }
+  .filters label { display: flex; flex-direction: column; font-size: 12px; color: var(--muted); gap: 3px; }
+  input, select, button.primary, button.ghost { font: inherit; padding: 6px 8px; border: 1px solid var(--line); border-radius: 6px; background: #fff; }
+  button.primary { background: var(--accent); color: #fff; border-color: var(--accent); cursor: pointer; }
+  button.ghost { cursor: pointer; }
+  table { width: 100%; border-collapse: collapse; }
+  th, td { text-align: left; padding: 6px 8px; border-bottom: 1px solid var(--line); white-space: nowrap; }
+  th { color: var(--muted); font-weight: 500; font-size: 12px; }
+  tr.row { cursor: pointer; }
+  tr.row:hover { background: #f0f4ff; }
+  .mono { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 12px; }
+  .pill { display: inline-block; padding: 1px 7px; border-radius: 10px; font-size: 11px; border: 1px solid var(--line); }
+  .pill.ok { color: var(--ok); border-color: #bbf7d0; background: #f0fdf4; }
+  .pill.error { color: var(--err); border-color: #fecaca; background: #fef2f2; }
+  .pill.unset { color: var(--muted); }
+  .pill.incomplete { color: var(--warn); border-color: #fde68a; background: #fffbeb; }
+  .muted { color: var(--muted); }
+  .pager { display: flex; gap: 8px; align-items: center; margin-top: 10px; color: var(--muted); font-size: 12px; }
+  .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  @media (max-width: 900px) { .grid { grid-template-columns: 1fr; } }
+  .bar { height: 8px; background: var(--line); border-radius: 4px; overflow: hidden; }
+  .bar > span { display: block; height: 100%; background: var(--accent); }
+  /* waterfall */
+  .wf { overflow-x: auto; }
+  .wf-row { display: grid; grid-template-columns: 300px 1fr; align-items: center; height: 24px; border-bottom: 1px solid #f0f1f3; }
+  .wf-row:hover { background: #f8fafc; }
+  .wf-label { font-size: 12px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; padding-right: 8px; }
+  .wf-track { position: relative; height: 16px; }
+  .wf-span { position: absolute; top: 2px; height: 12px; border-radius: 3px; min-width: 2px; opacity: .9; }
+  .wf-span.error { outline: 2px solid var(--err); }
+  .wf-span.missing { background: repeating-linear-gradient(45deg, #ccc 0 4px, #eee 4px 8px) !important; }
+  .wf-self { position: absolute; top: 15px; height: 2px; background: rgba(0,0,0,.45); }
+  .wf-time { position: absolute; top: 0; font-size: 10px; color: var(--muted); border-left: 1px solid var(--line); padding-left: 3px; height: 100%; }
+  .wf-axis { position: relative; height: 16px; margin-left: 300px; }
+  .legend { display: flex; flex-wrap: wrap; gap: 8px 14px; font-size: 12px; margin: 8px 0; }
+  .legend i { display: inline-block; width: 10px; height: 10px; border-radius: 2px; margin-right: 4px; vertical-align: -1px; }
+  .tip { position: fixed; pointer-events: none; background: #1f2328; color: #fff; padding: 6px 8px; border-radius: 6px; font-size: 12px; max-width: 360px; z-index: 10; display: none; }
+  .kv { display: grid; grid-template-columns: max-content 1fr; gap: 2px 12px; font-size: 13px; }
+  .kv b { font-weight: 500; color: var(--muted); }
+  .empty { color: var(--muted); padding: 20px; text-align: center; }
+  .rank { display: grid; grid-template-columns: 28px 1fr 60px; gap: 8px; align-items: center; padding: 6px 0; border-bottom: 1px solid var(--line); }
+  .rank .ev { font-size: 12px; color: var(--muted); }
+  .note { background: #fffbeb; border: 1px solid #fde68a; padding: 8px 10px; border-radius: 6px; font-size: 13px; }
+  a.link { color: var(--accent); cursor: pointer; text-decoration: none; }
+  .drop { border: 2px dashed var(--line); border-radius: 8px; padding: 24px; text-align: center; color: var(--muted); }
+  .drop.over { border-color: var(--accent); background: #f0f4ff; }
+  progress { width: 100%; }
+</style>
+</head>
+<body>
+<header>
+  <h1>Trace Dashboard</h1>
+  <nav>
+    <button data-view="overview" class="active">Overview</button>
+    <button data-view="traces">Traces</button>
+    <button data-view="rankings">Bottlenecks</button>
+    <button data-view="upload">Upload</button>
+  </nav>
+  <span class="status" id="status">connecting…</span>
+</header>
+<main>
+  <!-- ---------------- Overview ---------------- -->
+  <section id="view-overview">
+    <div class="panel">
+      <h2>Services</h2>
+      <table>
+        <thead><tr><th>Service</th><th>Spans</th><th>Traces</th><th>Error rate</th><th>p50</th><th>p99</th><th style="width:30%">p99 (relative)</th></tr></thead>
+        <tbody id="services-body"><tr><td colspan="7" class="empty">loading…</td></tr></tbody>
+      </table>
+    </div>
+    <div class="grid">
+      <div class="panel">
+        <h2>Slowest traces</h2>
+        <table><thead><tr><th>Trace</th><th>Endpoint</th><th>Duration</th><th>Status</th></tr></thead>
+        <tbody id="slowest-body"></tbody></table>
+      </div>
+      <div class="panel">
+        <h2>Latest bottleneck ranking</h2>
+        <div id="overview-ranking"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ---------------- Traces ---------------- -->
+  <section id="view-traces" hidden>
+    <div class="panel">
+      <h2>Search</h2>
+      <form class="filters" id="search-form" onsubmit="return false">
+        <label>Service <select id="f-service"><option value="">any</option></select></label>
+        <label>Endpoint contains <input id="f-operation" placeholder="e.g. checkout" size="18"></label>
+        <label>Status <select id="f-status"><option value="">any</option><option value="ok">ok</option><option value="error">error</option><option value="unset">unset</option></select></label>
+        <label>Min duration (ms) <input id="f-min" type="number" min="0" step="1" size="8"></label>
+        <label>Max duration (ms) <input id="f-max" type="number" min="0" step="1" size="8"></label>
+        <label>Complete <select id="f-complete"><option value="">any</option><option value="true">complete only</option><option value="false">incomplete only</option></select></label>
+        <label>Sort <select id="f-sort"><option value="start_desc">newest first</option><option value="duration_desc">slowest first</option><option value="duration_asc">fastest first</option><option value="start_asc">oldest first</option></select></label>
+        <button class="primary" id="btn-search">Search</button>
+        <button class="ghost" id="btn-reset">Reset</button>
+      </form>
+    </div>
+    <div class="panel">
+      <table>
+        <thead><tr><th>Trace</th><th>Endpoint</th><th>Start</th><th>Duration</th><th>Spans</th><th>Services</th><th>Status</th><th>Source</th></tr></thead>
+        <tbody id="traces-body"></tbody>
+      </table>
+      <div class="pager">
+        <button class="ghost" id="pg-prev">‹ prev</button>
+        <span id="pg-info"></span>
+        <button class="ghost" id="pg-next">next ›</button>
+      </div>
+    </div>
+    <div class="panel" id="trace-detail" hidden>
+      <h2>Trace <span class="mono" id="td-id"></span> <a class="link" id="td-close" style="float:right">close</a></h2>
+      <div class="kv" id="td-summary"></div>
+      <div class="legend" id="td-legend"></div>
+      <div class="wf" id="td-waterfall"></div>
+      <details style="margin-top:10px"><summary class="muted">Span table</summary>
+        <table><thead><tr><th>Service</th><th>Operation</th><th>Start (+ms)</th><th>Duration</th><th>Self</th><th>Status</th><th>Span id</th><th>Parent</th></tr></thead>
+        <tbody id="td-spans"></tbody></table>
+      </details>
+    </div>
+  </section>
+
+  <!-- ---------------- Rankings ---------------- -->
+  <section id="view-rankings" hidden>
+    <div class="panel">
+      <h2>Bottleneck rankings</h2>
+      <p class="muted" style="margin-top:0">One block per analysis window. Score and evidence come from the diagnosis step; click a service to see its slowest traces.</p>
+      <div id="rankings-list"></div>
+    </div>
+  </section>
+
+  <!-- ---------------- Upload ---------------- -->
+  <section id="view-upload" hidden>
+    <div class="panel">
+      <h2>Upload a trace file</h2>
+      <p class="muted" style="margin-top:0">Accepted: OTLP JSON, common-span JSONL, Alibaba CSV, RCAEval CSV. The file goes straight to S3 with a presigned URL; the pipeline picks it up from there.</p>
+      <div class="drop" id="drop">drop a file here or <label><a class="link">choose one</a><input type="file" id="file" hidden></label></div>
+      <div id="upload-status" style="margin-top:10px"></div>
+    </div>
+  </section>
+</main>
+<div class="tip" id="tip"></div>
+
+<script>
+(() => {
+  const $ = (id) => document.getElementById(id);
+  const api = async (path, opts) => {
+    const r = await fetch(path, opts);
+    if (!r.ok) throw new Error((await r.json().catch(() => ({}))).detail || `${r.status} ${r.statusText}`);
+    return r.json();
+  };
+  const ms = (us) => us == null ? '–' : (us / 1000).toFixed(us < 10000 ? 2 : 1) + ' ms';
+  const when = (us) => us == null ? '–' : new Date(us / 1000).toLocaleString();
+  const short = (id) => id.length > 14 ? id.slice(0, 14) + '…' : id;
+  const pill = (s) => `<span class="pill ${s}">${s}</span>`;
+  const esc = (s) => String(s ?? '').replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+  const colors = ['--c1','--c2','--c3','--c4','--c5','--c6','--c7','--c8','--c9','--c10'];
+  const colorOf = (() => { const m = new Map(); return (svc) => { if (!m.has(svc)) m.set(svc, `var(${colors[m.size % colors.length]})`); return m.get(svc); }; })();
+
+  // ---------- navigation ----------
+  const views = ['overview', 'traces', 'rankings', 'upload'];
+  function show(view) {
+    views.forEach(v => { $('view-' + v).hidden = v !== view; });
+    document.querySelectorAll('nav button').forEach(b => b.classList.toggle('active', b.dataset.view === view));
+    location.hash = view;
+    if (view === 'overview') loadOverview();
+    if (view === 'traces') search();
+    if (view === 'rankings') loadRankings();
+  }
+  document.querySelectorAll('nav button').forEach(b => b.onclick = () => show(b.dataset.view));
+
+  // ---------- overview ----------
+  async function loadOverview() {
+    const [svcs, slow, ranks] = await Promise.all([
+      api('/api/services'), api('/api/traces?sort=duration_desc&limit=8'), api('/api/rankings?limit=5')]);
+    const maxP99 = Math.max(1, ...svcs.map(s => s.p99_ms || 0));
+    $('services-body').innerHTML = svcs.length ? svcs.map(s => `<tr class="row" data-svc="${esc(s.service)}">
+      <td><i class="legend" style="display:inline-block;width:10px;height:10px;border-radius:2px;background:${colorOf(s.service)};margin-right:6px"></i>${esc(s.service)}</td>
+      <td>${s.span_count}</td><td>${s.trace_count}</td>
+      <td>${(s.error_rate * 100).toFixed(1)}%</td><td>${s.p50_ms == null ? '–' : s.p50_ms.toFixed(1) + ' ms'}</td>
+      <td>${s.p99_ms == null ? '–' : s.p99_ms.toFixed(1) + ' ms'}</td>
+      <td><div class="bar"><span style="width:${100 * (s.p99_ms || 0) / maxP99}%"></span></div></td></tr>`).join('')
+      : '<tr><td colspan="7" class="empty">no data yet — upload or replay a dataset</td></tr>';
+    $('services-body').querySelectorAll('tr.row').forEach(tr => tr.onclick = () => { $('f-service').value = tr.dataset.svc; $('f-sort').value = 'duration_desc'; show('traces'); });
+    $('slowest-body').innerHTML = slow.items.map(t => `<tr class="row" data-id="${t.trace_id}">
+      <td class="mono">${short(t.trace_id)}</td><td>${esc(t.root_operation)}</td><td>${ms(t.duration_us)}</td><td>${pill(t.status)}</td></tr>`).join('') || '<tr><td colspan="4" class="empty">none</td></tr>';
+    $('slowest-body').querySelectorAll('tr.row').forEach(tr => tr.onclick = () => openTrace(tr.dataset.id));
+    $('overview-ranking').innerHTML = ranks.length ? rankingBlock(ranks[0], true) : '<div class="empty">no rankings yet — the diagnosis step has not run</div>';
+    bindRankClicks($('overview-ranking'));
+  }
+
+  // ---------- trace search ----------
+  const page = { offset: 0, limit: 25 };
+  function params() {
+    const p = new URLSearchParams();
+    const set = (k, v) => { if (v !== '' && v != null) p.set(k, v); };
+    set('service', $('f-service').value); set('operation', $('f-operation').value.trim());
+    set('status', $('f-status').value); set('min_duration_ms', $('f-min').value); set('max_duration_ms', $('f-max').value);
+    set('complete', $('f-complete').value); set('sort', $('f-sort').value);
+    p.set('offset', page.offset); p.set('limit', page.limit);
+    return p;
+  }
+  async function search() {
+    const res = await api('/api/traces?' + params());
+    $('traces-body').innerHTML = res.items.map(t => `<tr class="row" data-id="${t.trace_id}">
+      <td class="mono">${short(t.trace_id)}</td><td>${esc(t.root_service)} <span class="muted">·</span> ${esc(t.root_operation)}</td>
+      <td class="muted">${when(t.start_us)}</td><td>${ms(t.duration_us)}</td><td>${t.span_count}</td><td>${t.service_count}</td>
+      <td>${pill(t.status)}${t.complete ? '' : ' ' + '<span class="pill incomplete">incomplete</span>'}</td><td class="muted">${esc(t.source)}</td></tr>`).join('')
+      || '<tr><td colspan="8" class="empty">no traces match</td></tr>';
+    $('traces-body').querySelectorAll('tr.row').forEach(tr => tr.onclick = () => openTrace(tr.dataset.id));
+    const from = res.total ? res.offset + 1 : 0, to = Math.min(res.total, res.offset + res.limit);
+    $('pg-info').textContent = `${from}–${to} of ${res.total}`;
+    $('pg-prev').disabled = res.offset === 0; $('pg-next').disabled = to >= res.total;
+  }
+  $('btn-search').onclick = () => { page.offset = 0; search(); };
+  $('search-form').onkeydown = (e) => { if (e.key === 'Enter') { page.offset = 0; search(); } };
+  $('btn-reset').onclick = () => { $('search-form').reset(); page.offset = 0; search(); };
+  $('pg-prev').onclick = () => { page.offset = Math.max(0, page.offset - page.limit); search(); };
+  $('pg-next').onclick = () => { page.offset += page.limit; search(); };
+
+  // ---------- trace detail + waterfall ----------
+  function selfTimes(spans) {
+    // self time = duration minus the union of the children's intervals
+    const kids = new Map();
+    spans.forEach(s => { if (s.parent_span_id) (kids.get(s.parent_span_id) || kids.set(s.parent_span_id, []).get(s.parent_span_id)).push(s); });
+    const self = new Map();
+    spans.forEach(s => {
+      if (s.duration_us == null) { self.set(s.span_id, null); return; }
+      const iv = (kids.get(s.span_id) || []).filter(k => k.duration_us != null)
+        .map(k => [Math.max(k.start_us, s.start_us), Math.min(k.start_us + k.duration_us, s.start_us + s.duration_us)])
+        .filter(([a, b]) => b > a).sort((a, b) => a[0] - b[0]);
+      let covered = 0, cur = null;
+      iv.forEach(([a, b]) => { if (!cur || a > cur[1]) { if (cur) covered += cur[1] - cur[0]; cur = [a, b]; } else cur[1] = Math.max(cur[1], b); });
+      if (cur) covered += cur[1] - cur[0];
+      self.set(s.span_id, Math.max(0, s.duration_us - covered));
+    });
+    return self;
+  }
+  function treeOrder(spans) {
+    const ids = new Set(spans.map(s => s.span_id));
+    const kids = new Map();
+    const roots = [];
+    spans.forEach(s => { if (s.parent_span_id && ids.has(s.parent_span_id)) (kids.get(s.parent_span_id) || kids.set(s.parent_span_id, []).get(s.parent_span_id)).push(s); else roots.push(s); });
+    const out = [];
+    const walk = (s, depth) => { out.push([s, depth]); (kids.get(s.span_id) || []).sort((a, b) => a.start_us - b.start_us).forEach(k => walk(k, depth + 1)); };
+    roots.sort((a, b) => a.start_us - b.start_us).forEach(r => walk(r, 0));
+    return out;
+  }
+  async function openTrace(id) {
+    show('traces');
+    const d = await api('/api/traces/' + encodeURIComponent(id));
+    const t = d.summary, spans = d.spans;
+    $('trace-detail').hidden = false;
+    $('td-id').textContent = t.trace_id;
+    $('td-summary').innerHTML = [['Endpoint', `${esc(t.root_service)} · ${esc(t.root_operation)}`], ['Start', when(t.start_us)],
+      ['Duration', ms(t.duration_us)], ['Spans', `${t.span_count} across ${t.service_count} services`],
+      ['Status', pill(t.status) + (t.complete ? '' : ' <span class="pill incomplete">incomplete — a parent span or duration is missing</span>')],
+      ['Source', esc(t.source)]].map(([k, v]) => `<b>${k}</b><span>${v}</span>`).join('');
+    const t0 = t.start_us, total = Math.max(1, t.duration_us);
+    const self = selfTimes(spans);
+    const svcs = [...new Set(spans.map(s => s.service))];
+    $('td-legend').innerHTML = svcs.map(s => `<span><i style="background:${colorOf(s)}"></i>${esc(s)}</span>`).join('') +
+      '<span><i style="background:repeating-linear-gradient(45deg,#ccc 0 3px,#eee 3px 6px)"></i>duration unknown</span><span><i style="background:rgba(0,0,0,.45);height:3px"></i>self time</span>';
+    const ticks = [0, .25, .5, .75, 1].map(f => `<span class="wf-time" style="left:${f * 100}%">${(total * f / 1000).toFixed(1)} ms</span>`).join('');
+    $('td-waterfall').innerHTML = `<div class="wf-axis">${ticks}</div>` + treeOrder(spans).map(([s, depth]) => {
+      const left = 100 * (s.start_us - t0) / total;
+      const width = s.duration_us == null ? 100 * Math.min(total, 0.03 * total) / total : 100 * s.duration_us / total;
+      const selfW = self.get(s.span_id) == null ? 0 : 100 * self.get(s.span_id) / total;
+      return `<div class="wf-row" data-id="${s.span_id}">
+        <div class="wf-label" style="padding-left:${8 + depth * 14}px" title="${esc(s.service)} ${esc(s.operation)}"><b style="font-weight:500">${esc(s.service)}</b> <span class="muted">${esc(s.operation)}</span></div>
+        <div class="wf-track"><div class="wf-span ${s.status === 'error' ? 'error' : ''} ${s.duration_us == null ? 'missing' : ''}" style="left:${left}%;width:${Math.max(0.3, width)}%;background:${colorOf(s.service)}"></div>
+        ${selfW ? `<div class="wf-self" style="left:${left}%;width:${selfW}%"></div>` : ''}</div></div>`;
+    }).join('');
+    const byId = new Map(spans.map(s => [s.span_id, s]));
+    const tip = $('tip');
+    $('td-waterfall').querySelectorAll('.wf-row').forEach(row => {
+      const s = byId.get(row.dataset.id);
+      row.onmousemove = (e) => {
+        tip.style.display = 'block'; tip.style.left = (e.clientX + 12) + 'px'; tip.style.top = (e.clientY + 12) + 'px';
+        const attrs = Object.entries(s.attributes || {}).slice(0, 8).map(([k, v]) => `${esc(k)}=${esc(JSON.stringify(v))}`).join('<br>');
+        tip.innerHTML = `<b>${esc(s.service)}</b> ${esc(s.operation)}<br>start +${ms(s.start_us - t0)} · duration ${ms(s.duration_us)} · self ${ms(self.get(s.span_id))}<br>status ${s.status}${s.kind ? ' · ' + s.kind : ''}${s.peer_service ? ' · from ' + esc(s.peer_service) : ''}${attrs ? '<br><span style="opacity:.7">' + attrs + '</span>' : ''}`;
+      };
+      row.onmouseleave = () => { tip.style.display = 'none'; };
+    });
+    $('td-spans').innerHTML = treeOrder(spans).map(([s, depth]) => `<tr>
+      <td style="padding-left:${8 + depth * 12}px">${esc(s.service)}</td><td>${esc(s.operation)}</td><td>+${ms(s.start_us - t0)}</td>
+      <td>${ms(s.duration_us)}</td><td>${ms(self.get(s.span_id))}</td><td>${pill(s.status)}</td>
+      <td class="mono">${esc(s.span_id)}</td><td class="mono muted">${esc(s.parent_span_id || '')}</td></tr>`).join('');
+    $('trace-detail').scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+  $('td-close').onclick = () => { $('trace-detail').hidden = true; };
+
+  // ---------- rankings ----------
+  function rankingBlock(w, compact) {
+    const top = Math.max(0.001, ...w.rankings.map(r => r.score));
+    const rows = w.rankings.map(r => `<div class="rank">
+      <span class="muted">#${r.rank}</span>
+      <div><a class="link" data-svc="${esc(r.service)}">${esc(r.service)}</a>
+        <div class="bar" style="margin:3px 0"><span style="width:${100 * r.score / top}%"></span></div>
+        ${compact ? '' : `<div class="ev">${Object.entries(r.evidence || {}).map(([k, v]) => `${esc(k)}: <b>${typeof v === 'number' ? +v.toFixed(3) : esc(v)}</b>`).join(' · ') || 'no evidence recorded'}</div>`}
+      </div>
+      <span class="mono" style="text-align:right">${r.score.toFixed(2)}</span></div>`).join('');
+    return `<div style="margin-bottom:14px">
+      <div class="muted" style="font-size:12px">${when(w.window_start_us)} → ${when(w.window_end_us)}${w.endpoint ? ' · ' + esc(w.endpoint) : ''} · ${esc(w.method)}</div>
+      ${w.note ? `<div class="note" style="margin:6px 0">${esc(w.note)}</div>` : ''}
+      ${rows || '<div class="empty">empty window</div>'}</div>`;
+  }
+  function bindRankClicks(root) {
+    root.querySelectorAll('a.link[data-svc]').forEach(a => a.onclick = () => { $('f-service').value = a.dataset.svc; $('f-sort').value = 'duration_desc'; page.offset = 0; show('traces'); });
+  }
+  async function loadRankings() {
+    const ws = await api('/api/rankings?limit=10');
+    $('rankings-list').innerHTML = ws.length ? ws.map(w => rankingBlock(w, false)).join('') : '<div class="empty">no rankings yet — the diagnosis step has not run</div>';
+    bindRankClicks($('rankings-list'));
+  }
+
+  // ---------- upload ----------
+  const drop = $('drop');
+  ['dragenter', 'dragover'].forEach(ev => drop.addEventListener(ev, e => { e.preventDefault(); drop.classList.add('over'); }));
+  ['dragleave', 'drop'].forEach(ev => drop.addEventListener(ev, e => { e.preventDefault(); drop.classList.remove('over'); }));
+  drop.addEventListener('drop', e => { if (e.dataTransfer.files[0]) upload(e.dataTransfer.files[0]); });
+  $('file').onchange = () => { if ($('file').files[0]) upload($('file').files[0]); };
+  async function upload(file) {
+    const st = $('upload-status');
+    const type = file.name.endsWith('.csv') ? 'text/csv' : file.name.endsWith('.jsonl') ? 'application/x-ndjson' : 'application/json';
+    st.innerHTML = `Preparing upload of <b>${esc(file.name)}</b> (${(file.size / 1e6).toFixed(1)} MB)…`;
+    let ticket;
+    try {
+      ticket = await api('/api/uploads', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ filename: file.name, content_type: type }) });
+    } catch (e) { st.innerHTML = `<span style="color:var(--err)">${esc(e.message)}</span>`; return; }
+    st.innerHTML = `Uploading to <span class="mono">${esc(ticket.key)}</span><progress id="prog" max="100" value="0"></progress>`;
+    await new Promise((resolve) => {
+      const x = new XMLHttpRequest();
+      x.open(ticket.method, ticket.url);
+      Object.entries(ticket.headers || {}).forEach(([k, v]) => x.setRequestHeader(k, v));
+      x.upload.onprogress = (e) => { if (e.lengthComputable) $('prog').value = 100 * e.loaded / e.total; };
+      x.onload = () => { st.innerHTML = x.status < 300 ? `Uploaded <b>${esc(file.name)}</b>. It will show up under Traces once the pipeline has processed it.` : `<span style="color:var(--err)">upload failed: HTTP ${x.status}</span>`; resolve(); };
+      x.onerror = () => { st.innerHTML = '<span style="color:var(--err)">upload failed (network or CORS error)</span>'; resolve(); };
+      x.send(file);
+    });
+  }
+
+  // ---------- boot ----------
+  async function boot() {
+    try {
+      const h = await api('/api/health');
+      $('status').textContent = `${h.traces} traces · ${h.store} store`;
+      const svcs = await api('/api/services');
+      $('f-service').innerHTML = '<option value="">any</option>' + svcs.map(s => `<option>${esc(s.service)}</option>`).join('');
+    } catch (e) { $('status').textContent = 'API unreachable: ' + e.message; }
+    const v = location.hash.replace('#', '');
+    show(views.includes(v) ? v : 'overview');
+  }
+  boot();
+})();
+</script>
+</body>
+</html>
