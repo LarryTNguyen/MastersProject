@@ -1,18 +1,23 @@
-"""Generate a small demo dataset in the common span format.
+"""Make a small demo dataset in the span format.
 
-Writes data/demo_spans.jsonl (about 200 e-commerce traces over 10 minutes,
-with one service that gets slow in the second half) and data/rankings.json
-(one example ranking window in the shape the diagnosis step will write).
+Writes data/demo_spans.jsonl (about 200 checkout traces over 10 minutes, one
+service gets slow halfway through) and data/rankings.json (an example ranking).
 
-    python tools/make_demo_data.py [out_dir]
+    python tools/make_demo_data.py [out_dir] [--now]
+
+--now puts the traces in the last ten minutes and adds ingest stamps, so the
+Pipeline tab has something to show.
 """
 import hashlib
 import json
 import os
 import random
 import sys
+import time
 
-OUT = sys.argv[1] if len(sys.argv) > 1 else os.path.join(os.path.dirname(__file__), "..", "data")
+args = [a for a in sys.argv[1:] if not a.startswith("--")]
+OUT = args[0] if args else os.path.join(os.path.dirname(__file__), "..", "data")
+NOW = "--now" in sys.argv
 random.seed(7)
 
 # service -> (children, base_ms, spread_ms)
@@ -30,7 +35,7 @@ SHOP = {
 OPS = {"frontend": "HTTP POST /cart/checkout", "checkoutservice": "PlaceOrder", "productcatalogservice": "GetProduct",
        "cartservice": "GetCart", "redis": "HGETALL", "paymentservice": "Charge", "shippingservice": "ShipOrder",
        "quoteservice": "GetQuote", "emailservice": "SendOrderConfirmation"}
-START_US = 1_760_428_800_000_000   # 2025-10-14 08:00 UTC
+START_US = int(time.time() * 1_000_000) - 600_000_000 if NOW else 1_760_428_800_000_000   # 2025-10-14 08:00 UTC
 SLOW_AFTER_US = START_US + 5 * 60_000_000
 
 
@@ -68,7 +73,19 @@ n = 200
 for i in range(n):
     start = START_US + int(i * 600_000_000 / n) + random.randint(0, 2_000_000)
     build(tid(i), "frontend", start, None, 0, spans, slow=start >= SLOW_AFTER_US)
-# a couple of incomplete traces (parent never arrived) to show the "incomplete" flag
+if NOW:
+    # fake ingest stamps: file lands a few seconds after the trace, adapter writes it a bit later
+    by_trace = {}
+    for s in spans:
+        by_trace.setdefault(s["trace_id"], []).append(s)
+    for lst in by_trace.values():
+        end = max(s["start_us"] + s["duration_us"] for s in lst)
+        received = end + random.randint(1_000_000, 4_000_000)
+        normalized = received + random.randint(300_000, 2_500_000)
+        for s in lst:
+            s["attributes"]["sta.received_us"] = received
+            s["attributes"]["sta.normalized_us"] = normalized
+# a few incomplete traces so the "incomplete" flag shows up
 for s in spans[-6:-3]:
     if s["parent_span_id"]:
         s["parent_span_id"] = "deadbeefdeadbeef"
