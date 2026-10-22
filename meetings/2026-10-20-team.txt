@@ -1,0 +1,32 @@
+Meeting Type: Team Only
+Date: 2026-10-20
+Start–End Time: 8:00 PM - 9:00 PM
+Location/Mode: Discord
+Attendees:
+-  Anukrithi
+-  Matthew
+-  Larry
+1) Accomplished Since Last Meeting
+Anukrithi:
+- Pushed the ingest package (Oct 14): dataset adapter for Alibaba and RCAEval into a common span format, OTLP JSON read/write, trace replayer (1x/2x/10x/max), presigned-URL upload path, Dataset Adapter Lambda handler, 45 tests
+- Built the dashboard API (FastAPI + Mangum) and page: trace search with filters, trace detail with waterfall, bottleneck rankings, upload panel; demo data generator; pushing this week
+Larry:
+- [add]
+Matthew:
+- [add]
+2) Accomplished During This Meeting
+- Larry's trace schema and reconstruction merged into main (PR #1): canonical span record format, PostgreSQL trace_v1 schema, reconstruction worker
+- [add anything else discussed]
+3) Issues / Blockers
+- RCAEval dataset download is blocked on home network (Hugging Face); need campus access or a mirror
+- Dashboard needs to be updated to read the new canonical record format and the trace_v1 tables
+- [add]
+4) Action Items
+- Action: Update dashboard to read canonical records and the trace_v1 PostgreSQL tables; push dashboard | Owner: Anukrithi | Due: 10/27
+- Action: Workbook 2 sections (design of ingest/upload/replay, dashboard API and UI, evaluation and test plan) | Owner: Anukrithi | Due: 10/29
+- Action: [add] | Owner: Larry | Due: [add]
+- Action: [add] | Owner: Matthew | Due: [add]
+5) Plans / Goals for Next Meeting
+- Workbook 2 and design specs due 10/29 8:00 AM; review drafts before submitting
+- First end-to-end run: converted dataset -> reconstruction -> PostgreSQL -> dashboard
+- [add]

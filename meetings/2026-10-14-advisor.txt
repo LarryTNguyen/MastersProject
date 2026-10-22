@@ -1,0 +1,37 @@
+Meeting Type: Advisor
+Date: 2026-10-14
+Start–End Time: 12:00 PM - 1:00 PM
+Location/Mode: Online (Google Meet)
+
+Attendees:
+- Prof. Bhargavi Trivedi (advisor)
+- Larry Nguyen
+- Matthew Tang
+- Anukrithi Myadala
+
+1) Accomplished Since Last Meeting
+- Workbook 1 submitted (Oct 1)
+- Anukrithi: ingest package pushed to the repo - dataset adapter (Alibaba + RCAEval -> common span format), OTLP JSON read/write, trace replayer (1x/2x/10x/max), presigned-URL upload path, Dataset Adapter Lambda handler, tests
+- Matthew: AWS IAM accounts created for the team
+- Larry: trace schema work started (contract for span records, PostgreSQL schema)
+
+2) Accomplished During This Meeting
+- Gave Prof. Trivedi a status update; project is moving again after the midterm/interview week
+- Walked through the ingest package and the plan for the dashboard
+- [add anything else she said / asked for]
+- Prof. Trivedi asked for a written update report
+
+3) Issues / Blockers
+- RCAEval dataset download blocked (Hugging Face not reachable from home network); asked about campus access
+- Sprint 3 slipped by about a week because of midterms and interviews
+
+4) Action Items
+- Action: Update report draft for Prof. Trivedi | Owner: Anukrithi | Due: 2026-10-23
+- Action: Dashboard API and page (trace search, waterfall, rankings) | Owner: Anukrithi | Due: 2026-10-23
+- Action: Trace schema + reconstruction pushed to the repo | Owner: Larry | Due: 2026-10-20
+- Action: Collector Lambda, SQS, S3 raw bucket deployed | Owner: Matthew | Due: 2026-10-23
+- Action: [add] | Owner: [add] | Due: [add]
+
+5) Plans / Goals for Next Meeting
+- Workbook 2 and design specs due Oct 29, 8 AM
+- First end-to-end run: dataset -> reconstruction -> PostgreSQL -> dashboard
