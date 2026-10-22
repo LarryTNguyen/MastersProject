@@ -1,0 +1,33 @@
+[
+ {
+  "window_start_us": 1700000000000000,
+  "window_end_us": 1700000003000000,
+  "endpoint": "POST /checkout",
+  "method": "bottleneck_score",
+  "note": null,
+  "rankings": [
+   {
+    "rank": 1,
+    "service": "paymentservice",
+    "score": 0.9,
+    "evidence": {
+     "critical_path_ms_slow": 280.0
+    }
+   },
+   {
+    "rank": 2,
+    "service": "checkoutservice",
+    "score": 0.1,
+    "evidence": {}
+   }
+  ]
+ },
+ {
+  "window_start_us": 1699999997000000,
+  "window_end_us": 1700000000000000,
+  "endpoint": null,
+  "method": "bottleneck_score",
+  "note": "no service clearly explains a slowdown",
+  "rankings": []
+ }
+]
