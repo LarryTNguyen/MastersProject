@@ -1,0 +1,23 @@
+# Jaeger all-in-one for the manual-diagnosis baseline (E9).
+#   docker compose up -d
+#   open http://localhost:16686
+# Spans go in over OTLP/HTTP on :4318, the same endpoint shape our collector uses,
+# so the replayer can target Jaeger with no changes.
+services:
+  jaeger:
+    image: jaegertracing/all-in-one:1.62
+    container_name: jaeger-baseline
+    environment:
+      - COLLECTOR_OTLP_ENABLED=true
+      - SPAN_STORAGE_TYPE=badger
+      - BADGER_EPHEMERAL=false
+      - BADGER_DIRECTORY_VALUE=/badger/data
+      - BADGER_DIRECTORY_KEY=/badger/key
+    ports:
+      - "16686:16686"   # UI
+      - "4318:4318"     # OTLP/HTTP
+      - "4317:4317"     # OTLP/gRPC
+    volumes:
+      - jaeger-data:/badger
+volumes:
+  jaeger-data:
