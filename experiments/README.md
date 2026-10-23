@@ -79,9 +79,11 @@ check the plumbing.
 | | | critical_path_only | 0.24 | 0.55 | 0.45 |
 
 Two things to keep in mind when reading those: on a single-root shop the front end is on
-every critical path and often takes rank 1, and 18 of the 30 RE3 Online Boutique cases
-inject into adservice or cartservice, which have no spans in the traces at all, so no
-trace-only method can find them.
+every critical path and takes rank 1 in 114 of the 120 Online Boutique cases for the
+critical-path heuristic, and 12 of the 30 RE3 Online Boutique cases inject into adservice
+or cartservice, which have no spans in the traces at all, so no trace-only method can find
+them (the other 18 are code-level faults in emailservice and currencyservice that change
+errors more than timing).
 
 ## Usability study
 
