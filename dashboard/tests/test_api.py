@@ -18,6 +18,21 @@ class ApiTests(unittest.TestCase):
     def test_health(self):
         self.assertEqual(self.c.get("/api/health").json(), {"ok": True, "store": "jsonl", "traces": 3})
 
+    def test_requests_are_logged_with_timing(self):
+        with self.assertLogs("dashboard", level="DEBUG") as cm:
+            self.c.get("/api/health")
+        self.assertTrue(any("GET /api/health 200" in line and "ms" in line for line in cm.output), cm.output)
+
+    def test_database_url_is_logged_without_password(self):
+        os.environ["DATABASE_URL"] = "postgresql://trace:secret@db.example:5432/trace"
+        try:
+            text = main._describe(type("S", (), {"name": "trace_v1", "run_id": lambda self: "abc"})())
+        finally:
+            del os.environ["DATABASE_URL"]
+        self.assertNotIn("secret", text)
+        self.assertIn("db.example", text)
+        self.assertIn("run=abc", text)
+
     def test_services_shape(self):
         s = self.c.get("/api/services").json()[0]
         self.assertEqual(set(s), {"service", "span_count", "trace_count", "error_rate", "p50_ms", "p99_ms"})

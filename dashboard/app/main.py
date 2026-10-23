@@ -21,6 +21,7 @@ Env:
   DATABASE_URL=postgresql://trace:trace@localhost:55432/trace   trace_v1 store
   RUN_ID=<uuid>                 trace_v1: which run to show (default newest)
   RAW_BUCKET, RAW_PREFIX, UPLOAD_EXPIRES   uploads
+  LOG_LEVEL=INFO                logging level; requests over SLOW_REQUEST_MS (default 250) are logged at INFO
 
 Run locally: uvicorn app.main:app --reload
 """
@@ -41,6 +42,8 @@ from . import models
 from .store import JsonlStore, Store, TraceQuery
 
 log = logging.getLogger("dashboard")
+logging.basicConfig(level=os.environ.get("LOG_LEVEL", "INFO").upper(), format="%(asctime)s %(levelname)s %(name)s: %(message)s")
+SLOW_REQUEST_MS = float(os.environ.get("SLOW_REQUEST_MS", "250"))
 STATIC_DIR = os.path.join(os.path.dirname(os.path.dirname(__file__)), "static")
 SAFE_NAME = re.compile(r"[^A-Za-z0-9._-]+")
 
@@ -52,7 +55,19 @@ def get_store() -> Store:
     global _store
     if _store is None:
         _store = make_store()
+        log.info("store %s ready: %s", _store.name, _describe(_store))
     return _store
+
+
+def _describe(store: Store) -> str:
+    """One line for the start-up log, without secrets."""
+    if store.name == "trace_v1":
+        url = re.sub(r"//[^@/]*@", "//", os.environ.get("DATABASE_URL", ""))   # drop user:password@
+        run = store.run_id() if hasattr(store, "run_id") else None
+        return f"{url} run={run or 'newest'}"
+    if store.name == "sqlite":
+        return os.environ.get("SQLITE_PATH", "traces.db")
+    return os.environ.get("DATA_DIR", "data")
 
 
 def make_store() -> Store:
@@ -76,6 +91,17 @@ def use_store(store: Store) -> None:
     """Swap the store, used by tests."""
     global _store
     _store = store
+
+
+@app.middleware("http")
+async def time_requests(request, call_next):
+    """Log method, path, status and elapsed ms; slow requests at INFO, the rest at DEBUG."""
+    t = time.perf_counter()
+    response = await call_next(request)
+    ms = (time.perf_counter() - t) * 1000
+    level = logging.INFO if ms >= SLOW_REQUEST_MS else logging.DEBUG
+    log.log(level, "%s %s %d %.1fms", request.method, request.url.path, response.status_code, ms)
+    return response
 
 
 @app.get("/api/health", response_model=models.Health)

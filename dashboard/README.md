@@ -13,7 +13,7 @@ cd dashboard
 pip install -r requirements.txt
 python tools/make_demo_data.py            # 200 demo traces + an example ranking in data/
 uvicorn app.main:app --reload             # http://127.0.0.1:8000
-python -m unittest discover -s tests -t . # 36 tests
+python -m unittest discover -s tests -t . # the tests (see Tests below)
 ```
 
 With real data instead of the demo set, point `DATA_DIR` at a folder of normalized
@@ -132,9 +132,14 @@ as-is. A window with an empty `rankings` list and a `note` is the honest
   (or a layer). Handler: `app.lambda_handler.handler`. 512 MB is plenty.
 - Function URL with auth type NONE for now (the page is public read-only); we can
   switch to IAM or add a token later.
-- Environment: `STORE=sqlite` is only for local use. For Aurora, add a store that
-  opens the connection (Data API or psycopg) and passes it to `SqlStore(conn, "%s")`;
-  that is a few lines in `app/main.py:make_store`.
+- Environment: `STORE=trace_v1` with `DATABASE_URL` (from Secrets Manager) and
+  optionally `RUN_ID`. `psycopg[binary]` must be in the package. `STORE=sqlite` and
+  `STORE=jsonl` are for local use only.
+- Logging: standard `logging` to stderr (CloudWatch in Lambda). On the first request
+  one line says which store and run is in use (the database password is never
+  printed); every request is logged with method, path, status and elapsed ms, at
+  INFO when it took over `SLOW_REQUEST_MS` (default 250) and at DEBUG otherwise.
+  `LOG_LEVEL` sets the level (default INFO).
 - Uploads: set `RAW_BUCKET` (and optionally `RAW_PREFIX`, default `uploads/`). The
   Lambda role needs `s3:PutObject` on that prefix, and the bucket needs a CORS rule
   allowing `PUT` from the dashboard's origin, otherwise the browser upload fails.
@@ -163,7 +168,7 @@ queries regardless of the number of services. The waterfall draws at most 600 ro
 ## Tests
 
 ```bash
-python -m unittest discover -s tests -t .      # 65 unit tests, no database or browser needed
+python -m unittest discover -s tests -t .      # 67 unit tests, no database or browser needed
 TEST_DATABASE_URL=postgresql://trace:trace@localhost:55432/trace python -m unittest tests.test_tracev1_store   # 6 contract tests on the real schema
 pip install playwright && playwright install chromium
 python -m unittest tests.test_ui               # 3 browser smoke tests on the demo data
