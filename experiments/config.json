@@ -2,7 +2,8 @@
   "out": "experiments/results",
   "replay": [],
   "rcaeval": {
-    "cases": ["data/rcaeval/re2ob_*", "data/rcaeval/re2tt_*"],
+    "cases": ["data/rcaeval/re2ob_*", "data/rcaeval/re2tt_*", "data/rcaeval/re3ob_*", "data/rcaeval/re3tt_*"],
+    "workers": 2,
     "methods": ["slowest_average", "longest_span", "critical_path_only"],
     "extra_methods": []
   },

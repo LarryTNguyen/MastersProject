@@ -64,8 +64,9 @@ def step_rcaeval(cfg: dict, out: str, log) -> dict:
         return {}
     methods = list(rc.get("methods", ["slowest_average", "longest_span", "critical_path_only"]))
     methods += [f"{mod}" for mod in rc.get("extra_methods", [])]
-    log(f"rcaeval: {len(dirs)} cases x {len(methods)} methods")
-    result = rcaeval_eval.evaluate(dirs, methods, log)
+    workers = int(rc.get("workers", 1))
+    log(f"rcaeval: {len(dirs)} cases x {len(methods)} methods, {workers} worker(s)")
+    result = rcaeval_eval.evaluate(dirs, methods, log, workers=workers)
     rcaeval_eval.write_results(result, out)
     return result["summary"]
 

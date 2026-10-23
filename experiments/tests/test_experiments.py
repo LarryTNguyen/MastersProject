@@ -61,7 +61,15 @@ class BaselineTests(unittest.TestCase):
         self.assertGreaterEqual(s["acc@1"], 0.8)          # the error case may rank elsewhere
         self.assertLess(res["summary"]["slowest_average"]["acc@1"], s["acc@1"])
         self.assertIn("delay", s["by_fault"])
+        self.assertIn("re2ob", s["by_benchmark"])
         self.assertEqual(res["failed"], [])
+
+    def test_parallel_workers_give_the_same_answer(self):
+        methods = ["slowest_average", "critical_path_only"]
+        one = rcaeval_eval.evaluate(self.cases, methods, log=lambda *_: None, workers=1)
+        two = rcaeval_eval.evaluate(self.cases, methods, log=lambda *_: None, workers=2)
+        self.assertEqual(one["rows"], two["rows"])
+        self.assertEqual(one["summary"], two["summary"])
 
     def test_bad_case_is_skipped_not_fatal(self):
         bad = os.path.join(self.tmp, "re2ob_nothing_delay_9")

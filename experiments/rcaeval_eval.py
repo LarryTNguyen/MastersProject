@@ -51,26 +51,53 @@ def evaluate_case(case_dir: str, methods: Dict[str, object]) -> List[dict]:
     return rows
 
 
-def evaluate(case_dirs: List[str], method_specs: List[str], log=print) -> dict:
+def _one(args):
+    """Worker: evaluate one case; returns (rows, error)."""
+    case_dir, method_specs = args
     methods = {spec.split(":")[-1] if ":" in spec else spec: load_method(spec) for spec in method_specs}
+    try:
+        return evaluate_case(case_dir, methods), None
+    except Exception as e:  # one bad case must not stop the run
+        return [], repr(e)
+
+
+def evaluate(case_dirs: List[str], method_specs: List[str], log=print, workers: int = 1) -> dict:
+    """Score every method on every case. ``workers`` > 1 runs cases in parallel
+    (a real Train Ticket case is about 1M spans, so two workers halve the time)."""
+    names = [spec.split(":")[-1] if ":" in spec else spec for spec in method_specs]
     rows: List[dict] = []
     failed = []
-    for d in case_dirs:
-        try:
-            rows.extend(evaluate_case(d, methods))
-        except Exception as e:  # one bad case must not stop the run
-            failed.append({"case": os.path.basename(d), "error": repr(e)})
-            log(f"skipped {d}: {e}")
+    jobs = [(d, method_specs) for d in case_dirs]
+    if workers > 1 and len(jobs) > 1:
+        from multiprocessing import Pool
+        with Pool(workers) as pool:
+            results = pool.imap(_one, jobs)
+            for d, (case_rows, err) in zip(case_dirs, results):
+                _collect(d, case_rows, err, rows, failed, log)
+    else:
+        for d, job in zip(case_dirs, jobs):
+            case_rows, err = _one(job)
+            _collect(d, case_rows, err, rows, failed, log)
     summary = {}
-    for name in methods:
+    for name in names:
         ranks = [r["rank"] for r in rows if r["method"] == name]
         summary[name] = summarize(ranks)
-        by_fault: Dict[str, list] = {}
-        for r in rows:
-            if r["method"] == name:
-                by_fault.setdefault(r["fault"], []).append(r["rank"])
-        summary[name]["by_fault"] = {f: summarize(v) for f, v in sorted(by_fault.items())}
+        for key, field in (("by_fault", "fault"), ("by_benchmark", "benchmark")):
+            groups: Dict[str, list] = {}
+            for r in rows:
+                if r["method"] == name:
+                    groups.setdefault(r[field], []).append(r["rank"])
+            summary[name][key] = {g: summarize(v) for g, v in sorted(groups.items())}
     return {"rows": rows, "summary": summary, "failed": failed}
+
+
+def _collect(case_dir, case_rows, err, rows, failed, log):
+    if err:
+        failed.append({"case": os.path.basename(case_dir), "error": err})
+        log(f"skipped {case_dir}: {err}")
+    else:
+        rows.extend(case_rows)
+        log(f"{os.path.basename(case_dir)}: " + ", ".join(f"{r['method']} rank {r['rank']}" for r in case_rows))
 
 
 def expand(patterns: List[str]) -> List[str]:
@@ -97,11 +124,12 @@ def main(argv=None):
     ap.add_argument("cases", nargs="+", help="case folders or glob patterns")
     ap.add_argument("--methods", nargs="+", default=["slowest_average", "longest_span", "critical_path_only"])
     ap.add_argument("--out", default="experiments/results/latest")
+    ap.add_argument("--workers", type=int, default=1, help="cases evaluated in parallel")
     a = ap.parse_args(argv)
     dirs = expand(a.cases)
     if not dirs:
         sys.exit("no case folders matched")
-    result = evaluate(dirs, a.methods)
+    result = evaluate(dirs, a.methods, workers=a.workers)
     write_results(result, a.out)
     for name, s in result["summary"].items():
         print(f"{name:22s} cases={s['cases']:4d} acc@1={s['acc@1']:.3f} acc@3={s['acc@3']:.3f} mrr={s['mrr']:.3f}")
