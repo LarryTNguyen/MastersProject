@@ -1,1 +1,5 @@
 matplotlib>=3.7
+# for the RCAEval Parquet cases and the download helper
+pandas>=2.0
+pyarrow>=14
+huggingface_hub>=0.23

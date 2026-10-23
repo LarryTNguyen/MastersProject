@@ -5,3 +5,4 @@ __pycache__/
 dashboard/data/
 experiments/results/
 replay_out/
+data/
