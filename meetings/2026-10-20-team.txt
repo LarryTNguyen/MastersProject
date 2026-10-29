@@ -18,7 +18,7 @@ Matthew:
 - Larry's trace schema and reconstruction merged into main (PR #1): canonical span record format, PostgreSQL trace_v1 schema, reconstruction worker
 - [add anything else discussed]
 3) Issues / Blockers
-- RCAEval dataset download is blocked on home network (Hugging Face); need campus access or a mirror
+- RCAEval dataset download (Hugging Face, RE2/RE3 trace cases) scheduled this week; score the naive baselines on it first
 - Dashboard needs to be updated to read the new canonical record format and the trace_v1 tables
 - [add]
 4) Action Items

@@ -42,7 +42,9 @@ from . import models
 from .store import JsonlStore, Store, TraceQuery
 
 log = logging.getLogger("dashboard")
-logging.basicConfig(level=os.environ.get("LOG_LEVEL", "INFO").upper(), format="%(asctime)s %(levelname)s %(name)s: %(message)s")
+log.setLevel(os.environ.get("LOG_LEVEL", "INFO").upper())
+if not logging.getLogger().handlers:   # local run: print to stderr; in Lambda the runtime's handler already exists
+    logging.basicConfig(format="%(asctime)s %(levelname)s %(name)s: %(message)s")
 SLOW_REQUEST_MS = float(os.environ.get("SLOW_REQUEST_MS", "250"))
 STATIC_DIR = os.path.join(os.path.dirname(os.path.dirname(__file__)), "static")
 SAFE_NAME = re.compile(r"[^A-Za-z0-9._-]+")

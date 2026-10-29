@@ -22,7 +22,7 @@ Attendees:
 - Prof. Trivedi asked for a written update report
 
 3) Issues / Blockers
-- RCAEval dataset download blocked (Hugging Face not reachable from home network); asked about campus access
+- RCAEval dataset: trace cases (RE2/RE3) to be downloaded from Hugging Face next; naive baselines run on them first
 - Sprint 3 slipped by about a week because of midterms and interviews
 
 4) Action Items

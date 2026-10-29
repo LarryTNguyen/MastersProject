@@ -11,11 +11,14 @@ import glob
 import json
 import os
 import time
+import logging
 from typing import Dict, Iterable, List, Optional, Tuple
 
 from . import analysis
 from .canonical import span_from_any
 from .stitch import group_by_trace, percentile, trace_summary
+
+log = logging.getLogger("dashboard")
 
 
 class TraceQuery:
@@ -171,6 +174,7 @@ class JsonlStore(Store):
                 data = json.load(fh)
             self._rankings = data if isinstance(data, list) else [data]
         self._stamp = stamp
+        log.info("jsonl store reloaded: %d files, %d spans, %d traces", len(self._files()), len(unique), len(self._traces))
 
     def count_traces(self) -> int:
         self.reload()
