@@ -98,6 +98,74 @@ class UiSmokeTests(unittest.TestCase):
         self.assertIn("traces", pg.inner_text(".flame .fr:first-child .fb"))
         self.assertEqual(errors, [])
 
+    def test_fresh_pill_on_live_demo_data(self):
+        pg, errors = self.page()
+        pg.goto(f"http://127.0.0.1:{self.port}/")
+        pg.wait_for_selector("#fresh:not([hidden])")
+        self.assertEqual(pg.get_attribute("#fresh", "class"), "pill ok")
+        self.assertEqual(pg.inner_text("#fresh"), "data is fresh")
+        self.assertEqual(errors, [])
+
+    def test_endpoint_choice_is_remembered(self):
+        pg, errors = self.page()
+        base = f"http://127.0.0.1:{self.port}/"
+        pg.goto(base + "#rankings")
+        pg.wait_for_selector("#cp-body tr")
+        pg.select_option("#cp-endpoint", "HTTP POST /cart/checkout")
+        pg.reload()
+        pg.goto(base + "#flame")
+        pg.wait_for_selector(".flame .fb")
+        self.assertEqual(pg.eval_on_selector("#fl-endpoint", "e => e.value"), "HTTP POST /cart/checkout")
+        self.assertEqual(errors, [])
+
+
+@unittest.skipIf(sync_playwright is None, "playwright not installed")
+class UiStaleDataTests(unittest.TestCase):
+    """Same demo data moved two hours into the past: the header pill must turn amber."""
+
+    @classmethod
+    def setUpClass(cls):
+        import json
+        cls.tmp = tempfile.mkdtemp()
+        subprocess.check_call([sys.executable, "tools/make_demo_data.py", cls.tmp, "--now"], cwd=HERE,
+                              stdout=subprocess.DEVNULL)
+        path = os.path.join(cls.tmp, "demo_spans.jsonl")
+        shift = 2 * 3600 * 1_000_000
+        with open(path) as f:
+            rows = [json.loads(line) for line in f if line.strip()]
+        for r in rows:
+            r["start_us"] -= shift
+            for k in ("sta.received_us", "sta.normalized_us"):
+                if k in r["attributes"]:
+                    r["attributes"][k] -= shift
+        with open(path, "w") as f:
+            f.writelines(json.dumps(r) + "\n" for r in rows)
+        cls.port = free_port()
+        cls.server = subprocess.Popen([sys.executable, "-m", "uvicorn", "app.main:app", "--port", str(cls.port)],
+                                      cwd=HERE, env={**os.environ, "DATA_DIR": cls.tmp},
+                                      stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+        for _ in range(50):
+            try:
+                socket.create_connection(("127.0.0.1", cls.port), timeout=0.2).close()
+                break
+            except OSError:
+                time.sleep(0.2)
+        cls.pw = sync_playwright().start()
+        cls.browser = cls.pw.chromium.launch()
+
+    @classmethod
+    def tearDownClass(cls):
+        cls.browser.close()
+        cls.pw.stop()
+        cls.server.terminate()
+
+    def test_stale_pill_turns_amber(self):
+        pg = self.browser.new_page()
+        pg.goto(f"http://127.0.0.1:{self.port}/")
+        pg.wait_for_selector("#fresh:not([hidden])")
+        self.assertEqual(pg.get_attribute("#fresh", "class"), "pill stale")
+        self.assertIn("no new data for", pg.inner_text("#fresh"))
+
 
 if __name__ == "__main__":
     unittest.main()

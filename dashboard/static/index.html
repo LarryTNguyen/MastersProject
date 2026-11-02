@@ -15,6 +15,7 @@
   header { display: flex; align-items: center; gap: 16px; padding: 10px 20px; background: var(--panel); border-bottom: 1px solid var(--line); }
   header h1 { font-size: 16px; margin: 0; }
   header .status { color: var(--muted); font-size: 12px; margin-left: auto; }
+  header .pill { cursor: help; }
   nav button { background: none; border: 0; padding: 8px 10px; cursor: pointer; color: var(--muted); border-bottom: 2px solid transparent; font: inherit; }
   nav button.active { color: var(--accent); border-color: var(--accent); }
   main { padding: 16px 20px; max-width: 1400px; margin: 0 auto; }
@@ -36,6 +37,7 @@
   .pill.error { color: var(--err); border-color: #fecaca; background: #fef2f2; }
   .pill.unset { color: var(--muted); }
   .pill.incomplete { color: var(--warn); border-color: #fde68a; background: #fffbeb; }
+  .pill.stale { color: var(--warn); border-color: #fde68a; background: #fffbeb; }
   .muted { color: var(--muted); }
   .pager { display: flex; gap: 8px; align-items: center; margin-top: 10px; color: var(--muted); font-size: 12px; }
   .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
@@ -89,6 +91,7 @@
     <button data-view="upload">Upload</button>
   </nav>
   <span class="status" id="status">connecting…</span>
+  <span class="pill" id="fresh" hidden></span>
 </header>
 <main>
   <!-- ---------------- Overview ---------------- -->
@@ -415,7 +418,13 @@
     const roots = (await api('/api/traces?limit=200&sort=duration_desc')).items.map(t => t.root_operation);
     const list = [...new Set(roots.concat(ops.filter(o => roots.includes(o))))];
     sel.innerHTML = '<option value="">all endpoints</option>' + list.map(o => `<option>${esc(o)}</option>`).join('');
+    const saved = remembered('endpoint');
+    if (saved && list.includes(saved)) sel.value = saved;
   }
+  // the last endpoint picked on Bottlenecks or Flame graph comes back after a reload (this browser only)
+  function remembered(key) { try { return localStorage.getItem('dash.' + key); } catch (e) { return null; } }
+  function remember(key, value) { try { localStorage.setItem('dash.' + key, value); } catch (e) {} }
+  ['cp-endpoint', 'fl-endpoint'].forEach(id => $(id).addEventListener('change', e => remember('endpoint', e.target.value)));
   async function loadCompare() {
     const p = new URLSearchParams();
     if ($('cp-endpoint').value) p.set('endpoint', $('cp-endpoint').value);
@@ -525,6 +534,29 @@
     });
   }
 
+  // ---------- header freshness pill ----------
+  // green when data is flowing on time, amber when the newest span is over 5 min old or p95 staleness is over 60 s,
+  // hidden when no span has ingest stamps (demo data without --now, or a store loaded by hand)
+  const STALE_AFTER_S = 300, TARGET_P95_MS = 60000;
+  async function checkFreshness() {
+    const el = $('fresh');
+    let p;
+    try { p = await api('/api/pipeline?window_s=900'); } catch (e) { return; }
+    if (!p.spans_with_stamps || p.seconds_since_last == null) { el.hidden = true; return; }
+    const p95 = p.staleness_ms.p95;
+    let cls = 'ok', text = 'data is fresh';
+    if (p.seconds_since_last > STALE_AFTER_S) {
+      cls = 'stale'; text = `no new data for ${p.seconds_since_last < 7200 ? Math.round(p.seconds_since_last / 60) + ' min' : Math.round(p.seconds_since_last / 3600) + ' h'}`;
+    } else if (p95 != null && p95 >= TARGET_P95_MS) {
+      cls = 'stale'; text = `behind: p95 ${(p95 / 1000).toFixed(0)} s`;
+    }
+    el.className = 'pill ' + cls;
+    el.textContent = text;
+    el.title = cls === 'ok' ? 'Newest span arrived recently and p95 staleness is under the 60 s target.'
+      : 'Rankings may not include the latest traffic yet. See the Pipeline view for details.';
+    el.hidden = false;
+  }
+
   // ---------- boot ----------
   async function boot() {
     try {
@@ -540,6 +572,8 @@
     show(views.includes(h) ? h : 'overview');
   }
   boot();
+  checkFreshness();
+  setInterval(checkFreshness, 30000);
 })();
 </script>
 </body>
