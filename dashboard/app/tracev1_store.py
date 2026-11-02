@@ -9,31 +9,63 @@ filling span_features / critical_path they can replace that.
 
 TraceV1Store(psycopg.connect(DATABASE_URL)). Shows one run at a time: run_id
 arg, else the newest run.
+
+Pass connect= (a function that opens a new connection) and a dropped connection
+gets reopened on the next query instead of failing every request until the
+Lambda instance is recycled. Every query here is a read, so retrying once is safe.
 """
 from __future__ import annotations
 
 import json
-from typing import Dict, Iterable, List, Optional, Tuple
+import logging
+from typing import Callable, Dict, Iterable, List, Optional, Tuple
 
 from .canonical import span_from_record
 from .stitch import percentile, trace_summary
 from .store import SORTS, Store, TraceQuery
 
 _CONFIDENCE = {"HIGH": 0.9, "MEDIUM": 0.6, "LOW": 0.3, "UNAVAILABLE": None}
+log = logging.getLogger("dashboard")
+
+
+def _is_connection_error(e: Exception) -> bool:
+    """True for errors that mean the connection itself is gone (server restart, idle timeout, closed)."""
+    try:
+        import psycopg
+    except ImportError:
+        return False
+    return isinstance(e, (psycopg.OperationalError, psycopg.InterfaceError))
 
 
 class TraceV1Store(Store):
     name = "trace_v1"
 
-    def __init__(self, conn, run_id: Optional[str] = None):
+    def __init__(self, conn, run_id: Optional[str] = None, connect: Optional[Callable[[], object]] = None):
         self.conn = conn
         self._run_id = run_id
+        self._connect = connect
+        self.reconnects = 0
 
     # ---- helpers ----
-    def _rows(self, sql: str, params=()) -> List[tuple]:
+    def _query(self, sql: str, params=()) -> List[tuple]:
         with self.conn.cursor() as cur:
             cur.execute(sql, params)
             return cur.fetchall()
+
+    def _rows(self, sql: str, params=()) -> List[tuple]:
+        try:
+            return self._query(sql, params)
+        except Exception as e:
+            if self._connect is None or not _is_connection_error(e):
+                raise
+            log.warning("database connection lost (%s), reconnecting", type(e).__name__)
+            try:
+                self.conn.close()
+            except Exception:
+                pass
+            self.conn = self._connect()
+            self.reconnects += 1
+            return self._query(sql, params)
 
     def run_id(self) -> Optional[str]:
         if self._run_id:

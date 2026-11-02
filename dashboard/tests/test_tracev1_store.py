@@ -137,6 +137,27 @@ class TraceV1StoreTests(unittest.TestCase):
         p = self.store.pipeline(now_us=1_700_000_010_000_000)
         self.assertEqual(p["spans_with_stamps"], 9)       # received_at_unix_ns on every record
 
+    def test_reconnects_after_the_connection_drops(self):
+        import psycopg
+        from app.tracev1_store import TraceV1Store
+        store = TraceV1Store(psycopg.connect(DSN, autocommit=True), run_id=RUN,
+                             connect=lambda: psycopg.connect(DSN, autocommit=True))
+        old_pid = store.conn.info.backend_pid
+        with self.conn.cursor() as cur:      # kill the store's connection from the outside, like an idle timeout
+            cur.execute("SELECT pg_terminate_backend(%s)", (old_pid,))
+        self.assertEqual(store.count_traces(), 3)
+        self.assertEqual(store.reconnects, 1)
+        self.assertNotEqual(store.conn.info.backend_pid, old_pid)
+        store.conn.close()
+
+    def test_no_reconnect_without_a_connect_function(self):
+        import psycopg
+        from app.tracev1_store import TraceV1Store
+        store = TraceV1Store(psycopg.connect(DSN, autocommit=True), run_id=RUN)
+        store.conn.close()
+        with self.assertRaises((psycopg.OperationalError, psycopg.InterfaceError)):
+            store.count_traces()
+
 
 if __name__ == "__main__":
     unittest.main()

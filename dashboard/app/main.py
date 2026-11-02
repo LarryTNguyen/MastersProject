@@ -77,8 +77,9 @@ def make_store() -> Store:
     if kind == "trace_v1":
         import psycopg
         from .tracev1_store import TraceV1Store
-        conn = psycopg.connect(os.environ["DATABASE_URL"], autocommit=True)
-        return TraceV1Store(conn, run_id=os.environ.get("RUN_ID"))
+        def connect():
+            return psycopg.connect(os.environ["DATABASE_URL"], autocommit=True)
+        return TraceV1Store(connect(), run_id=os.environ.get("RUN_ID"), connect=connect)
     if kind == "sqlite":
         import sqlite3
         from .sql_store import SqlStore
