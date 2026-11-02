@@ -99,4 +99,4 @@ derived from their source reference, so retries are idempotent. Set
 1. **Matthew:**
    - Which header does the collector Lambda expect for the token? (Default here: `Authorization: Bearer <token>`, configurable with `--auth-header` / `--auth-scheme`.)
    - Does the dashboard API presign endpoint shape (`POST {filename, content_type}` → `{url, key}`) work for you?
-2. **Adapter Lambda setup:** S3 event → SQS → this Lambda, with `ReportBatchItemFailures` on. Env: `NORMALIZED_PREFIX` (default `normalized/`), optional `NORMALIZED_BUCKET`, `BASE_EPOCH_US`, and `TRACE_RUN_ID`. Handler: `traceingest.adapter_lambda.handler`.
+2. **Adapter Lambda setup:** build the zip with `python tools/build_lambda.py` (from `ingest/`, writes `dist/adapter-lambda.zip`, about 30 KB, standard library only so it runs on arm64 or x86_64). S3 event → SQS → this Lambda, with `ReportBatchItemFailures` on. Env: `NORMALIZED_PREFIX` (default `normalized/`), optional `NORMALIZED_BUCKET`, `BASE_EPOCH_US`, and `TRACE_RUN_ID`. Handler: `traceingest.adapter_lambda.handler`.

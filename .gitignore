@@ -6,3 +6,4 @@ dashboard/data/
 experiments/results/
 replay_out/
 data/
+dist/

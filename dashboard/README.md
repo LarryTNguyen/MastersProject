@@ -128,13 +128,19 @@ as-is. A window with an empty `rankings` list and a `note` is the honest
 
 ## Deploying (for Matthew)
 
-- Package `app/` and `static/` with `fastapi`, `mangum`, `pydantic` into the Lambda
-  (or a layer). Handler: `app.lambda_handler.handler`. 512 MB is plenty.
+- Build the zip with `python tools/build_lambda.py` (from `dashboard/`). It pulls Linux
+  arm64 wheels for Python 3.12 (works from a Mac too), adds `app/` and `static/`, and
+  writes `dist/dashboard-lambda.zip` (about 8 MB). `--arch x86_64` and `--python 3.13`
+  change the target. Handler: `app.lambda_handler.handler`. 512 MB is plenty.
 - Function URL with auth type NONE for now (the page is public read-only); we can
   switch to IAM or add a token later.
 - Environment: `STORE=trace_v1` with `DATABASE_URL` (from Secrets Manager) and
-  optionally `RUN_ID`. `psycopg[binary]` must be in the package. `STORE=sqlite` and
+  optionally `RUN_ID`. `psycopg[binary]` is in the zip. `STORE=sqlite` and
   `STORE=jsonl` are for local use only.
+- A Lambda instance lives for hours, so the database connection can drop (Aurora
+  pausing, an idle timeout, a failover). The trace_v1 store reopens it on the next
+  request and retries that query once, logging a warning, instead of failing every
+  request until the instance is recycled.
 - Logging: standard `logging` to stderr (CloudWatch in Lambda). On the first request
   one line says which store and run is in use (the database password is never
   printed); every request is logged with method, path, status and elapsed ms, at
@@ -146,6 +152,16 @@ as-is. A window with an empty `rankings` list and a `note` is the honest
 - Presigned URLs expire after `UPLOAD_EXPIRES` seconds (default 900). Filenames are
   sanitized and prefixed with the date and a random id, so uploads never overwrite
   each other.
+
+## Header freshness pill
+
+Next to the trace count the header shows a small pill, refreshed every 30 s from
+`/api/pipeline`: green "data is fresh" when the newest span arrived in the last 5
+minutes and p95 staleness is under the 60 s target, amber when either one is not
+true, and nothing when no span carries ingest stamps (demo data without `--now`).
+It is there so nobody reads a ranking as current while the pipeline is behind.
+The endpoint picked on Bottlenecks or Flame graph is remembered in the browser and
+comes back after a reload.
 
 ## Analysis in `app/analysis.py`
 
@@ -169,9 +185,9 @@ queries regardless of the number of services. The waterfall draws at most 600 ro
 
 ```bash
 python -m unittest discover -s tests -t .      # 67 unit tests, no database or browser needed
-TEST_DATABASE_URL=postgresql://trace:trace@localhost:55432/trace python -m unittest tests.test_tracev1_store   # 6 contract tests on the real schema
+TEST_DATABASE_URL=postgresql://trace:trace@localhost:55432/trace python -m unittest tests.test_tracev1_store   # 8 tests on the real schema (incl. reconnect after a dropped connection)
 pip install playwright && playwright install chromium
-python -m unittest tests.test_ui               # 3 browser smoke tests on the demo data
+python -m unittest tests.test_ui               # 6 browser tests on the demo data (incl. the freshness pill)
 ```
 
 ## Requirements covered
