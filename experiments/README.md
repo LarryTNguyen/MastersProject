@@ -85,6 +85,37 @@ or cartservice, which have no spans in the traces at all, so no trace-only metho
 them (the other 18 are code-level faults in emailservice and currencyservice that change
 errors more than timing).
 
+## Freshness on one machine
+
+`local_pipeline.py` runs the whole pipeline locally and measures freshness (N1)
+before the AWS deployment is up. The replayer sends spans at 1x to a small local
+collector (it checks the token and stores each batch, like the collector Lambda);
+from there it is the real code: the adapter Lambda's handler, the reconstruction
+store and worker on PostgreSQL, and the dashboard's pipeline numbers.
+
+```bash
+docker compose up -d postgres            # repo root
+python -m experiments.local_pipeline data/rcaeval/re2ob_checkoutservice_cpu_1 --seconds 180 --keep-values
+```
+
+First run (Nov 2, `reported/2026-11-02-local-freshness/`), one RCAEval Online
+Boutique case at 1x for 3 minutes: 46,409 spans, 2,827 traces, all settled, no
+duplicates or adapter failures.
+
+| | p50 | p95 | p99 |
+|---|---|---|---|
+| staleness (span end → normalized, the Pipeline view's number) | 0.61 s | 1.10 s | 1.23 s |
+| adapter lag (collector → normalized) | 0.15 s | 0.34 s | |
+| settle (last span end → trace settled, includes the 5 s quiet window) | 6.48 s | 8.16 s | 9.31 s |
+
+The 60 s target is met with a wide margin locally. On AWS the SQS hop and Lambda
+start-up add to this, so these numbers are a lower bound. The AWS measurement is
+the same replay sent to the collector's Function URL (`python -m traceingest replay
+... --url <collector URL> --rebase-to-now`), with the runner's freshness step pulling
+the numbers from the deployed dashboard (`"freshness": {"dashboard_url": ...}` in
+`config.json`). `--keep-values` stores every staleness value so `figures.py` can
+draw the CDF.
+
 ## Usability study
 
 `usability/protocol.md` is the procedure for the timed Jaeger-versus-dashboard
