@@ -69,7 +69,7 @@ class TopologyQualityTests(unittest.TestCase):
         self.assertEqual(trace.root_span_id, self.root["span_id"])
         self.assertEqual(trace.children[self.root["span_id"]],
                          (self.payment["span_id"], self.inventory["span_id"]))
-        self.assertFalse(trace.quality["self_time_ready"])
+        self.assertTrue(trace.quality["self_time_ready"])
         self.assertFalse(trace.quality["critical_path_ready"])
         self.assertFalse(trace.quality["duplicate_count_available"])
 

@@ -55,7 +55,7 @@ def main(dsn: str) -> None:
         with store.connection.cursor() as cursor:
             cursor.execute(
                 "SELECT input_revision, topology, quality FROM trace_v1.current_trace_analyses "
-                "WHERE run_id=%s::uuid AND trace_id=%s AND algorithm_version='topology-v1'",
+                "WHERE run_id=%s::uuid AND trace_id=%s AND algorithm_version='timing-v1'",
                 (run_id, trace_id),
             )
             revision, topology, quality = cursor.fetchone()
@@ -78,7 +78,7 @@ def main(dsn: str) -> None:
         with store.connection.cursor() as cursor:
             cursor.execute(
                 "SELECT input_revision, quality FROM trace_v1.current_trace_analyses "
-                "WHERE run_id=%s::uuid AND trace_id=%s AND algorithm_version='topology-v1'",
+                "WHERE run_id=%s::uuid AND trace_id=%s AND algorithm_version='timing-v1'",
                 (run_id, trace_id),
             )
             revision, quality = cursor.fetchone()

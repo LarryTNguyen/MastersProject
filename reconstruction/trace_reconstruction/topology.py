@@ -1,8 +1,6 @@
 """Pure trace grouping and topology reconstruction.
 
-This module deliberately does not calculate self time or a critical path.  It
-only establishes the observed parent topology and the evidence needed to say
-whether that topology is connected, incomplete, invalid, or unknown.
+Establishes topology and computes quality-gated observed timing features.
 """
 from __future__ import annotations
 
@@ -76,11 +74,12 @@ class TraceGroup:
     def has_conflicts(self) -> bool:
         return bool(self.conflict_span_ids)
 
-    def reconstruct(self) -> "ReconstructedTrace":
+    def reconstruct(self, *, assume_synchronous=False) -> "ReconstructedTrace":
         return reconstruct_trace(
             self.records.values(),
             duplicate_count=self.duplicate_count,
             conflict_span_ids=self.conflict_span_ids,
+            assume_synchronous=assume_synchronous,
         )
 
 
@@ -94,6 +93,8 @@ class ReconstructedTrace:
     parents: dict[str, Optional[str]]
     children: dict[str, tuple[str, ...]]
     quality: dict
+    timing_features: dict = field(default_factory=dict)
+    critical_path: Optional[dict] = None
 
     def span_features(self) -> dict:
         """Serializable flat topology stored with the trace analysis."""
@@ -101,6 +102,7 @@ class ReconstructedTrace:
             span["span_id"]: {
                 "parent_span_id": self.parents[span["span_id"]],
                 "children": list(self.children[span["span_id"]]),
+                **self.timing_features.get(span["span_id"], {}),
             }
             for span in self.spans
         }
@@ -135,6 +137,7 @@ def reconstruct_trace(
     duplicate_count: Optional[int] = None,
     conflict_span_ids: Iterable[str] = (),
     has_conflicts: bool = False,
+    assume_synchronous: bool = False,
 ) -> ReconstructedTrace:
     materialized = [copy.deepcopy(dict(record)) for record in records]
     if not materialized:
@@ -193,10 +196,7 @@ def reconstruct_trace(
     observed_status_count = sum(r.get("status", {}).get("code") in {"OK", "ERROR"} for r in ordered)
     error_span_count = sum(r.get("status", {}).get("code") == "ERROR" for r in ordered)
     conflicts = sorted(set(map(str, conflict_span_ids)))
-    unavailable_reasons = {
-        "self_time": "deferred_to_sprint_4",
-        "critical_path": "deferred_to_sprint_4",
-    }
+    unavailable_reasons = {}
     if has_conflicts and not conflicts:
         unavailable_reasons["conflict_span_ids"] = "conflict_payloads_are_retained_outside_trace_state"
     if duplicate_count is None:
@@ -219,7 +219,7 @@ def reconstruct_trace(
         "critical_path_ready": False,
         "unavailable_reasons": unavailable_reasons,
     }
-    return ReconstructedTrace(
+    trace = ReconstructedTrace(
         run_id=run_id,
         trace_id=trace_id,
         topology=topology,
@@ -229,3 +229,13 @@ def reconstruct_trace(
         children={key: tuple(value) for key, value in children_lists.items()},
         quality=quality,
     )
+    from dataclasses import replace
+    from .timing import analyze_timing
+    features, critical_path, reason = analyze_timing(trace, assume_synchronous=assume_synchronous)
+    quality['self_time_ready'] = all(f['observed_self_time_ns'] is not None for f in features.values())
+    quality['critical_path_ready'] = critical_path is not None
+    if not quality['self_time_ready']:
+        unavailable_reasons['self_time'] = 'see_per_span_unavailable_reasons'
+    if reason:
+        unavailable_reasons['critical_path'] = reason
+    return replace(trace, timing_features=features, critical_path=critical_path)

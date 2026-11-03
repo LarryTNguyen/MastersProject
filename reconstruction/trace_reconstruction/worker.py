@@ -16,16 +16,18 @@ class WorkerStats:
 
 
 class ReconstructionWorker:
-    def __init__(self, store, *, algorithm_version: str = "topology-v1", configuration=None):
+    def __init__(self, store, *, algorithm_version: str = None, configuration=None):
         self.store = store
-        self.algorithm_version = algorithm_version
         self.configuration = configuration or {}
+        self.algorithm_version = algorithm_version or (
+            'timing-v1-synchronous' if self.configuration.get('assume_synchronous') else 'timing-v1')
 
     def _analyze_candidate(self, candidate) -> bool:
         records, revision, has_conflicts = self.store.fetch_trace(candidate.run_id, candidate.trace_id)
         if revision != candidate.revision:
             return False
-        trace = reconstruct_trace(records, has_conflicts=has_conflicts)
+        trace = reconstruct_trace(records, has_conflicts=has_conflicts,
+                                  assume_synchronous=self.configuration.get('assume_synchronous', False))
         try:
             self.store.publish_topology(
                 trace,

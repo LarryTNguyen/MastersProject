@@ -186,6 +186,10 @@ class PostgresStore:
         ends = [int(span["end_time_ns"]) for span in trace.spans if span.get("end_time_ns") is not None]
         observed_start = min(starts) if starts else None
         observed_end = max(ends) if ends else None
+        domains = {s.get('time_domain') for s in trace.spans}
+        if len(starts) != len(trace.spans) or len(ends) != len(trace.spans) or len(domains) != 1 or domains & {None, 'UNKNOWN'}:
+            observed_start = observed_end = None
+        root = next((s for s in trace.spans if s['span_id'] == trace.root_span_id), {})
         try:
             with self.connection.cursor() as cursor:
                 cursor.execute(
@@ -195,12 +199,13 @@ class PostgresStore:
                        configuration, topology, root_span_id, observed_start_ns,
                        observed_end_ns, root_duration_ns, quality, span_features, critical_path)
                     VALUES (%s::uuid, %s::uuid, %s, %s, %s, %s::jsonb, %s, %s,
-                            %s, %s, %s, %s::jsonb, %s::jsonb, NULL)
+                            %s, %s, %s, %s::jsonb, %s::jsonb, %s::jsonb)
                     """,
                     (analysis_id, trace.run_id, trace.trace_id, revision, algorithm_version,
                      json.dumps(configuration or {}), trace.topology, trace.root_span_id,
-                     observed_start, observed_end, None, json.dumps(trace.quality),
-                     json.dumps(trace.span_features())),
+                     observed_start, observed_end, root.get('duration_ns'), json.dumps(trace.quality),
+                     json.dumps(trace.span_features()),
+                     json.dumps(trace.critical_path) if trace.critical_path is not None else None),
                 )
             self.connection.commit()
             return analysis_id

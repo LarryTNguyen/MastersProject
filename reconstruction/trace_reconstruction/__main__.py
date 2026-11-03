@@ -46,13 +46,15 @@ def cmd_inspect(args) -> None:
     groups = group_records(_records(args.input))
     output = []
     for key in sorted(groups):
-        trace = groups[key].reconstruct()
+        trace = groups[key].reconstruct(assume_synchronous=args.assume_synchronous)
         output.append({
             "run_id": trace.run_id,
             "trace_id": trace.trace_id,
             "topology": trace.topology,
             "root_span_id": trace.root_span_id,
             "quality": trace.quality,
+            "span_features": trace.span_features(),
+            "critical_path": trace.critical_path,
         })
     print(json.dumps(output, indent=2))
 
@@ -86,7 +88,7 @@ def cmd_ingest(args) -> None:
 def cmd_poll(args) -> None:
     store = _store(args)
     try:
-        worker = ReconstructionWorker(store)
+        worker = ReconstructionWorker(store, configuration={'assume_synchronous': args.assume_synchronous})
         if args.forever:
             worker.run_forever(interval_seconds=args.interval, limit=args.limit)
         else:
@@ -98,7 +100,7 @@ def cmd_poll(args) -> None:
 def cmd_finish(args) -> None:
     store = _store(args)
     try:
-        stats = ReconstructionWorker(store).finish_run(args.run_id)
+        stats = ReconstructionWorker(store, configuration={'assume_synchronous': args.assume_synchronous}).finish_run(args.run_id)
         print(json.dumps(vars(stats), indent=2))
     finally:
         store.close()
@@ -141,6 +143,9 @@ def build_parser() -> argparse.ArgumentParser:
     finish_parser = sub.add_parser("finish", help="settle and analyze every open trace in a run")
     finish_parser.add_argument("run_id")
     finish_parser.set_defaults(func=cmd_finish)
+    for command in (inspect_parser, poll_parser, finish_parser):
+        command.add_argument('--assume-synchronous', action='store_true',
+                             help='enable a labeled last-finisher critical-path estimate')
     return parser
 
 

@@ -1,4 +1,5 @@
 __pycache__/
+.venv/
 *.pyc
 .snapshots/
 *.db
@@ -7,3 +8,4 @@ experiments/results/
 replay_out/
 data/
 dist/
+Workbook2/

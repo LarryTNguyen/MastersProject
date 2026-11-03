@@ -1,14 +1,21 @@
 # Trace reconstruction
 
-This package implements the Sprint 3 reconstruction boundary. It groups
+This package implements the reconstruction and observed-timing boundary. It groups
 canonical span records by `(run_id, trace_id)`, performs first-observation-wins
 retry deduplication, reconstructs explicit/inferred parent relationships, and
 publishes a revisioned topology and quality result after quiet-window, hard
 timeout, or end-of-input settlement.
 
-Self time and critical path are deliberately unavailable in this version. The
-analysis records make that explicit so Sprint 4 can add them without changing
-the ingestion or lifecycle model.
+Self time subtracts the union of comparable child intervals, clipped to the
+parent. Missing intervals, incomplete topology, and conflicts remain unavailable
+with per-span reasons. `--assume-synchronous` enables a labeled last-finisher
+critical-path estimate, with non-overlapping attributed segments and explicit
+assumptions. The default leaves critical path unavailable: parent links alone
+do not establish blocking dependencies. Worker versions are `timing-v1` and
+`timing-v1-synchronous`, so existing topology-only analyses are recomputed.
+
+See [the sprint 4 runbook](../docs/sprint-4.md) for episode diagnosis, the case-study
+report, and the normalized S3/SQS consumer.
 
 ## Local setup
 
