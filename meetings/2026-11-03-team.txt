@@ -1,0 +1,23 @@
+Meeting Type: Team-Only
+Date: 2026-11-03
+Start–End Time: 6:18pm – 6:45 pm
+Location/Mode: Discord
+Attendees:
+- Larry
+- Anukrithi
+- Matthew
+1) Accomplished Since Last Meeting
+Larry: Sprint 4 portion of goals
+Anukrithi: Sprint 5 portion
+Matthew: Configured clouds
+2) Accomplished During This Meeting
+Updated each other on what progress was made 
+Set up goals for the next couple of weeks 
+3) Issues / Blockers
+Cloud set up 
+Bottleneck score
+4) Action Items
+- Action: Test out reconstruction and bottleneck ranking | Owner: Larry | Due: 11/7
+- Action: Sprint 5 goals | Owner: Anukrithi and Matthew | Due: 11/11
+5) Plans / Goals for Next Meeting
+Test out more of our code
