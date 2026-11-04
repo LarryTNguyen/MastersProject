@@ -63,6 +63,11 @@ derived from their source reference, so retries are idempotent. Set
   `DURATION_ONLY`; the dataset timestamp remains replay provenance and is not
   claimed as a measured interval.
 - Note: dedup holds the file in memory, so split a full-day file by hour before converting.
+- One `MSCallGraph_<n>.csv` from the v2021 release is 5 minutes of the whole sampled cluster (about 6M rows, 1.3 GB). `tools/alibaba_sample.py` cuts it down to what one application would send: the traces that enter through one entry service, optionally only a hashed share of them, so the same command always gives the same sample. `--list` shows the entry services by traffic.
+  ```bash
+  python tools/alibaba_sample.py MSCallGraph_0.csv --list
+  python tools/alibaba_sample.py MSCallGraph_0.csv -o top1_2pct.csv --entry top1 --fraction 0.02   # 80k rows, 1,441 traces
+  ```
 
 **RCAEval (RE2/RE3).** Uses the same columns RCAEval's own trace methods read: traceID, spanID, parentSpanID, serviceName, operationName, methodName, startTime, duration, and a status code column if present.
 - Case folders `{benchmark}_{service}_{fault}_{instance}` also give the ground truth. `convert` writes it to `<output>.label.json` (root-cause service, fault, inject time) for the RCAEval adapter (E12).
