@@ -110,13 +110,18 @@ def read_jsonl(path: str) -> List[dict]:
 
 
 # ---------------------------------------------------------------- measurement
+SPAN_END_NS = ("COALESCE(s.end_time_ns, (s.data->'source'->'details'->>'replay_start_ns')::bigint"
+               " + (s.data->>'duration_ns')::bigint)")
+
 def settle_latency_ms(conn, run_id: str) -> List[float]:
-    """Per trace: when it settled minus when its last span ended (both wall clock, ms)."""
+    """Per trace: when it settled minus when its last span ended (both wall clock, ms).
+    Alibaba call observations have no absolute end time, so their replay start plus
+    duration is used instead (the same fallback the dashboard uses)."""
     with conn.cursor() as cur:
         cur.execute(
-            "SELECT EXTRACT(EPOCH FROM t.settled_at) * 1000 - max(s.end_time_ns) / 1e6 "
+            f"SELECT EXTRACT(EPOCH FROM t.settled_at) * 1000 - max({SPAN_END_NS}) / 1e6 "
             "FROM trace_v1.traces t JOIN trace_v1.spans s ON s.run_id = t.run_id AND s.trace_id = t.trace_id "
-            "WHERE t.run_id = %s AND t.settled_at IS NOT NULL AND s.end_time_ns IS NOT NULL "
+            f"WHERE t.run_id = %s AND t.settled_at IS NOT NULL AND {SPAN_END_NS} IS NOT NULL "
             "GROUP BY t.trace_id, t.settled_at", (run_id,))
         return [float(r[0]) for r in cur.fetchall()]
 
@@ -151,6 +156,12 @@ def run(args) -> dict:
     run_created = False
     counts = {"batches": 0, "spans": 0, "adapter_failures": 0}
     ingest = {}
+    busy = {"adapter": 0.0, "ingest": 0.0, "worker": 0.0}     # seconds spent in each stage
+
+    def poll_worker():
+        t = time.perf_counter()
+        worker.poll_once(limit=1000)
+        busy["worker"] += time.perf_counter() - t
 
     cmd = [sys.executable, "-m", "traceingest", "replay", os.path.abspath(args.input), "--speed", str(args.speed),
            "--url", url, "--token", token, "--rebase-to-now", "--quiet"]
@@ -168,8 +179,10 @@ def run(args) -> dict:
             except queue.Empty:
                 return handled
             last_arrival = time.time()
+            t = time.perf_counter()
             with contextlib.redirect_stdout(io.StringIO()):     # the handler prints one log line per file
                 result = adapter_lambda.handler(s3_event(key, received), s3=s3)
+            busy["adapter"] += time.perf_counter() - t
             counts["adapter_failures"] += len(result["batchItemFailures"])
             for r in result["results"]:
                 records = read_jsonl(os.path.join(work, *r["output"].split("/", 3)[3].split("/")))
@@ -180,8 +193,10 @@ def run(args) -> dict:
                                      source_format=r["format"], identity_kind=records[0]["identity_kind"],
                                      dataset_name=os.path.basename(args.input.rstrip("/")))
                     run_created = True
+                t = time.perf_counter()
                 for k, v in store.ingest_many(records).items():
                     ingest[k] = ingest.get(k, 0) + v
+                busy["ingest"] += time.perf_counter() - t
                 counts["spans"] += len(records)
             counts["batches"] += 1
             handled += 1
@@ -189,7 +204,7 @@ def run(args) -> dict:
     try:
         while time.time() - started < args.seconds and replayer.poll() is None:
             drain_once()
-            worker.poll_once(limit=1000)
+            poll_worker()
             time.sleep(0.2)
     finally:
         if replayer.poll() is None:
@@ -202,9 +217,10 @@ def run(args) -> dict:
     deadline = time.time() + args.settle_wait
     while time.time() < deadline:
         drain_once()
-        worker.poll_once(limit=1000)
+        poll_worker()
         time.sleep(0.5)
     server.shutdown()
+    elapsed = time.time() - started
 
     conn = psycopg.connect(args.dsn, autocommit=True)
     dash = TraceV1Store(conn, run_id=run_id)
@@ -222,12 +238,14 @@ def run(args) -> dict:
         "ingest": ingest,
         "adapter_failures": counts["adapter_failures"], "trace_states": states,
         "incomplete_rate": pipe["incomplete_rate"],
+        "elapsed_s": round(elapsed, 1),
+        "busy_s": {k: round(v, 1) for k, v in busy.items()},
         "staleness_ms_values": [],
     }
     if args.keep_values:
         with conn.cursor() as cur:
-            cur.execute("SELECT (data->'attributes'->'sta.normalized_us'->>'value')::bigint / 1000.0 - end_time_ns / 1e6 "
-                        "FROM trace_v1.spans WHERE run_id = %s AND end_time_ns IS NOT NULL", (run_id,))
+            cur.execute(f"SELECT (s.data->'attributes'->'sta.normalized_us'->>'value')::bigint / 1000.0 - {SPAN_END_NS} / 1e6 "
+                        f"FROM trace_v1.spans s WHERE s.run_id = %s AND {SPAN_END_NS} IS NOT NULL", (run_id,))
             result["staleness_ms_values"] = [round(float(r[0]), 1) for r in cur.fetchall() if r[0] is not None]
     conn.close()
     store.close()
@@ -240,6 +258,7 @@ def run(args) -> dict:
 
 def summary_md(r: dict) -> str:
     s, st = r["staleness_ms"], r["settle_ms"]
+    busy = ", ".join(f"{k} {v:.0f} s" for k, v in r.get("busy_s", {}).items()) + f" of {r.get('elapsed_s', 0):.0f} s"
     ok = s.get("p95") is not None and s["p95"] < r["target_p95_ms"]
     fmt = lambda v: "–" if v is None else f"{v / 1000:.2f} s"
     return (
@@ -251,6 +270,7 @@ def summary_md(r: dict) -> str:
         f"| staleness (span end → normalized, what the Pipeline view shows) | {fmt(s.get('p50'))} | {fmt(s.get('p95'))} | {fmt(s.get('p99'))} |\n"
         f"| adapter lag (collector → normalized) | {fmt(r['lag_ms'].get('p50'))} | {fmt(r['lag_ms'].get('p95'))} | – |\n"
         f"| settle (last span end → trace settled) | {fmt(st['p50'])} | {fmt(st['p95'])} | {fmt(st['p99'])} |\n\n"
+        f"Time spent per stage (one process): {busy}.\n\n"
         f"N1 target: p95 staleness under 60 s → **{'met' if ok else 'not met'}** locally. "
         f"Settle time includes the 5 s quiet window by design. AWS adds the SQS hop and Lambda start-up, "
         f"so these are a lower bound for the deployed pipeline.\n")

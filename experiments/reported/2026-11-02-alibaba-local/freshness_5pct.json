@@ -1,0 +1,45 @@
+{
+  "run_id": "a48da24c-9dd3-487a-8d9a-e82bc01b529c",
+  "input": "data/alibaba2021/samples/top1_5pct.csv",
+  "speed": "1",
+  "seconds": 310.0,
+  "where": "one machine, local PostgreSQL 16",
+  "target_p95_ms": 60000,
+  "staleness_ms": {
+    "p50": 31392.142,
+    "p95": 75781.765,
+    "p99": 79468.043
+  },
+  "lag_ms": {
+    "p50": 30974.216,
+    "p95": 75462.748
+  },
+  "settle_ms": {
+    "p50": 233928.4,
+    "p95": 363508.8,
+    "p99": 376107.5,
+    "traces": 3560
+  },
+  "spans_with_stamps": 154264,
+  "spans": 154264,
+  "batches": 365,
+  "ingest": {
+    "INSERTED": 154264,
+    "DUPLICATE": 0,
+    "CONFLICT": 0
+  },
+  "adapter_failures": 0,
+  "trace_states": {
+    "SETTLED": 428,
+    "TIMED_OUT": 3136
+  },
+  "incomplete_rate": 1.0,
+  "elapsed_s": 409.9,
+  "busy_s": {
+    "adapter": 8.2,
+    "ingest": 365.2,
+    "worker": 29.0
+  },
+  "command": "python -m experiments.local_pipeline data/alibaba2021/samples/top1_5pct.csv --seconds 310 --settle-wait 20 --keep-values",
+  "staleness_ms_values": []
+}

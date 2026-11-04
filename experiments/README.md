@@ -116,11 +116,41 @@ the numbers from the deployed dashboard (`"freshness": {"dashboard_url": ...}` i
 `config.json`). `--keep-values` stores every staleness value so `figures.py` can
 draw the CDF.
 
+### Alibaba production traces
+
+Run on Nov 2 (`reported/2026-11-02-alibaba-local/`), samples of the first 5-minute
+file of the Alibaba v2021 release cut with `ingest/tools/alibaba_sample.py` (commands
+in `REPRODUCE.md`), replayed at 1x for the full 5 minutes:
+
+| sample | spans | traces | staleness p50 / p95 / p99 | settled by quiet window |
+|---|---|---|---|---|
+| 2%, about 210 spans/s | 62,390 | 1,441 | 0.51 / 1.19 / 2.00 s | all |
+| 5%, about 510 spans/s | 154,264 | 3,564 | 31.4 / 75.8 / 79.5 s | 428 (rest hit the 60 s timeout) |
+
+At 2% the target is met as easily as on RCAEval. At 5% one process falls behind:
+ingest (validating and storing each record) takes about 2.1–2.4 ms per span, so the
+local harness tops out around 420–470 spans/s. The summary breaks the time down by
+stage; on AWS each batch is its own Lambda, so this is a limit of the one-process
+harness, and the per-span ingest cost is the thing to watch in the throughput tests.
+
 ## Usability study
 
 `usability/protocol.md` is the procedure for the timed Jaeger-versus-dashboard
-comparison; fill in `usability/timing_log.csv` as sessions happen. Jaeger setup is in
-`baselines/jaeger/`.
+comparison. The kit does the setup:
+
+```bash
+python -m experiments.usability.episodes prepare data/rcaeval    # episodes A-D, task sheet, answer key
+python -m experiments.usability.session P1                       # one participant: load, read, time, log
+python -m experiments.usability.usability_stats experiments/usability/timing_log.csv
+```
+
+`episodes.py` cuts four RCAEval delay faults (two Online Boutique, two Train Ticket)
+to 5 minutes either side of the fault and picks the busiest endpoint that clearly got
+slower and is not served by the culprit. `load` moves an episode so it ends half a
+minute ago and sends it to Jaeger over OTLP and/or into the dashboard's data folder.
+`schedule.csv` (from `schedule.py`) counterbalances tool order and which episodes go
+to which tool. `session.py` times each answer and checks it against the answer key,
+so the facilitator never has to look at it. Jaeger setup is in `baselines/jaeger/`.
 
 ## Cost
 
