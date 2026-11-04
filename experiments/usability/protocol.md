@@ -4,30 +4,74 @@ Goal: measure how long it takes a person to name the service responsible for a s
 episode, and how often they are right, using Jaeger (today's manual approach) and
 our dashboard, on the same traces.
 
-## Setup
+## Episodes
 
-- Load one dataset with a known bottleneck into both tools (`baselines/jaeger/load.sh`
-  and the dashboard's data folder). Use an episode where the ground truth is known:
-  an RCAEval case, or an Astronomy Shop run with a failure flag on.
-- Prepare 4 episodes (A–D). Each participant sees two in Jaeger and two in the
-  dashboard. Alternate which tool comes first between participants so learning
-  effects cancel out: participant 1 = Jaeger first, participant 2 = dashboard first, …
-- Participants should not have seen the dataset before. Team members do not count
-  as participants.
+Four RCAEval delay faults, each cut to 5 minutes before and 5 minutes after the
+fault starts:
 
-## Procedure, per episode
+| episode | benchmark | case |
+|---|---|---|
+| A | Online Boutique | `re2ob_checkoutservice_delay_1` |
+| B | Online Boutique | `re2ob_recommendationservice_delay_1` |
+| C | Train Ticket | `re2tt_ts-route-service_delay_1` |
+| D | Train Ticket | `re2tt_ts-travel-service_delay_1` |
 
-1. Read the task aloud: "Requests to *endpoint* became slow around *time*. Which
-   service is most likely responsible?" Start the timer when the participant touches
-   the mouse.
-2. Stop the timer when they name a service. Record the service and the time.
-3. Ask one follow-up, not timed: "What did you look at to decide?" Note it in one
-   line; this is the explanation-validity check.
-4. No hints. If they give up, record `gave_up` with the time and no service.
+For each one the kit picks the busiest endpoint that clearly got slower (p95 at least
+1.5x) and is not served by the culprit, so the question never contains the answer.
 
-## What to record
+## Setup, once
 
-One row per (participant, episode) in `timing_log.csv`:
+```bash
+python -m experiments.get_rcaeval --suites re2ob re2tt   # if data/rcaeval is not there yet
+python -m experiments.usability.episodes prepare data/rcaeval
+python -m experiments.usability.schedule 8 > experiments/usability/schedule.csv
+```
+
+`prepare` writes `experiments/usability/episodes/` (not committed): the spans for
+each episode, `task_sheet.md` with the sentence to read, and `answer_key.json`.
+Don't open the answer key in front of a participant; the session script checks
+answers for you.
+
+Start the two tools:
+
+```bash
+cd baselines/jaeger && docker compose up -d           # Jaeger UI on :16686, OTLP on :4318
+cd dashboard && DATA_DIR=../experiments/usability/episodes/live_dashboard uvicorn app.main:app --port 8000
+```
+
+The dashboard notices new files in its data folder by itself. If the scoring step's
+`rankings.json` is available for an episode, copy it into the same folder; without
+it, participants use the compare, waterfall and flame views.
+
+## Schedule
+
+`schedule.csv` gives each participant four episodes, two per tool, and repeats every
+four participants:
+
+- half start with Jaeger, half with the dashboard, and the tools alternate
+- each episode is done with both tools equally often
+- each tool gets one Online Boutique and one Train Ticket episode per person
+
+Participants should not have seen the datasets before. Team members do not count.
+
+## Running a session
+
+```bash
+python -m experiments.usability.session P3
+```
+
+The script walks through the participant's four episodes. For each one it:
+
+1. says which tool to open, and for a Jaeger episode waits while you restart Jaeger
+   (it keeps everything in memory, so this clears the previous episode);
+2. loads the episode, shifted in time so it ends half a minute ago, and prints the
+   sentence to read aloud, e.g. *"Requests to "frontend" on frontendservice became
+   slow around 14:32. Which service is most likely responsible?"*;
+3. starts the timer when you press Enter (when the participant touches the mouse),
+   and stops it when you type the service they named, or `gave_up`;
+4. asks for one line on what they looked at (the explanation check, not timed).
+
+No hints. Each episode is one row in `timing_log.csv`:
 
 | column | meaning |
 |---|---|
@@ -37,12 +81,17 @@ One row per (participant, episode) in `timing_log.csv`:
 | order | 1–4, the position of this episode in the session |
 | seconds | time to answer |
 | answer | service named, or `gave_up` |
-| correct | 1 if the answer matches the ground truth, else 0 |
+| correct | 1 if the answer matches the culprit, else 0 (names compared loosely) |
 | notes | what they looked at |
 
-Then: `python -m experiments.usability.usability_stats experiments/usability/timing_log.csv`
+To load an episode by hand instead (`session.py --no-load`):
+`python -m experiments.usability.episodes load B --tool jaeger`.
 
-## Reporting
+## Results
+
+```bash
+python -m experiments.usability.usability_stats experiments/usability/timing_log.csv
+```
 
 - Median and p25–p75 time per tool, accuracy per tool, and the per-participant
   difference (dashboard minus Jaeger) so the comparison is paired.
