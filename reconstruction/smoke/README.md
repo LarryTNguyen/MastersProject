@@ -68,6 +68,14 @@ Export the captured canonical records as JSONL and verify them:
 python smoke/astronomy_shop.py verify --input path/to/capture.jsonl
 ```
 
-The check intentionally validates trace evidence rather than a top-three
-ranking; ranking is Sprint 4 work. The runtime directory is disposable and
-should not be committed.
+The verifier requires a clearing timestamp, excludes traces crossing phase
+boundaries, rejects incomplete/conflicting topology and synthetic evidence, and
+writes `verification.json` with supporting trace IDs. Keep the manifest and
+capture with the experiment evidence. From the repository root, generate the
+Sprint 5 error-anomaly diagnosis and injected-service comparison:
+
+```powershell
+.\.venv\Scripts\python.exe -m diagnosis.fault_report --runtime reconstruction/.astronomy-smoke --input path/to/capture.jsonl --output data/astronomy/report
+```
+
+See [Sprint 5 policy and limitations](../../docs/sprint-5.md).

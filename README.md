@@ -41,6 +41,8 @@ Its rankings are illustrative, prewritten examples; the sprint 4 demo computes i
 
 See [Sprint 4 scope, real-data commands, AWS wiring, and verification](docs/sprint-4.md).
 
+See [Sprint 5 reliability policy, persisted baselines, error analysis, and fault-report commands](docs/sprint-5.md).
+
 Normalized JSONL from ingestion conforms to trace schema version 1. OTLP replay
 remains a standards-compatible `ExportTraceServiceRequest` for collectors.
 

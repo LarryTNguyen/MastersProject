@@ -46,3 +46,15 @@ class LambdaTests(unittest.TestCase):
     def test_invalid_body_is_retried(self):
         response = handler({'Records': [{'messageId': 'bad', 'body': 'not json'}]}, s3=S3(), store=Store())
         self.assertEqual(response['batchItemFailures'], [{'itemIdentifier': 'bad'}])
+
+    def test_invalid_canonical_message_does_not_discard_valid_message(self):
+        class MixedS3(S3):
+            def get_object(self, **kwargs):
+                if kwargs['Key'].endswith('invalid.jsonl'):
+                    return {'Body': io.BytesIO(b'{"schema_version":"invalid"}\n')}
+                return super().get_object(**kwargs)
+        store = Store()
+        response = handler({'Records': [message('invalid', 'normalized/invalid.jsonl'),
+                                        message('valid', 'normalized/spans.jsonl')]}, s3=MixedS3(), store=store)
+        self.assertEqual(response['batchItemFailures'], [{'itemIdentifier': 'invalid'}])
+        self.assertEqual(len(store.ingested), 3)

@@ -47,7 +47,13 @@ def main(dsn: str) -> None:
         duplicate = copy.deepcopy(payment)
         duplicate["received_at_unix_ns"] = str(int(duplicate["received_at_unix_ns"]) + 1)
         duplicate["source"]["raw_reference"] = "s3://retry/batch"
+        with store.connection.cursor() as cursor:
+            cursor.execute('SELECT revision, last_changed_at FROM trace_v1.traces WHERE run_id=%s::uuid AND trace_id=%s', (run_id, trace_id))
+            before_retry = cursor.fetchone()
         check(store.ingest_span(duplicate).value == "DUPLICATE", "retry was not deduplicated")
+        with store.connection.cursor() as cursor:
+            cursor.execute('SELECT revision, last_changed_at FROM trace_v1.traces WHERE run_id=%s::uuid AND trace_id=%s', (run_id, trace_id))
+            check(cursor.fetchone() == before_retry, 'duplicate changed revision or extended quiet window')
 
         worker = ReconstructionWorker(store)
         first = worker.finish_run(run_id)
@@ -67,6 +73,11 @@ def main(dsn: str) -> None:
         late["operation_name"] = "capture"
         late["source"]["record_key"] = late["span_id"]
         check(store.ingest_span(late).value == "INSERTED", "late span was not inserted")
+        with store.connection.cursor() as cursor:
+            cursor.execute('SELECT state, revision FROM trace_v1.traces WHERE run_id=%s::uuid AND trace_id=%s', (run_id, trace_id))
+            check(cursor.fetchone() == ('OPEN', 4), 'late span did not reopen revision 4')
+            cursor.execute('SELECT count(*) FROM trace_v1.current_trace_analyses WHERE run_id=%s::uuid AND trace_id=%s', (run_id, trace_id))
+            check(cursor.fetchone()[0] == 0, 'stale analysis remained current after late arrival')
         second = worker.finish_run(run_id)
         check((second.settled, second.analyzed) == (1, 1), "late revision was not reanalyzed")
 

@@ -111,21 +111,40 @@ def cmd_verify(args) -> None:
     if injected is None:
         raise ValueError("manifest has no injection timestamp; run inject first")
     injected_ns = int(injected)
+    cleared = manifest.get('cleared_at_unix_ns')
+    if cleared is None or int(cleared) <= injected_ns:
+        raise ValueError('manifest requires a clearing timestamp after injection')
+    cleared_ns = int(cleared)
+    healthy_start = int(manifest.get('healthy_started_at_unix_ns', 0))
 
     sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
     from trace_reconstruction.topology import group_records
 
     records = _read_jsonl(Path(args.input))
+    sys.path.insert(0, str(Path(__file__).resolve().parents[2] / 'trace_schema'))
+    from validate import validate_record
+    for index, record in enumerate(records, 1):
+        errors = validate_record(record)
+        if errors:
+            raise ValueError(f'invalid canonical record {index}: ' + '; '.join(errors))
+        if record['timing_quality'] != 'MEASURED' or record['time_domain'] != 'UNIX':
+            raise ValueError('experiment evidence requires measured UNIX intervals')
+        if any('synthetic' in flag.lower() for flag in record['quality_flags']):
+            raise ValueError('synthetic evidence is not an application experiment')
     wrong_run = sorted({record.get("run_id") for record in records if record.get("run_id") != manifest["run_id"]})
     groups = group_records(records)
     healthy = 0
     faulty = 0
     invalid = []
     missing_payment_error = []
+    healthy_ids, faulty_ids = [], []
+    unhealthy = []
     for (_, trace_id), group in groups.items():
         trace = group.reconstruct()
-        if trace.topology == "INVALID":
+        if (trace.topology != 'CONNECTED' or trace.quality['has_conflicts'] or
+                trace.quality['inferred_parent_count'] or trace.quality['out_of_bounds_child_count']):
             invalid.append(trace_id)
+            continue
         roots = [span for span in trace.spans if span.get("parent_relation") == "ROOT"]
         if len(roots) != 1 or roots[0].get("start_time_ns") is None:
             continue
@@ -133,10 +152,18 @@ def cmd_verify(args) -> None:
         is_checkout = "checkout" in root.get("service_name", "").lower() or "checkout" in (root.get("operation_name") or "").lower()
         if not is_checkout:
             continue
-        if int(root["start_time_ns"]) < injected_ns:
+        start, end = int(root['start_time_ns']), int(root['end_time_ns'])
+        if healthy_start <= start < injected_ns and end <= injected_ns:
+            if root['status']['code'] != 'OK' or any(s['status']['code'] == 'ERROR' for s in trace.spans):
+                unhealthy.append(trace_id)
+                continue
             healthy += 1
+            healthy_ids.append(trace_id)
+            continue
+        if not injected_ns <= start < cleared_ns or end > cleared_ns:
             continue
         faulty += 1
+        faulty_ids.append(trace_id)
         payment_errors = [
             span for span in trace.spans
             if span.get("service_name") == "payment" and span.get("status", {}).get("code") == "ERROR"
@@ -147,14 +174,16 @@ def cmd_verify(args) -> None:
     failures = []
     if wrong_run:
         failures.append(f"records contain unexpected run IDs: {wrong_run}")
-    if healthy < manifest["minimum_healthy_checkout_traces"]:
+    if healthy < max(5, manifest["minimum_healthy_checkout_traces"]):
         failures.append(f"only {healthy} healthy checkout traces")
-    if faulty < manifest["minimum_faulty_checkout_traces"]:
+    if faulty < max(5, manifest["minimum_faulty_checkout_traces"]):
         failures.append(f"only {faulty} faulty-window checkout traces")
     if missing_payment_error:
         failures.append(f"fault-window checkout traces without payment ERROR: {missing_payment_error[:10]}")
     if invalid:
         failures.append(f"invalid trace topology: {invalid[:10]}")
+    if unhealthy:
+        failures.append(f'healthy-window checkout traces lack success evidence: {unhealthy[:10]}')
 
     result = {
         "passed": not failures,
@@ -164,7 +193,11 @@ def cmd_verify(args) -> None:
         "invalid_trace_count": len(invalid),
         "faulty_without_payment_error_count": len(missing_payment_error),
         "failures": failures,
+        'healthy_trace_ids': healthy_ids,
+        'faulty_trace_ids': faulty_ids,
+        'data_label': 'application capture; provenance requires review',
     }
+    _write_json(runtime / 'verification.json', result)
     print(json.dumps(result, indent=2))
     if failures:
         raise SystemExit(1)

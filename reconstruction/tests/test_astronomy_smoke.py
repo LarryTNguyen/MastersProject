@@ -53,6 +53,7 @@ class AstronomySmokeTests(unittest.TestCase):
             manifest = {
                 "run_id": run_id,
                 "injected_at_unix_ns": str(injection_ns),
+                "cleared_at_unix_ns": "5000000000",
                 "minimum_healthy_checkout_traces": 5,
                 "minimum_faulty_checkout_traces": 5,
             }
@@ -68,6 +69,7 @@ class AstronomySmokeTests(unittest.TestCase):
                     record["run_id"] = run_id
                     record["trace_id"] = trace_id
                 trace_root["service_name"] = "checkout"
+                trace_root['status'] = {'code': 'OK', 'message': None}
                 trace_root["start_time_ns"] = str(start)
                 trace_root["end_time_ns"] = str(start + 1_000_000_000)
                 trace_root["duration_ns"] = "1000000000"
@@ -86,6 +88,22 @@ class AstronomySmokeTests(unittest.TestCase):
             self.assertTrue(result["passed"])
             self.assertEqual(result["healthy_checkout_traces"], 5)
             self.assertEqual(result["faulty_checkout_traces"], 5)
+            for change in ('after_clear', 'incomplete', 'synthetic', 'unknown_healthy'):
+                changed = copy.deepcopy(records)
+                if change == 'after_clear':
+                    for span in changed[10:]:
+                        span['start_time_ns'] = str(int(span['start_time_ns']) + 5_000_000_000)
+                        span['end_time_ns'] = str(int(span['end_time_ns']) + 5_000_000_000)
+                elif change == 'incomplete':
+                    changed[1]['parent_span_id'] = '0000000000000099'
+                elif change == 'synthetic':
+                    changed[0]['quality_flags'] = ['synthetic_demo']
+                else:
+                    changed[0]['status']['code'] = 'UNKNOWN'
+                capture.write_text(''.join(json.dumps(r) + '\n' for r in changed), encoding='utf-8')
+                with self.subTest(change=change), contextlib.redirect_stdout(io.StringIO()):
+                    with self.assertRaises((ValueError, SystemExit)):
+                        astronomy_shop.cmd_verify(argparse.Namespace(runtime=str(runtime), input=str(capture)))
 
 
 if __name__ == "__main__":
