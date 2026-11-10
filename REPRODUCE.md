@@ -19,8 +19,9 @@ Python 3.12. The browser tests also need `pip install playwright && python -m pl
 
 | number | saved in | command |
 |---|---|---|
-| 201 tests passing | CI (`.github/workflows/tests.yml`) | [Tests](#tests) |
+| 221 tests passing | CI (`.github/workflows/tests.yml`) | [Tests](#tests) |
 | naive baselines on 240 RCAEval cases (best acc@1 0.36) | `experiments/reported/2026-10-23-naive-baselines/` | [RCAEval baselines](#rcaeval-baselines) |
+| diagnosis score v1 on the same 240 cases (acc@1 0.15) | `experiments/reported/2026-11-10-diagnosis-score/` | [RCAEval baselines](#rcaeval-baselines) |
 | local freshness on RCAEval, p95 1.10 s | `experiments/reported/2026-11-02-local-freshness/` | [Local freshness](#local-freshness-rcaeval) |
 | local freshness on Alibaba production traces, p95 1.19 s | `experiments/reported/2026-11-02-alibaba-local/` | [Alibaba](#alibaba-production-traces) |
 | usability study times and accuracy | `experiments/usability/timing_log.csv` | [Usability](#usability-study) |
@@ -31,11 +32,11 @@ CI runs these on every push and pull request. Locally, with `TEST_DATABASE_URL` 
 (the PostgreSQL tests are skipped without it, the browser tests without Playwright):
 
 ```bash
-python -m unittest discover -s diagnosis/tests -t .               # 9
+python -m unittest discover -s diagnosis/tests -t .               # 19
 (cd ingest && python -m unittest discover -s tests -t .)           # 52
-(cd reconstruction && python -m unittest discover -s tests -t .)   # 33
+(cd reconstruction && python -m unittest discover -s tests -t .)   # 34
 (cd dashboard && python -m unittest discover -s tests -t .)        # 81 (8 PostgreSQL, 6 browser)
-python -m unittest discover -s experiments/tests -t .              # 26
+python -m unittest discover -s experiments/tests -t .              # 35
 ```
 
 ## RCAEval baselines
@@ -47,7 +48,12 @@ python -m experiments.run experiments/reported/2026-10-23-naive-baselines/config
 
 About 45 minutes with two workers. `experiments/results/latest/summary.md` should
 match `reported/2026-10-23-naive-baselines/summary.md` exactly; the methods are
-deterministic.
+deterministic. The diagnosis score has its own config and takes about 5 hours with
+two workers:
+
+```bash
+python -m experiments.run experiments/reported/2026-11-10-diagnosis-score/config.json
+```
 
 ## Local freshness (RCAEval)
 
@@ -86,6 +92,18 @@ python -m experiments.local_pipeline data/alibaba2021/samples/top1_5pct.csv --se
 
 The 2% sample is the freshness number; the 5% sample is where one process stops
 keeping up (see the saved summary).
+
+## Freshness on AWS
+
+Once the collector, the queue and the adapter Lambda are deployed, replay 3 minutes
+at 1x into the collector and read the stamps back from the normalized bucket (before
+Aurora) or from the dashboard (after). The exact commands are in
+`experiments/README.md`, "Freshness on AWS":
+
+```bash
+python -m experiments.aws_freshness files experiments/results/aws-normalized --since <replay start>
+python -m experiments.aws_freshness dashboard <dashboard Function URL>
+```
 
 ## Usability study
 

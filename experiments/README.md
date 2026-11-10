@@ -77,6 +77,16 @@ check the plumbing.
 | 2026-10-23 naive baselines | 240 (RE2-OB 90, RE2-TT 90, RE3-OB 30, RE3-TT 30) | slowest_average | 0.24 | 0.34 | 0.39 |
 | | | longest_span | 0.36 | 0.63 | 0.51 |
 | | | critical_path_only | 0.24 | 0.55 | 0.45 |
+| 2026-11-10 diagnosis score | same 240 | tail_share_excess (diagnosis v1) | 0.15 | 0.31 | 0.23 |
+
+The diagnosis package's ranking is scored through `diagnosis_method.py`
+(`"extra_methods": ["experiments.diagnosis_method:tail_share_excess"]`), which runs
+it unchanged with its defaults and combines the windows that overlap the fault.
+`reported/2026-11-10-diagnosis-score/summary.md` breaks down where the first version
+loses cases: it leaves the true service out of its ranking in 152 of 240 cases, the
+caller takes the blame for a slow callee in Online Boutique, half of the Train Ticket
+traces fail the interval-containment check, and RCAEval intervals count as derived
+rather than measured.
 
 Two things to keep in mind when reading those: on a single-root shop the front end is on
 every critical path and takes rank 1 in 114 of the 120 Online Boutique cases for the
@@ -115,6 +125,30 @@ the same replay sent to the collector's Function URL (`python -m traceingest rep
 the numbers from the deployed dashboard (`"freshness": {"dashboard_url": ...}` in
 `config.json`). `--keep-values` stores every staleness value so `figures.py` can
 draw the CDF.
+
+### Freshness on AWS
+
+The same measurement against the deployed pipeline. It needs the collector's
+Function URL and ingest token, and read access to the normalized bucket.
+
+```bash
+export STA_INGEST_TOKEN=<ingest token>
+START=$(date -u +%Y-%m-%dT%H:%MZ)
+(cd ingest && python -m traceingest replay ../data/rcaeval/re2ob_checkoutservice_cpu_1 --speed 1 \
+       --rebase-to-now --url <collector Function URL>)  # Ctrl+C after 3 minutes
+# wait a minute for the last batches, then:
+aws s3 sync s3://<normalized bucket>/normalized/ experiments/results/aws-normalized/
+python -m experiments.aws_freshness files experiments/results/aws-normalized --since $START
+```
+
+`--since` leaves out spans from earlier runs still in the bucket. This works before
+Aurora is up, because the adapter Lambda stamps every span when the collector received
+it and when it was normalized. Once reconstruction and the dashboard Lambda are
+deployed, `python -m experiments.aws_freshness dashboard <dashboard Function URL>`
+reads the same numbers from `/api/pipeline`. Both write `freshness.json` and
+`summary.md` (same fields as the local runs) to `experiments/results/aws-freshness-<time>/`;
+copy the folder into `reported/` once it's a run we quote. Checked against the local
+2% Alibaba run: reading its normalized files gives exactly the reported numbers.
 
 ### Alibaba production traces
 
