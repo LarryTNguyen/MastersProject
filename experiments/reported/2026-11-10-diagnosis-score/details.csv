@@ -1,0 +1,241 @@
+case,traces,excluded_traces,windows_during_fault,windows_with_ranking,notes
+re2ob_checkoutservice_cpu_1,23969,2,33,6,No service has sufficient excess time and an inflated critical-path share.
+re2ob_checkoutservice_cpu_2,12257,98,11,2,No service has sufficient excess time and an inflated critical-path share.
+re2ob_checkoutservice_cpu_3,24721,0,44,8,No separable tail episode.; No service has sufficient excess time and an inflated critical-path share.
+re2ob_checkoutservice_delay_1,24812,2,33,5,No separable tail episode.; No service has sufficient excess time and an inflated critical-path share.
+re2ob_checkoutservice_delay_2,24318,1,33,4,No separable tail episode.; No service has sufficient excess time and an inflated critical-path share.
+re2ob_checkoutservice_delay_3,24620,0,33,3,No separable tail episode.; No service has sufficient excess time and an inflated critical-path share.
+re2ob_checkoutservice_disk_1,23869,4,44,8,Insufficient traces in this endpoint window.; No service has sufficient excess time and an inflated critical-path share.
+re2ob_checkoutservice_disk_2,24997,0,33,6,No separable tail episode.; No service has sufficient excess time and an inflated critical-path share.
+re2ob_checkoutservice_disk_3,24858,1,44,8,Insufficient traces in this endpoint window.; No separable tail episode.; No service has sufficient excess time and an inflated critical-path share.
+re2ob_checkoutservice_loss_1,23471,39,33,6,No service has sufficient excess time and an inflated critical-path share.
+re2ob_checkoutservice_loss_2,24557,1,33,6,No service has sufficient excess time and an inflated critical-path share.
+re2ob_checkoutservice_loss_3,24469,22,44,8,Insufficient traces in this endpoint window.; No separable tail episode.; No service has sufficient excess time and an inflated critical-path share.
+re2ob_checkoutservice_mem_1,24772,5,33,6,No service has sufficient excess time and an inflated critical-path share.
+re2ob_checkoutservice_mem_2,19991,36,22,4,No service has sufficient excess time and an inflated critical-path share.
+re2ob_checkoutservice_mem_3,24716,2,33,6,No service has sufficient excess time and an inflated critical-path share.
+re2ob_checkoutservice_socket_1,24642,1,33,6,No service has sufficient excess time and an inflated critical-path share.
+re2ob_checkoutservice_socket_2,24729,0,33,6,No service has sufficient excess time and an inflated critical-path share.
+re2ob_checkoutservice_socket_3,24821,0,44,8,No separable tail episode.; No service has sufficient excess time and an inflated critical-path share.
+re2ob_currencyservice_cpu_1,24408,0,33,5,No separable tail episode.; No service has sufficient excess time and an inflated critical-path share.
+re2ob_currencyservice_cpu_2,24351,0,33,6,No service has sufficient excess time and an inflated critical-path share.
+re2ob_currencyservice_cpu_3,24583,1,33,6,No separable tail episode.; No service has sufficient excess time and an inflated critical-path share.
+re2ob_currencyservice_delay_1,23667,0,33,4,No separable tail episode.; No service has sufficient excess time and an inflated critical-path share.
+re2ob_currencyservice_delay_2,23622,0,33,6,No service has sufficient excess time and an inflated critical-path share.
+re2ob_currencyservice_delay_3,23369,0,44,7,Insufficient traces in this endpoint window.; No separable tail episode.; No service has sufficient excess time and an inflated critical-path share.
+re2ob_currencyservice_disk_1,22294,1,33,6,No service has sufficient excess time and an inflated critical-path share.
+re2ob_currencyservice_disk_2,24192,3,33,6,No service has sufficient excess time and an inflated critical-path share.
+re2ob_currencyservice_disk_3,24520,1,33,6,No service has sufficient excess time and an inflated critical-path share.
+re2ob_currencyservice_loss_1,20599,3,43,5,No separable tail episode.; No service has sufficient excess time and an inflated critical-path share.
+re2ob_currencyservice_loss_2,22493,1,33,6,No separable tail episode.; No service has sufficient excess time and an inflated critical-path share.
+re2ob_currencyservice_loss_3,21869,0,44,8,No separable tail episode.; No service has sufficient excess time and an inflated critical-path share.
+re2ob_currencyservice_mem_1,23168,0,44,8,Insufficient traces in this endpoint window.; No separable tail episode.; No service has sufficient excess time and an inflated critical-path share.
+re2ob_currencyservice_mem_2,23636,0,44,8,No service has sufficient excess time and an inflated critical-path share.
+re2ob_currencyservice_mem_3,23580,3,33,6,No service has sufficient excess time and an inflated critical-path share.
+re2ob_currencyservice_socket_1,24741,1,33,6,No service has sufficient excess time and an inflated critical-path share.
+re2ob_currencyservice_socket_2,24195,0,33,6,No service has sufficient excess time and an inflated critical-path share.
+re2ob_currencyservice_socket_3,24297,2,33,6,No service has sufficient excess time and an inflated critical-path share.
+re2ob_emailservice_cpu_1,23874,2,33,6,No service has sufficient excess time and an inflated critical-path share.
+re2ob_emailservice_cpu_2,25076,2,44,8,No separable tail episode.; No service has sufficient excess time and an inflated critical-path share.
+re2ob_emailservice_cpu_3,24977,3,33,6,No service has sufficient excess time and an inflated critical-path share.
+re2ob_emailservice_delay_1,24663,1,44,8,No service has sufficient excess time and an inflated critical-path share.
+re2ob_emailservice_delay_2,24709,2,44,8,Insufficient traces in this endpoint window.; No service has sufficient excess time and an inflated critical-path share.
+re2ob_emailservice_delay_3,24856,0,33,6,No service has sufficient excess time and an inflated critical-path share.
+re2ob_emailservice_disk_1,23535,4,44,8,No service has sufficient excess time and an inflated critical-path share.
+re2ob_emailservice_disk_2,24906,4,33,6,No separable tail episode.; No service has sufficient excess time and an inflated critical-path share.
+re2ob_emailservice_disk_3,22533,5,33,6,No service has sufficient excess time and an inflated critical-path share.
+re2ob_emailservice_loss_1,23539,0,33,6,No service has sufficient excess time and an inflated critical-path share.
+re2ob_emailservice_loss_2,24745,0,33,6,No service has sufficient excess time and an inflated critical-path share.
+re2ob_emailservice_loss_3,24554,2,33,6,No service has sufficient excess time and an inflated critical-path share.
+re2ob_emailservice_mem_1,24544,0,33,6,No service has sufficient excess time and an inflated critical-path share.
+re2ob_emailservice_mem_2,24620,1,44,7,Insufficient traces in this endpoint window.; No service has sufficient excess time and an inflated critical-path share.
+re2ob_emailservice_mem_3,24367,2332,33,5,No separable tail episode.; No service has sufficient excess time and an inflated critical-path share.
+re2ob_emailservice_socket_1,24861,0,33,6,No service has sufficient excess time and an inflated critical-path share.
+re2ob_emailservice_socket_2,25065,0,33,6,No service has sufficient excess time and an inflated critical-path share.
+re2ob_emailservice_socket_3,24698,1,44,8,No separable tail episode.; No service has sufficient excess time and an inflated critical-path share.
+re2ob_productcatalogservice_cpu_1,24014,7,33,5,No separable tail episode.; No service has sufficient excess time and an inflated critical-path share.
+re2ob_productcatalogservice_cpu_2,24275,2,33,4,No separable tail episode.; No service has sufficient excess time and an inflated critical-path share.
+re2ob_productcatalogservice_cpu_3,24613,1,33,5,No service has sufficient excess time and an inflated critical-path share.
+re2ob_productcatalogservice_delay_1,22537,1,33,6,No separable tail episode.; No service has sufficient excess time and an inflated critical-path share.
+re2ob_productcatalogservice_delay_2,22523,4,33,6,No separable tail episode.; No service has sufficient excess time and an inflated critical-path share.
+re2ob_productcatalogservice_delay_3,22516,1,33,6,No separable tail episode.; No service has sufficient excess time and an inflated critical-path share.
+re2ob_productcatalogservice_disk_1,23493,2,44,8,Insufficient traces in this endpoint window.; No service has sufficient excess time and an inflated critical-path share.
+re2ob_productcatalogservice_disk_2,24437,2,33,6,No separable tail episode.; No service has sufficient excess time and an inflated critical-path share.
+re2ob_productcatalogservice_disk_3,24420,3,44,8,No service has sufficient excess time and an inflated critical-path share.
+re2ob_productcatalogservice_loss_1,17167,101,33,6,Insufficient traces in this endpoint window.; No service has sufficient excess time and an inflated critical-path share.
+re2ob_productcatalogservice_loss_2,17364,32,43,6,Insufficient traces in this endpoint window.; No separable tail episode.; No service has sufficient excess time and an inflated critical-path share.
+re2ob_productcatalogservice_loss_3,21000,11,44,8,Insufficient traces in this endpoint window.; No service has sufficient excess time and an inflated critical-path share.
+re2ob_productcatalogservice_mem_1,19936,13,33,6,No service has sufficient excess time and an inflated critical-path share.
+re2ob_productcatalogservice_mem_2,20277,644,33,6,No separable tail episode.; No service has sufficient excess time and an inflated critical-path share.
+re2ob_productcatalogservice_mem_3,17363,639,44,8,Insufficient traces in this endpoint window.; No separable tail episode.; No service has sufficient excess time and an inflated critical-path share.
+re2ob_productcatalogservice_socket_1,23633,0,44,8,No separable tail episode.; No service has sufficient excess time and an inflated critical-path share.
+re2ob_productcatalogservice_socket_2,24488,2,33,6,No service has sufficient excess time and an inflated critical-path share.
+re2ob_productcatalogservice_socket_3,24745,4,33,6,No separable tail episode.; No service has sufficient excess time and an inflated critical-path share.
+re2ob_recommendationservice_cpu_1,23958,4,44,8,No service has sufficient excess time and an inflated critical-path share.
+re2ob_recommendationservice_cpu_2,24647,0,33,6,No service has sufficient excess time and an inflated critical-path share.
+re2ob_recommendationservice_cpu_3,24843,0,33,6,No separable tail episode.; No service has sufficient excess time and an inflated critical-path share.
+re2ob_recommendationservice_delay_1,24009,0,44,8,No separable tail episode.; No service has sufficient excess time and an inflated critical-path share.
+re2ob_recommendationservice_delay_2,24165,1,33,6,No service has sufficient excess time and an inflated critical-path share.
+re2ob_recommendationservice_delay_3,24275,0,33,6,No service has sufficient excess time and an inflated critical-path share.
+re2ob_recommendationservice_disk_1,23786,5,33,6,No service has sufficient excess time and an inflated critical-path share.
+re2ob_recommendationservice_disk_2,24660,0,33,6,No separable tail episode.; No service has sufficient excess time and an inflated critical-path share.
+re2ob_recommendationservice_disk_3,24884,1,33,6,No service has sufficient excess time and an inflated critical-path share.
+re2ob_recommendationservice_loss_1,21470,509,44,7,Insufficient traces in this endpoint window.; No separable tail episode.; No service has sufficient excess time and an inflated critical-path share.
+re2ob_recommendationservice_loss_2,23300,183,33,6,No service has sufficient excess time and an inflated critical-path share.
+re2ob_recommendationservice_loss_3,23093,166,44,8,No separable tail episode.; No service has sufficient excess time and an inflated critical-path share.
+re2ob_recommendationservice_mem_1,24159,1,44,8,No separable tail episode.; No service has sufficient excess time and an inflated critical-path share.
+re2ob_recommendationservice_mem_2,24014,2,33,6,No separable tail episode.; No service has sufficient excess time and an inflated critical-path share.
+re2ob_recommendationservice_mem_3,23936,4,33,6,No service has sufficient excess time and an inflated critical-path share.
+re2ob_recommendationservice_socket_1,18952,385,42,6,Insufficient traces in this endpoint window.; No separable tail episode.; No service has sufficient excess time and an inflated critical-path share.
+re2ob_recommendationservice_socket_2,24697,0,44,8,Insufficient traces in this endpoint window.; No service has sufficient excess time and an inflated critical-path share.
+re2ob_recommendationservice_socket_3,24678,2,44,8,No separable tail episode.; No service has sufficient excess time and an inflated critical-path share.
+re2tt_ts-auth-service_cpu_1,6707,3055,47,7,Insufficient traces in this endpoint window.; No separable tail episode.; No service has sufficient excess time and an inflated critical-path share.
+re2tt_ts-auth-service_cpu_2,6475,3131,35,11,Insufficient traces in this endpoint window.; No separable tail episode.; No service has sufficient excess time and an inflated critical-path share.
+re2tt_ts-auth-service_cpu_3,6408,3082,35,10,Insufficient traces in this endpoint window.; No separable tail episode.; No service has sufficient excess time and an inflated critical-path share.
+re2tt_ts-auth-service_delay_1,6478,4746,24,1,Insufficient traces in this endpoint window.; No separable tail episode.; No service has sufficient excess time and an inflated critical-path share.
+re2tt_ts-auth-service_delay_2,6491,3218,36,12,Insufficient traces in this endpoint window.; No separable tail episode.; No service has sufficient excess time and an inflated critical-path share.
+re2tt_ts-auth-service_delay_3,6860,3455,36,10,Insufficient traces in this endpoint window.; No separable tail episode.; No service has sufficient excess time and an inflated critical-path share.
+re2tt_ts-auth-service_disk_1,6479,3102,39,9,Insufficient traces in this endpoint window.; No separable tail episode.; No service has sufficient excess time and an inflated critical-path share.
+re2tt_ts-auth-service_disk_2,6415,3307,34,10,Insufficient traces in this endpoint window.; No separable tail episode.; No service has sufficient excess time and an inflated critical-path share.
+re2tt_ts-auth-service_disk_3,6550,3192,36,13,Insufficient traces in this endpoint window.; No separable tail episode.; No service has sufficient excess time and an inflated critical-path share.
+re2tt_ts-auth-service_loss_1,6667,3043,38,11,Insufficient traces in this endpoint window.; No separable tail episode.; No service has sufficient excess time and an inflated critical-path share.
+re2tt_ts-auth-service_loss_2,6673,3175,33,12,Insufficient traces in this endpoint window.; No separable tail episode.; No service has sufficient excess time and an inflated critical-path share.
+re2tt_ts-auth-service_loss_3,6601,5328,21,2,Insufficient traces in this endpoint window.; No separable tail episode.; No service has sufficient excess time and an inflated critical-path share.
+re2tt_ts-auth-service_mem_1,6507,3087,45,14,Insufficient traces in this endpoint window.; No separable tail episode.; No service has sufficient excess time and an inflated critical-path share.
+re2tt_ts-auth-service_mem_2,6325,3057,46,13,Insufficient traces in this endpoint window.; No separable tail episode.; No service has sufficient excess time and an inflated critical-path share.
+re2tt_ts-auth-service_mem_3,6330,3190,35,16,Insufficient traces in this endpoint window.; No separable tail episode.; No service has sufficient excess time and an inflated critical-path share.
+re2tt_ts-auth-service_socket_1,6545,3014,39,10,Insufficient traces in this endpoint window.; No separable tail episode.; No service has sufficient excess time and an inflated critical-path share.
+re2tt_ts-auth-service_socket_2,6437,3111,37,12,Insufficient traces in this endpoint window.; No separable tail episode.; No service has sufficient excess time and an inflated critical-path share.
+re2tt_ts-auth-service_socket_3,6355,3058,35,11,Insufficient traces in this endpoint window.; No separable tail episode.; No service has sufficient excess time and an inflated critical-path share.
+re2tt_ts-order-service_cpu_1,6477,3243,37,14,Insufficient traces in this endpoint window.; No separable tail episode.; No service has sufficient excess time and an inflated critical-path share.
+re2tt_ts-order-service_cpu_2,6746,3217,46,10,Insufficient traces in this endpoint window.; No separable tail episode.; No service has sufficient excess time and an inflated critical-path share.
+re2tt_ts-order-service_cpu_3,6249,2938,34,12,Insufficient traces in this endpoint window.; No separable tail episode.; No service has sufficient excess time and an inflated critical-path share.
+re2tt_ts-order-service_delay_1,3661,2712,13,0,Insufficient traces in this endpoint window.; No separable tail episode.; No service has sufficient excess time and an inflated critical-path share.
+re2tt_ts-order-service_delay_2,6517,2797,35,19,Insufficient traces in this endpoint window.; No separable tail episode.; No service has sufficient excess time and an inflated critical-path share.
+re2tt_ts-order-service_delay_3,6588,2595,36,12,Insufficient traces in this endpoint window.; No separable tail episode.; No service has sufficient excess time and an inflated critical-path share.
+re2tt_ts-order-service_disk_1,6547,3027,41,10,Insufficient traces in this endpoint window.; No separable tail episode.; No service has sufficient excess time and an inflated critical-path share.
+re2tt_ts-order-service_disk_2,6605,2720,36,15,Insufficient traces in this endpoint window.; No separable tail episode.; No service has sufficient excess time and an inflated critical-path share.
+re2tt_ts-order-service_disk_3,6633,2554,36,19,Insufficient traces in this endpoint window.; No separable tail episode.; No service has sufficient excess time and an inflated critical-path share.
+re2tt_ts-order-service_loss_1,6527,2948,38,12,Insufficient traces in this endpoint window.; No separable tail episode.; No service has sufficient excess time and an inflated critical-path share.
+re2tt_ts-order-service_loss_2,6646,2557,48,20,Insufficient traces in this endpoint window.; No separable tail episode.; No service has sufficient excess time and an inflated critical-path share.
+re2tt_ts-order-service_loss_3,6648,2532,48,21,Insufficient traces in this endpoint window.; No separable tail episode.; No service has sufficient excess time and an inflated critical-path share.
+re2tt_ts-order-service_mem_1,6211,3181,43,18,Insufficient traces in this endpoint window.; No separable tail episode.; No service has sufficient excess time and an inflated critical-path share.
+re2tt_ts-order-service_mem_2,6639,3235,36,19,Insufficient traces in this endpoint window.; No separable tail episode.; No service has sufficient excess time and an inflated critical-path share.
+re2tt_ts-order-service_mem_3,6264,3063,44,17,Insufficient traces in this endpoint window.; No separable tail episode.; No service has sufficient excess time and an inflated critical-path share.
+re2tt_ts-order-service_socket_1,6565,2973,37,10,Insufficient traces in this endpoint window.; No separable tail episode.; No service has sufficient excess time and an inflated critical-path share.
+re2tt_ts-order-service_socket_2,6494,2383,36,13,Insufficient traces in this endpoint window.; No separable tail episode.; No service has sufficient excess time and an inflated critical-path share.
+re2tt_ts-order-service_socket_3,6617,3079,39,8,Insufficient traces in this endpoint window.; No separable tail episode.; No service has sufficient excess time and an inflated critical-path share.
+re2tt_ts-route-service_cpu_1,6259,2918,39,8,Insufficient traces in this endpoint window.; No separable tail episode.; No service has sufficient excess time and an inflated critical-path share.
+re2tt_ts-route-service_cpu_2,6639,2724,36,21,Insufficient traces in this endpoint window.; No separable tail episode.; No service has sufficient excess time and an inflated critical-path share.
+re2tt_ts-route-service_cpu_3,6643,2589,45,18,Insufficient traces in this endpoint window.; No separable tail episode.; No service has sufficient excess time and an inflated critical-path share.
+re2tt_ts-route-service_delay_1,5748,2603,37,9,Insufficient traces in this endpoint window.; No separable tail episode.; No service has sufficient excess time and an inflated critical-path share.
+re2tt_ts-route-service_delay_2,5774,2729,33,6,Insufficient traces in this endpoint window.; No separable tail episode.; No service has sufficient excess time and an inflated critical-path share.
+re2tt_ts-route-service_delay_3,5758,2689,33,11,Insufficient traces in this endpoint window.; No separable tail episode.; No service has sufficient excess time and an inflated critical-path share.
+re2tt_ts-route-service_disk_1,6510,2938,38,11,Insufficient traces in this endpoint window.; No separable tail episode.; No service has sufficient excess time and an inflated critical-path share.
+re2tt_ts-route-service_disk_2,6219,5618,24,0,Insufficient traces in this endpoint window.; No separable tail episode.; No service has sufficient excess time and an inflated critical-path share.
+re2tt_ts-route-service_disk_3,5732,2867,47,12,Insufficient traces in this endpoint window.; No separable tail episode.; No service has sufficient excess time and an inflated critical-path share.
+re2tt_ts-route-service_loss_1,5095,2376,34,4,Insufficient traces in this endpoint window.; No separable tail episode.; No service has sufficient excess time and an inflated critical-path share.
+re2tt_ts-route-service_loss_2,6553,4894,24,1,Insufficient traces in this endpoint window.; No separable tail episode.; No service has sufficient excess time and an inflated critical-path share.
+re2tt_ts-route-service_loss_3,6387,3172,35,11,Insufficient traces in this endpoint window.; No separable tail episode.; No service has sufficient excess time and an inflated critical-path share.
+re2tt_ts-route-service_mem_1,5698,2646,37,13,Insufficient traces in this endpoint window.; No separable tail episode.; No service has sufficient excess time and an inflated critical-path share.
+re2tt_ts-route-service_mem_2,6378,3275,36,16,Insufficient traces in this endpoint window.; No separable tail episode.; No service has sufficient excess time and an inflated critical-path share.
+re2tt_ts-route-service_mem_3,6408,3099,38,18,Insufficient traces in this endpoint window.; No separable tail episode.; No service has sufficient excess time and an inflated critical-path share.
+re2tt_ts-route-service_socket_1,6338,2887,37,10,Insufficient traces in this endpoint window.; No separable tail episode.; No service has sufficient excess time and an inflated critical-path share.
+re2tt_ts-route-service_socket_2,6565,3310,43,13,Insufficient traces in this endpoint window.; No separable tail episode.; No service has sufficient excess time and an inflated critical-path share.
+re2tt_ts-route-service_socket_3,6515,3089,47,12,Insufficient traces in this endpoint window.; No separable tail episode.; No service has sufficient excess time and an inflated critical-path share.
+re2tt_ts-train-service_cpu_1,6567,3000,37,10,Insufficient traces in this endpoint window.; No separable tail episode.; No service has sufficient excess time and an inflated critical-path share.
+re2tt_ts-train-service_cpu_2,6629,3169,38,9,Insufficient traces in this endpoint window.; No separable tail episode.; No service has sufficient excess time and an inflated critical-path share.
+re2tt_ts-train-service_cpu_3,6685,3124,36,9,Insufficient traces in this endpoint window.; No separable tail episode.; No service has sufficient excess time and an inflated critical-path share.
+re2tt_ts-train-service_delay_1,5765,2590,38,9,Insufficient traces in this endpoint window.; No separable tail episode.; No service has sufficient excess time and an inflated critical-path share.
+re2tt_ts-train-service_delay_2,5785,2822,34,8,Insufficient traces in this endpoint window.; No separable tail episode.; No service has sufficient excess time and an inflated critical-path share.
+re2tt_ts-train-service_delay_3,5885,2819,33,8,Insufficient traces in this endpoint window.; No separable tail episode.; No service has sufficient excess time and an inflated critical-path share.
+re2tt_ts-train-service_disk_1,6707,3324,34,11,Insufficient traces in this endpoint window.; No separable tail episode.; No service has sufficient excess time and an inflated critical-path share.
+re2tt_ts-train-service_disk_2,6627,3120,35,11,Insufficient traces in this endpoint window.; No separable tail episode.; No service has sufficient excess time and an inflated critical-path share.
+re2tt_ts-train-service_disk_3,6705,3153,35,11,Insufficient traces in this endpoint window.; No separable tail episode.; No service has sufficient excess time and an inflated critical-path share.
+re2tt_ts-train-service_loss_1,7394,3336,49,14,Insufficient traces in this endpoint window.; No separable tail episode.; No service has sufficient excess time and an inflated critical-path share.
+re2tt_ts-train-service_loss_2,6469,3047,36,11,Insufficient traces in this endpoint window.; No separable tail episode.; No service has sufficient excess time and an inflated critical-path share.
+re2tt_ts-train-service_loss_3,6516,3107,38,10,Insufficient traces in this endpoint window.; No separable tail episode.; No service has sufficient excess time and an inflated critical-path share.
+re2tt_ts-train-service_mem_1,6494,3334,35,17,Insufficient traces in this endpoint window.; No separable tail episode.; No service has sufficient excess time and an inflated critical-path share.
+re2tt_ts-train-service_mem_2,6363,3210,34,15,Insufficient traces in this endpoint window.; No separable tail episode.; No service has sufficient excess time and an inflated critical-path share.
+re2tt_ts-train-service_mem_3,6616,3174,34,15,Insufficient traces in this endpoint window.; No separable tail episode.; No service has sufficient excess time and an inflated critical-path share.
+re2tt_ts-train-service_socket_1,1754,1286,22,0,Insufficient traces in this endpoint window.; No separable tail episode.; No service has sufficient excess time and an inflated critical-path share.
+re2tt_ts-train-service_socket_2,6666,3097,46,12,Insufficient traces in this endpoint window.; No separable tail episode.; No service has sufficient excess time and an inflated critical-path share.
+re2tt_ts-train-service_socket_3,6544,3320,46,17,Insufficient traces in this endpoint window.; No separable tail episode.; No service has sufficient excess time and an inflated critical-path share.
+re2tt_ts-travel-service_cpu_1,7168,3612,37,17,Insufficient traces in this endpoint window.; No separable tail episode.; No service has sufficient excess time and an inflated critical-path share.
+re2tt_ts-travel-service_cpu_2,6583,3094,44,9,Insufficient traces in this endpoint window.; No separable tail episode.; No service has sufficient excess time and an inflated critical-path share.
+re2tt_ts-travel-service_cpu_3,6623,4534,31,4,Insufficient traces in this endpoint window.; No separable tail episode.; No service has sufficient excess time and an inflated critical-path share.
+re2tt_ts-travel-service_delay_1,5886,2845,45,8,Insufficient traces in this endpoint window.; No separable tail episode.; No service has sufficient excess time and an inflated critical-path share.
+re2tt_ts-travel-service_delay_2,6250,2969,45,9,Insufficient traces in this endpoint window.; No separable tail episode.; No service has sufficient excess time and an inflated critical-path share.
+re2tt_ts-travel-service_delay_3,6212,2930,48,11,Insufficient traces in this endpoint window.; No separable tail episode.; No service has sufficient excess time and an inflated critical-path share.
+re2tt_ts-travel-service_disk_1,6507,3134,45,13,Insufficient traces in this endpoint window.; No separable tail episode.; No service has sufficient excess time and an inflated critical-path share.
+re2tt_ts-travel-service_disk_2,6561,2496,36,14,Insufficient traces in this endpoint window.; No separable tail episode.; No service has sufficient excess time and an inflated critical-path share.
+re2tt_ts-travel-service_disk_3,6662,2486,36,15,Insufficient traces in this endpoint window.; No separable tail episode.; No service has sufficient excess time and an inflated critical-path share.
+re2tt_ts-travel-service_loss_1,7346,3537,45,10,Insufficient traces in this endpoint window.; No separable tail episode.; No service has sufficient excess time and an inflated critical-path share.
+re2tt_ts-travel-service_loss_2,6995,3261,35,14,Insufficient traces in this endpoint window.; No separable tail episode.; No service has sufficient excess time and an inflated critical-path share.
+re2tt_ts-travel-service_loss_3,7258,3398,47,13,Insufficient traces in this endpoint window.; No separable tail episode.; No service has sufficient excess time and an inflated critical-path share.
+re2tt_ts-travel-service_mem_1,6260,2986,32,12,Insufficient traces in this endpoint window.; No separable tail episode.; No service has sufficient excess time and an inflated critical-path share.
+re2tt_ts-travel-service_mem_2,6079,2915,34,13,Insufficient traces in this endpoint window.; No separable tail episode.; No service has sufficient excess time and an inflated critical-path share.
+re2tt_ts-travel-service_mem_3,6035,3040,34,12,Insufficient traces in this endpoint window.; No separable tail episode.; No service has sufficient excess time and an inflated critical-path share.
+re2tt_ts-travel-service_socket_1,6568,2438,36,15,Insufficient traces in this endpoint window.; No separable tail episode.; No service has sufficient excess time and an inflated critical-path share.
+re2tt_ts-travel-service_socket_2,6776,3468,36,13,Insufficient traces in this endpoint window.; No separable tail episode.; No service has sufficient excess time and an inflated critical-path share.
+re2tt_ts-travel-service_socket_3,6849,3300,38,14,Insufficient traces in this endpoint window.; No separable tail episode.; No service has sufficient excess time and an inflated critical-path share.
+re3ob_adservice_f3_1,9545,0,15,5,No service has sufficient excess time and an inflated critical-path share.
+re3ob_adservice_f3_2,9292,0,20,7,Insufficient traces in this endpoint window.; No separable tail episode.; No service has sufficient excess time and an inflated critical-path share.
+re3ob_adservice_f3_3,9373,2055,20,5,Insufficient traces in this endpoint window.; No separable tail episode.; No service has sufficient excess time and an inflated critical-path share.
+re3ob_adservice_f4_1,9499,1,15,6,No service has sufficient excess time and an inflated critical-path share.
+re3ob_adservice_f4_2,9526,0,20,8,No separable tail episode.; No service has sufficient excess time and an inflated critical-path share.
+re3ob_adservice_f4_3,9486,2220,20,2,No separable tail episode.; No service has sufficient excess time and an inflated critical-path share.
+re3ob_adservice_f5_1,9133,0,15,5,No service has sufficient excess time and an inflated critical-path share.
+re3ob_adservice_f5_2,9428,0,20,7,No separable tail episode.; No service has sufficient excess time and an inflated critical-path share.
+re3ob_adservice_f5_3,9366,2181,20,4,No separable tail episode.; No service has sufficient excess time and an inflated critical-path share.
+re3ob_cartservice_f1_1,8715,0,20,6,Insufficient traces in this endpoint window.; No separable tail episode.; No service has sufficient excess time and an inflated critical-path share.
+re3ob_cartservice_f1_2,8882,0,15,4,No separable tail episode.; No service has sufficient excess time and an inflated critical-path share.
+re3ob_cartservice_f1_3,8871,1865,15,4,No separable tail episode.; No service has sufficient excess time and an inflated critical-path share.
+re3ob_currencyservice_f1_1,9111,1,21,3,Insufficient traces in this endpoint window.; No separable tail episode.; No service has sufficient excess time and an inflated critical-path share.
+re3ob_currencyservice_f1_2,9352,280,16,2,Insufficient traces in this endpoint window.; No separable tail episode.; No service has sufficient excess time and an inflated critical-path share.
+re3ob_currencyservice_f1_3,9105,1523,15,0,No separable tail episode.; No service has sufficient excess time and an inflated critical-path share.
+re3ob_emailservice_f1_1,9453,0,20,7,No separable tail episode.; No service has sufficient excess time and an inflated critical-path share.
+re3ob_emailservice_f1_2,9460,2,15,4,No separable tail episode.; No service has sufficient excess time and an inflated critical-path share.
+re3ob_emailservice_f1_3,9286,2309,15,3,No separable tail episode.; No service has sufficient excess time and an inflated critical-path share.
+re3ob_emailservice_f2_1,9549,0,15,5,No separable tail episode.; No service has sufficient excess time and an inflated critical-path share.
+re3ob_emailservice_f2_2,9450,2,15,4,No separable tail episode.; No service has sufficient excess time and an inflated critical-path share.
+re3ob_emailservice_f2_3,9549,2201,15,3,No separable tail episode.; No service has sufficient excess time and an inflated critical-path share.
+re3ob_emailservice_f3_1,9415,0,15,6,No service has sufficient excess time and an inflated critical-path share.
+re3ob_emailservice_f3_2,9544,0,20,6,Insufficient traces in this endpoint window.; No separable tail episode.; No service has sufficient excess time and an inflated critical-path share.
+re3ob_emailservice_f3_3,9604,2344,20,4,Insufficient traces in this endpoint window.; No separable tail episode.; No service has sufficient excess time and an inflated critical-path share.
+re3ob_emailservice_f4_1,9487,1,15,5,No service has sufficient excess time and an inflated critical-path share.
+re3ob_emailservice_f4_2,9618,0,20,6,No separable tail episode.; No service has sufficient excess time and an inflated critical-path share.
+re3ob_emailservice_f4_3,9423,2242,20,4,No separable tail episode.; No service has sufficient excess time and an inflated critical-path share.
+re3ob_emailservice_f5_1,9470,1,15,5,No service has sufficient excess time and an inflated critical-path share.
+re3ob_emailservice_f5_2,9539,0,20,7,No separable tail episode.; No service has sufficient excess time and an inflated critical-path share.
+re3ob_emailservice_f5_3,9547,2270,20,4,No separable tail episode.; No service has sufficient excess time and an inflated critical-path share.
+re3tt_ts-auth-service_f1_1,2072,629,21,2,Insufficient traces in this endpoint window.; No separable tail episode.; No service has sufficient excess time and an inflated critical-path share.
+re3tt_ts-auth-service_f1_2,2050,505,16,2,Insufficient traces in this endpoint window.; No service has sufficient excess time and an inflated critical-path share.
+re3tt_ts-auth-service_f1_3,2082,637,17,2,Insufficient traces in this endpoint window.; No separable tail episode.; No service has sufficient excess time and an inflated critical-path share.
+re3tt_ts-auth-service_f1_4,2034,537,16,3,Insufficient traces in this endpoint window.; No separable tail episode.; No service has sufficient excess time and an inflated critical-path share.
+re3tt_ts-auth-service_f2_1,2032,515,23,3,Insufficient traces in this endpoint window.; No separable tail episode.; No service has sufficient excess time and an inflated critical-path share.
+re3tt_ts-auth-service_f2_2,2074,552,21,3,Insufficient traces in this endpoint window.; No service has sufficient excess time and an inflated critical-path share.
+re3tt_ts-auth-service_f2_3,2042,539,21,1,Insufficient traces in this endpoint window.; No separable tail episode.; No service has sufficient excess time and an inflated critical-path share.
+re3tt_ts-auth-service_f2_4,2060,494,19,4,Insufficient traces in this endpoint window.; No separable tail episode.; No service has sufficient excess time and an inflated critical-path share.
+re3tt_ts-auth-service_f3_1,2615,609,43,3,Insufficient traces in this endpoint window.; No separable tail episode.; No service has sufficient excess time and an inflated critical-path share.
+re3tt_ts-auth-service_f3_2,2593,599,42,3,Insufficient traces in this endpoint window.; No separable tail episode.; No service has sufficient excess time and an inflated critical-path share.
+re3tt_ts-auth-service_f3_3,2593,661,38,2,Insufficient traces in this endpoint window.; No separable tail episode.; No service has sufficient excess time and an inflated critical-path share.
+re3tt_ts-auth-service_f3_4,2592,558,43,5,Insufficient traces in this endpoint window.; No separable tail episode.; No service has sufficient excess time and an inflated critical-path share.
+re3tt_ts-auth-service_f4_1,2071,551,14,3,Insufficient traces in this endpoint window.; No service has sufficient excess time and an inflated critical-path share.
+re3tt_ts-auth-service_f4_2,2049,609,16,2,Insufficient traces in this endpoint window.; No separable tail episode.; No service has sufficient excess time and an inflated critical-path share.
+re3tt_ts-auth-service_f4_3,2040,592,16,2,Insufficient traces in this endpoint window.; No separable tail episode.; No service has sufficient excess time and an inflated critical-path share.
+re3tt_ts-route-service_f1_1,2614,1018,49,8,Insufficient traces in this endpoint window.; No separable tail episode.; No service has sufficient excess time and an inflated critical-path share.
+re3tt_ts-route-service_f1_2,2669,990,45,7,Insufficient traces in this endpoint window.; No separable tail episode.; No service has sufficient excess time and an inflated critical-path share.
+re3tt_ts-route-service_f1_3,2625,1022,45,8,Insufficient traces in this endpoint window.; No separable tail episode.; No service has sufficient excess time and an inflated critical-path share.
+re3tt_ts-route-service_f2_1,2623,958,44,6,Insufficient traces in this endpoint window.; No separable tail episode.; No service has sufficient excess time and an inflated critical-path share.
+re3tt_ts-route-service_f2_2,2626,987,48,9,Insufficient traces in this endpoint window.; No separable tail episode.; No service has sufficient excess time and an inflated critical-path share.
+re3tt_ts-route-service_f2_3,2647,1152,46,3,Insufficient traces in this endpoint window.; No separable tail episode.; No service has sufficient excess time and an inflated critical-path share.
+re3tt_ts-route-service_f3_1,2649,970,46,7,Insufficient traces in this endpoint window.; No separable tail episode.; No service has sufficient excess time and an inflated critical-path share.
+re3tt_ts-route-service_f3_2,2634,1107,48,9,Insufficient traces in this endpoint window.; No separable tail episode.; No service has sufficient excess time and an inflated critical-path share.
+re3tt_ts-route-service_f3_3,2662,851,51,12,Insufficient traces in this endpoint window.; No separable tail episode.; No service has sufficient excess time and an inflated critical-path share.
+re3tt_ts-route-service_f3_4,2646,1106,44,7,Insufficient traces in this endpoint window.; No separable tail episode.; No service has sufficient excess time and an inflated critical-path share.
+re3tt_ts-route-service_f3_5,2580,1002,47,7,Insufficient traces in this endpoint window.; No separable tail episode.; No service has sufficient excess time and an inflated critical-path share.
+re3tt_ts-route-service_f3_6,2592,978,50,6,Insufficient traces in this endpoint window.; No separable tail episode.; No service has sufficient excess time and an inflated critical-path share.
+re3tt_ts-route-service_f4_1,2551,1031,50,12,Insufficient traces in this endpoint window.; No separable tail episode.; No service has sufficient excess time and an inflated critical-path share.
+re3tt_ts-route-service_f4_2,2650,1169,47,6,Insufficient traces in this endpoint window.; No separable tail episode.; No service has sufficient excess time and an inflated critical-path share.
+re3tt_ts-route-service_f4_3,2636,928,47,9,Insufficient traces in this endpoint window.; No separable tail episode.; No service has sufficient excess time and an inflated critical-path share.
