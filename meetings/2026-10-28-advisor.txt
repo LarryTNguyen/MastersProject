@@ -10,6 +10,12 @@ Attendees:
 1) Accomplished Since Last Meeting
 Finished workbook 2
 Worked more on our project 
+Anukrithi:
+- Pushed the dashboard (Oct 21): FastAPI API and Lambda handler; page with trace search, waterfall, bottleneck rankings, slow vs normal compare, flame graph and pipeline health; reads JSONL files, SQLite or the trace_v1 PostgreSQL tables; demo data, demo script and browser tests
+- Pushed the evaluation side (Oct 21-22): one-command experiment runner, RCAEval evaluator, three naive ranking baselines, metrics and charts; first results on all 240 RCAEval trace cases (best naive baseline: right service first in 36% of cases)
+- Jaeger setup for the manual-diagnosis comparison and the usability study protocol
+- Update report for Prof. Trivedi (Oct 23)
+- Workbook 2 sections (ingest/upload/replay design, dashboard API and UI, evaluation and test plan) and the dashboard design spec
 2) Accomplished During This Meeting
 Improvements for our workbook
 3) Issues / Blockers

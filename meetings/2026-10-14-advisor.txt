@@ -18,7 +18,6 @@ Attendees:
 2) Accomplished During This Meeting
 - Gave Prof. Trivedi a status update; project is moving again after the midterm/interview week
 - Walked through the ingest package and the plan for the dashboard
-- [add anything else she said / asked for]
 - Prof. Trivedi asked for a written update report
 
 3) Issues / Blockers
@@ -30,7 +29,6 @@ Attendees:
 - Action: Dashboard API and page (trace search, waterfall, rankings) | Owner: Anukrithi | Due: 2026-10-23
 - Action: Trace schema + reconstruction pushed to the repo | Owner: Larry | Due: 2026-10-20
 - Action: Collector Lambda, SQS, S3 raw bucket deployed | Owner: Matthew | Due: 2026-10-23
-- Action: [add] | Owner: [add] | Due: [add]
 
 5) Plans / Goals for Next Meeting
 - Workbook 2 and design specs due Oct 29, 8 AM

@@ -9,15 +9,29 @@ Attendees:
 1) Accomplished Since Last Meeting
 Larry: Sprint 4 portion of goals
 Anukrithi: Sprint 5 portion
+- Dashboard reconnects to PostgreSQL when the connection drops; freshness indicator in the header; remembers the chosen endpoint
+- Build scripts for the dashboard and adapter Lambda zips (for the AWS deployment)
+- Ran the whole pipeline locally and measured freshness: p95 about 1.1 s on an RCAEval case (target: under 60 s)
 Matthew: Configured clouds
 2) Accomplished During This Meeting
 Updated each other on what progress was made 
 Set up goals for the next couple of weeks 
+- Agreed: Alibaba traces are used for freshness, throughput and cost; RCAEval is the benchmark for diagnosis accuracy (Alibaba has no absolute start times, so the critical-path ranking can't score it)
+- AWS: S3, SQS and Lambda are connected and the adapter Lambda is uploaded from the build-script zip; next is an integration test (collector -> S3 -> SQS -> adapter -> normalized bucket), then Aurora and the reconstruction Lambda
+- Freshness gets measured on AWS once Aurora and reconstruction are up
+- Anukrithi will run Larry's ranking on the RCAEval cases next to the baselines
+- Prof's suggestion (muting services that send too many traces / deciding which traces to keep) noted as a Spring item under RQ3 (tail sampling)
+- Target: most of this semester's work done by Nov 24; extra meeting on Friday
 3) Issues / Blockers
 Cloud set up 
 Bottleneck score
 4) Action Items
 - Action: Test out reconstruction and bottleneck ranking | Owner: Larry | Due: 11/7
 - Action: Sprint 5 goals | Owner: Anukrithi and Matthew | Due: 11/11
+- Action: Push CI and the experiment work (Alibaba runs, usability study kit) | Owner: Anukrithi | Due: 11/3
+- Action: Run Larry's ranking on the 240 RCAEval cases next to the baselines | Owner: Anukrithi | Due: 11/11
+- Action: Show the diagnosis rankings in the usability study episodes | Owner: Anukrithi | Due: 11/11
+- Action: Update report ch. 1-2 (Alibaba for freshness/throughput/cost, RCAEval for accuracy) | Owner: Anukrithi | Due: 11/11
+- Action: Measure freshness on AWS once Aurora and the reconstruction Lambda are up | Owner: Anukrithi | Due: after AWS setup
 5) Plans / Goals for Next Meeting
 Test out more of our code
