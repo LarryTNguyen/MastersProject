@@ -80,10 +80,23 @@ class EpisodeTests(unittest.TestCase):
             sent = [s for b in sink.batches for s in b]
             self.assertEqual(len(sent), self.key["B"]["spans"])
             self.assertEqual(max(s.end_us for s in sent), now - 30_000_000)
-            self.assertEqual(os.listdir(dash), ["episode_B.jsonl"])
+            self.assertEqual(sorted(os.listdir(dash)), ["episode_B.jsonl", "rankings.json"])
             from app.store import JsonlStore
-            self.assertEqual(JsonlStore(dash).count_traces(), self.key["B"]["traces"])
+            store = JsonlStore(dash)
+            self.assertEqual(store.count_traces(), self.key["B"]["traces"])
+            # rankings moved by the same amount as the spans, so they line up with the traces
+            with open(os.path.join(self.out, "B", "rankings.json")) as f:
+                original = json.load(f)
+            shift = now - 30_000_000 - self.key["B"]["end_us"]
+            self.assertEqual([w["window_end_us"] for w in store.rankings(limit=100)],
+                             sorted((w["window_end_us"] + shift for w in original), reverse=True))
+        self.assertTrue(r["dashboard_rankings"])
         self.assertRegex(r["read_aloud"], r"became slow around \d\d:\d\d\.")
+
+    def test_prepare_ranks_the_culprit_on_the_slow_endpoint(self):
+        # fake cases: one service gets 150 ms slower after the injection
+        for x in "ABCD":
+            self.assertEqual(self.key[x]["rankings"]["endpoint_top_after_fault"], self.key[x]["culprit"], x)
 
     def test_load_refuses_a_jaeger_that_already_has_data(self):
         class Resp(io.BytesIO):

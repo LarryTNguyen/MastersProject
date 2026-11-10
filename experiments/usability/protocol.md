@@ -39,9 +39,13 @@ cd baselines/jaeger && docker compose up -d           # Jaeger UI on :16686, OTL
 cd dashboard && DATA_DIR=../experiments/usability/episodes/live_dashboard uvicorn app.main:app --port 8000
 ```
 
-The dashboard notices new files in its data folder by itself. If the scoring step's
-`rankings.json` is available for an episode, copy it into the same folder; without
-it, participants use the compare, waterfall and flame views.
+The dashboard notices new files in its data folder by itself. `prepare` also runs the
+diagnosis step on each episode and `load` puts its `rankings.json` next to the spans,
+moved to the same clock time, so the Bottlenecks view shows computed rankings
+(`prepare --no-rankings` skips this; then participants use the compare, waterfall and
+flame views). The rankings are the system's real output, right or wrong; that is part
+of what the study measures. `answer_key.json` records, per episode, what the ranking
+put first for the slow endpoint after the fault.
 
 ## Schedule
 

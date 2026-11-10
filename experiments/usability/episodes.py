@@ -8,6 +8,7 @@ prepare  cuts each chosen RCAEval case down to 5 minutes before and 5 minutes af
          served by the culprit itself, so the question is not answered by the
          endpoint name), and writes
              episodes/<X>/spans.jsonl      the spans
+             episodes/<X>/rankings.json    the diagnosis step's rankings for the dashboard
              episodes/task_sheet.md        what to read to the participant
              episodes/answer_key.json      the culprit per episode (keep it away from them)
 load     moves an episode in time so it ends half a minute ago, sends it to Jaeger over
@@ -120,7 +121,27 @@ def pick_endpoint(effects: List[dict], culprit: str) -> dict:
     return effects[0]
 
 
-def prepare_episode(case_dir: str, out_dir: str) -> dict:
+def episode_rankings(spans: List[spanio.Span]) -> List[dict]:
+    """Run the diagnosis step on an episode and return its windows in the format the
+    dashboard's rankings.json takes (the same mapping as python -m diagnosis)."""
+    from ..diagnosis_method import diagnose_by_window
+    traces: Dict[str, List[dict]] = {}
+    for d in spans_to_dicts(spans):
+        traces.setdefault(d["trace_id"], []).append(d)
+    result = diagnose_by_window(list(traces.values()), accept_derived=True)
+    return [{"window_start_us": int(w["window_start_ns"]) // 1000, "window_end_us": int(w["window_end_ns"]) // 1000,
+             "endpoint": w["root_operation"], "method": result["method"] + " (estimate)", "note": w["note"],
+             "rankings": [{"rank": r["rank"], "service": r["service_name"], "score": r["score"],
+                           "evidence": {k: v for k, v in r.items() if k not in ("rank", "service", "service_name", "score")}}
+                          for r in w["rankings"]]}
+            for w in result["windows"]]
+
+
+def spans_to_dicts(spans: List[spanio.Span]) -> List[dict]:
+    return [s.to_dict() for s in spans]
+
+
+def prepare_episode(case_dir: str, out_dir: str, rankings: bool = True) -> dict:
     spans, label = read_case(case_dir)
     if label.inject_time_s is None:
         raise ValueError(f"{case_dir} has no inject_time.txt")
@@ -132,6 +153,15 @@ def prepare_episode(case_dir: str, out_dir: str) -> dict:
     kept.sort(key=spanio.Span.sort_key)
     with open(os.path.join(out_dir, "spans.jsonl"), "w", encoding="utf-8") as f:
         spanio.write_jsonl(kept, f)
+    ranked = None
+    if rankings:
+        windows = episode_rankings(kept)
+        with open(os.path.join(out_dir, "rankings.json"), "w", encoding="utf-8") as f:
+            json.dump(windows, f, indent=1)
+        top = [w["rankings"][0]["service"] for w in windows
+               if w["endpoint"] == ep["operation"] and w["rankings"] and w["window_end_us"] > inject_us]
+        ranked = {"windows": len(windows), "with_ranking": sum(1 for w in windows if w["rankings"]),
+                  "endpoint_top_after_fault": max(set(top), key=top.count) if top else None}
     start = min(s.start_us for s in kept)
     end = max(s.end_us for s in kept)
     return {"case": label.case, "benchmark": label.benchmark, "fault": label.fault,
@@ -140,7 +170,8 @@ def prepare_episode(case_dir: str, out_dir: str) -> dict:
             "endpoint_p95_after_ms": ep["p95_after_ms"], "spans": len(kept),
             "traces": len({s.trace_id for s in kept}), "inject_us": inject_us,
             "start_us": start, "end_us": end,
-            "slow_after_s": round((inject_us - start) / 1e6), "data_s": round((end - start) / 1e6)}
+            "slow_after_s": round((inject_us - start) / 1e6), "data_s": round((end - start) / 1e6),
+            "rankings": ranked}
 
 
 def task_sentence(ep: dict, clock: str = "HH:MM") -> str:
@@ -164,13 +195,14 @@ def write_sheets(episodes: Dict[str, dict], out_dir: str) -> None:
         f.write("\n".join(lines))
 
 
-def prepare(data_dir: str, out_dir: str, cases: Dict[str, str]) -> Dict[str, dict]:
+def prepare(data_dir: str, out_dir: str, cases: Dict[str, str], rankings: bool = True) -> Dict[str, dict]:
     episodes = {}
     for x, case in sorted(cases.items()):
-        episodes[x] = prepare_episode(os.path.join(data_dir, case), os.path.join(out_dir, x))
+        episodes[x] = prepare_episode(os.path.join(data_dir, case), os.path.join(out_dir, x), rankings)
         e = episodes[x]
         print(f"{x}: {e['case']}: {e['traces']:,} traces, endpoint {e['endpoint_service']} {e['endpoint']!r} "
-              f"p95 {e['endpoint_p95_before_ms']} -> {e['endpoint_p95_after_ms']} ms")
+              f"p95 {e['endpoint_p95_before_ms']} -> {e['endpoint_p95_after_ms']} ms"
+              + (f"; rankings in {e['rankings']['with_ranking']} of {e['rankings']['windows']} windows" if e["rankings"] else ""))
     write_sheets(episodes, out_dir)
     print(f"wrote {out_dir}/task_sheet.md and answer_key.json")
     return episodes
@@ -196,11 +228,18 @@ def send_otlp(spans: List[spanio.Span], url: str, batch: int = 1000, sink=None) 
     return len(spans)
 
 
-def write_dashboard(spans: List[spanio.Span], data_dir: str, episode: str) -> str:
-    """Replace whatever episode the dashboard folder held with this one."""
+def write_dashboard(spans: List[spanio.Span], data_dir: str, episode: str,
+                    rankings: Optional[List[dict]] = None, delta_us: int = 0) -> str:
+    """Replace whatever episode the dashboard folder held with this one, and its
+    rankings (moved by the same delta_us as the spans), if prepare made any."""
     os.makedirs(data_dir, exist_ok=True)
-    for old in glob.glob(os.path.join(data_dir, "episode_*.jsonl")):
+    for old in glob.glob(os.path.join(data_dir, "episode_*.jsonl")) + glob.glob(os.path.join(data_dir, "rankings.json")):
         os.remove(old)
+    if rankings is not None:
+        moved = [dict(w, window_start_us=w["window_start_us"] + delta_us, window_end_us=w["window_end_us"] + delta_us)
+                 for w in rankings]
+        with open(os.path.join(data_dir, "rankings.json"), "w", encoding="utf-8") as f:
+            json.dump(moved, f)
     path = os.path.join(data_dir, f"episode_{episode}.jsonl")
     ctx = NormalizationContext.for_source(f"usability:episode_{episode}")
     with open(path, "w", encoding="utf-8") as f:
@@ -225,7 +264,14 @@ def load(episode: str, ep_dir: str, tool: str = "both", otlp_url: str = "http://
                 raise SystemExit(f"Jaeger already has data ({', '.join(have[:3])}...). Restart it first, or pass --force.")
         out["jaeger_spans"] = send_otlp(moved, otlp_url, sink=sink)
     if tool in ("dashboard", "both"):
-        out["dashboard_file"] = write_dashboard(moved, dashboard_dir or os.path.join(ep_dir, "live_dashboard"), episode)
+        rk_path = os.path.join(ep_dir, episode, "rankings.json")
+        rk = None
+        if os.path.exists(rk_path):
+            with open(rk_path, encoding="utf-8") as f:
+                rk = json.load(f)
+        out["dashboard_file"] = write_dashboard(moved, dashboard_dir or os.path.join(ep_dir, "live_dashboard"), episode,
+                                                rankings=rk, delta_us=delta)
+        out["dashboard_rankings"] = rk is not None
     slow_at = datetime.fromtimestamp((ep["inject_us"] + delta) / 1e6)
     out["slow_from"] = slow_at.strftime("%H:%M")
     out["read_aloud"] = task_sentence(ep, out["slow_from"])
@@ -238,6 +284,7 @@ def main(argv: Optional[Sequence[str]] = None):
     p = sub.add_parser("prepare", help="cut the RCAEval cases into episodes A-D")
     p.add_argument("data_dir", help="folder with the RCAEval case folders")
     p.add_argument("--out", default=DEFAULT_DIR)
+    p.add_argument("--no-rankings", action="store_true", help="skip running the diagnosis step on each episode")
     p.add_argument("--case", action="append", default=[], metavar="X=CASE",
                    help="override an episode, e.g. --case C=re2tt_ts-train-service_delay_1")
     l = sub.add_parser("load", help="load one episode into Jaeger and/or the dashboard")
@@ -254,7 +301,7 @@ def main(argv: Optional[Sequence[str]] = None):
         for item in a.case:
             x, _, case = item.partition("=")
             cases[x.upper()] = case
-        prepare(a.data_dir, a.out, cases)
+        prepare(a.data_dir, a.out, cases, rankings=not a.no_rankings)
         return
     r = load(a.episode, a.dir, a.tool, a.otlp, a.jaeger, a.dashboard_data, a.force)
     print(json.dumps({k: v for k, v in r.items() if k != "read_aloud"}, indent=2))
