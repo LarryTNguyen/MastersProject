@@ -196,3 +196,12 @@ row per configuration (idle, during experiments, always-on comparison).
 ```bash
 python -m unittest discover -s experiments/tests -t .
 ```
+
+## Versioned score comparison (November 19)
+
+See [score v2 implementation and validation](../docs/score-v2.md) for the formula,
+reference selection, explicit derived-timing policy, reproducible comparison config,
+fixture-only results, and MicroRCA collection requirements. Run
+`python -X utf8 -m experiments.run experiments/score_comparison.json` once the full
+RCAEval cases are available. The old saved diagnosis report used a timing-label
+override; new evaluations preserve DERIVED labels and record the eligibility policy.

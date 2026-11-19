@@ -1,0 +1,21 @@
+{
+  "out": "experiments/results/score-v2-fixture-runner",
+  "rcaeval": {
+    "cases": [
+      "data/score-v2-fixtures/*"
+    ],
+    "workers": 1,
+    "split": "all",
+    "methods": [
+      "slowest_average",
+      "longest_span",
+      "critical_path_only"
+    ],
+    "extra_methods": [
+      "experiments.diagnosis_method:tail_share_excess",
+      "experiments.diagnosis_method:score_v2",
+      "experiments.diagnosis_method:v1_measured",
+      "experiments.diagnosis_method:v2_measured"
+    ]
+  }
+}

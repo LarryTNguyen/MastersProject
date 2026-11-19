@@ -4,6 +4,7 @@ import contextlib
 import hashlib
 import io
 import json
+import shutil
 from pathlib import Path
 
 from reconstruction.smoke.astronomy_shop import cmd_verify
@@ -11,14 +12,14 @@ from .reliability import Policy, analyze, persist
 from .reliability_cli import read_capture
 
 
-def main():
+def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--runtime', type=Path, required=True)
     parser.add_argument('--input', type=Path, required=True)
     parser.add_argument('--output', type=Path, required=True)
     parser.add_argument('--application', default='astronomy-shop')
     parser.add_argument('--environment', default='local-controlled-experiment')
-    args = parser.parse_args()
+    args = parser.parse_args(argv)
     with contextlib.redirect_stdout(io.StringIO()):
         cmd_verify(args)
     manifest = json.loads((args.runtime / 'manifest.json').read_text(encoding='utf-8'))
@@ -31,6 +32,25 @@ def main():
                      [r for r in records if r['trace_id'] in faulty],
                      application=args.application, environment=args.environment,
                      policy=Policy(min_samples=5))
+    baseline = [r for r in records if r['trace_id'] in healthy]
+    evaluation = [r for r in records if r['trace_id'] in faulty]
+    from .episodes import diagnose as v1
+    from .score_v2 import diagnose as v2
+    report['score_comparison'] = {
+        'v1': v1(evaluation, min_samples=5, assume_synchronous=True),
+        'v2': v2(baseline, evaluation, min_samples=5, assume_synchronous=True),
+        'interpretation': 'Payment failure tests errors; latency validation requires an observed latency anomaly.'}
+    for version in ('v1', 'v2'):
+        score_report = report['score_comparison'][version]
+        score_report['injected_service_comparison'] = [
+            {'endpoint': window['endpoint'], 'window_start_ns': window['window_start_ns'],
+             'expected_service': manifest['root_cause_service'],
+             'observed_rank': next((r['rank'] for r in window['rankings']
+                                    if r['service_name'] == manifest['root_cause_service'] and r['score'] is not None), None),
+             'top_services': [r['service_name'] for r in window['rankings']
+                              if r['score'] is not None and r['score'] == max(
+                                  (x['score'] for x in window['rankings'] if x['score'] is not None), default=None)]}
+            for window in score_report['windows']]
     report['experiment_manifest'] = manifest
     report['verification'] = verification
     report['capture_sha256'] = hashlib.sha256(args.input.read_bytes()).hexdigest()
@@ -49,6 +69,11 @@ def main():
         'rankings': candidates,
     }
     args.output.mkdir(parents=True, exist_ok=True)
+    for name, value in (('manifest.json', manifest), ('verification.json', verification),
+                        ('scores.json', report['score_comparison'])):
+        (args.output / name).write_text(json.dumps(value, indent=2) + '\n', encoding='utf-8')
+    if args.input.resolve() != (args.output / 'capture.jsonl').resolve():
+        shutil.copyfile(args.input, args.output / 'capture.jsonl')
     persist(args.output / 'baselines.sqlite', report)
     (args.output / 'reliability.json').write_text(json.dumps(report, indent=2) + '\n', encoding='utf-8')
     lines = ['# Controlled payment-failure evidence', '',

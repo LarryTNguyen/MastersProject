@@ -36,12 +36,15 @@ def digest(value):
                                      allow_nan=False).encode()).hexdigest()
 
 
-def observations(records):
+def observations(records, *, timing_policy="measured", allow_uncontained=False):
     """Validate before reconstruction; retain rejected payloads and poison their trace.
 
     Service latency is the longest span for that service in each trace, not the
     sum of overlapping spans and not a critical-path attribution.
     """
+    if timing_policy not in ("measured", "measured-or-derived"):
+        raise ValueError("invalid timing policy")
+    allowed = {"MEASURED"} if timing_policy == "measured" else {"MEASURED", "DERIVED"}
     valid, quarantine, poisoned = [], [], set()
     for index, record in enumerate(records):
         errors = validate_record(record)
@@ -67,10 +70,10 @@ def observations(records):
             reason = 'topology_' + trace.topology.lower()
         elif trace.quality['inferred_parent_count']:
             reason = 'inferred_parent_relations'
-        elif any(s['timing_quality'] != 'MEASURED' or s['time_domain'] != 'UNIX'
+        elif any(s['timing_quality'] not in allowed or s['time_domain'] != 'UNIX'
                  or s['record_kind'] != 'SPAN' for s in trace.spans):
             reason = 'requires_measured_unix_intervals'
-        elif trace.quality['out_of_bounds_child_count']:
+        elif trace.quality['out_of_bounds_child_count'] and not allow_uncontained:
             reason = 'out_of_bounds_child'
         elif int(root['duration_ns']) <= 0:
             reason = 'nonpositive_root_duration'
@@ -92,7 +95,9 @@ def observations(records):
             rows.append({**identity, 'scope': scope, 'service_namespace': namespace, 'service_name': service,
                          'duration_ns': int(root['duration_ns']) if scope == 'endpoint' else max(int(s['duration_ns']) for s in spans),
                          'error': bool(errors) if known else None, 'error_span_ids': errors,
-                         'fingerprint': fingerprint})
+                         'fingerprint': fingerprint, 'span_ids': sorted(s['span_id'] for s in spans),
+                         'timing_qualities': sorted({s['timing_quality'] for s in spans}),
+                         'contained': not bool(trace.quality['out_of_bounds_child_count'])})
     # Retain both versions of conflicting payloads for later inspection.
     for run_id, trace_id in sorted(poisoned - set(groups), key=str):
         excluded.append({'run_id': run_id, 'trace_id': trace_id, 'endpoint': None,

@@ -1,0 +1,160 @@
+{
+  "summary": {
+    "slowest_average": {
+      "cases": 1,
+      "acc@1": 1.0,
+      "acc@3": 1.0,
+      "acc@5": 1.0,
+      "mrr": 1.0,
+      "not_found": 0,
+      "no_ranking": 0,
+      "by_fault": {
+        "delay": {
+          "cases": 1,
+          "acc@1": 1.0,
+          "acc@3": 1.0,
+          "acc@5": 1.0,
+          "mrr": 1.0,
+          "not_found": 0,
+          "no_ranking": 0
+        }
+      },
+      "by_benchmark": {
+        "re2ob": {
+          "cases": 1,
+          "acc@1": 1.0,
+          "acc@3": 1.0,
+          "acc@5": 1.0,
+          "mrr": 1.0,
+          "not_found": 0,
+          "no_ranking": 0
+        }
+      }
+    },
+    "longest_span": {
+      "cases": 1,
+      "acc@1": 0.0,
+      "acc@3": 0.0,
+      "acc@5": 0.0,
+      "mrr": 0.0,
+      "not_found": 1,
+      "no_ranking": 0,
+      "by_fault": {
+        "delay": {
+          "cases": 1,
+          "acc@1": 0.0,
+          "acc@3": 0.0,
+          "acc@5": 0.0,
+          "mrr": 0.0,
+          "not_found": 1,
+          "no_ranking": 0
+        }
+      },
+      "by_benchmark": {
+        "re2ob": {
+          "cases": 1,
+          "acc@1": 0.0,
+          "acc@3": 0.0,
+          "acc@5": 0.0,
+          "mrr": 0.0,
+          "not_found": 1,
+          "no_ranking": 0
+        }
+      }
+    },
+    "critical_path_only": {
+      "cases": 1,
+      "acc@1": 0.0,
+      "acc@3": 1.0,
+      "acc@5": 1.0,
+      "mrr": 0.5,
+      "not_found": 0,
+      "no_ranking": 0,
+      "by_fault": {
+        "delay": {
+          "cases": 1,
+          "acc@1": 0.0,
+          "acc@3": 1.0,
+          "acc@5": 1.0,
+          "mrr": 0.5,
+          "not_found": 0,
+          "no_ranking": 0
+        }
+      },
+      "by_benchmark": {
+        "re2ob": {
+          "cases": 1,
+          "acc@1": 0.0,
+          "acc@3": 1.0,
+          "acc@5": 1.0,
+          "mrr": 0.5,
+          "not_found": 0,
+          "no_ranking": 0
+        }
+      }
+    },
+    "tail_share_excess": {
+      "cases": 1,
+      "acc@1": 0.0,
+      "acc@3": 0.0,
+      "acc@5": 0.0,
+      "mrr": 0.0,
+      "not_found": 1,
+      "no_ranking": 1,
+      "by_fault": {
+        "delay": {
+          "cases": 1,
+          "acc@1": 0.0,
+          "acc@3": 0.0,
+          "acc@5": 0.0,
+          "mrr": 0.0,
+          "not_found": 1,
+          "no_ranking": 1
+        }
+      },
+      "by_benchmark": {
+        "re2ob": {
+          "cases": 1,
+          "acc@1": 0.0,
+          "acc@3": 0.0,
+          "acc@5": 0.0,
+          "mrr": 0.0,
+          "not_found": 1,
+          "no_ranking": 1
+        }
+      }
+    },
+    "score_v2": {
+      "cases": 1,
+      "acc@1": 0.0,
+      "acc@3": 0.0,
+      "acc@5": 0.0,
+      "mrr": 0.0,
+      "not_found": 1,
+      "no_ranking": 1,
+      "by_fault": {
+        "delay": {
+          "cases": 1,
+          "acc@1": 0.0,
+          "acc@3": 0.0,
+          "acc@5": 0.0,
+          "mrr": 0.0,
+          "not_found": 1,
+          "no_ranking": 1
+        }
+      },
+      "by_benchmark": {
+        "re2ob": {
+          "cases": 1,
+          "acc@1": 0.0,
+          "acc@3": 0.0,
+          "acc@5": 0.0,
+          "mrr": 0.0,
+          "not_found": 1,
+          "no_ranking": 1
+        }
+      }
+    }
+  },
+  "failed": []
+}

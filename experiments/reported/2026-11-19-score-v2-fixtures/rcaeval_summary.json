@@ -1,0 +1,285 @@
+{
+  "summary": {
+    "slowest_average": {
+      "cases": 5,
+      "acc@1": 0.0,
+      "acc@3": 1.0,
+      "acc@5": 1.0,
+      "mrr": 0.36666666666666664,
+      "not_found": 0,
+      "no_ranking": 0,
+      "by_fault": {
+        "delay": {
+          "cases": 4,
+          "acc@1": 0.0,
+          "acc@3": 1.0,
+          "acc@5": 1.0,
+          "mrr": 0.375,
+          "not_found": 0,
+          "no_ranking": 0
+        },
+        "error": {
+          "cases": 1,
+          "acc@1": 0.0,
+          "acc@3": 1.0,
+          "acc@5": 1.0,
+          "mrr": 0.3333333333333333,
+          "not_found": 0,
+          "no_ranking": 0
+        }
+      },
+      "by_benchmark": {
+        "re2ob": {
+          "cases": 5,
+          "acc@1": 0.0,
+          "acc@3": 1.0,
+          "acc@5": 1.0,
+          "mrr": 0.36666666666666664,
+          "not_found": 0,
+          "no_ranking": 0
+        }
+      }
+    },
+    "longest_span": {
+      "cases": 5,
+      "acc@1": 1.0,
+      "acc@3": 1.0,
+      "acc@5": 1.0,
+      "mrr": 1.0,
+      "not_found": 0,
+      "no_ranking": 0,
+      "by_fault": {
+        "delay": {
+          "cases": 4,
+          "acc@1": 1.0,
+          "acc@3": 1.0,
+          "acc@5": 1.0,
+          "mrr": 1.0,
+          "not_found": 0,
+          "no_ranking": 0
+        },
+        "error": {
+          "cases": 1,
+          "acc@1": 1.0,
+          "acc@3": 1.0,
+          "acc@5": 1.0,
+          "mrr": 1.0,
+          "not_found": 0,
+          "no_ranking": 0
+        }
+      },
+      "by_benchmark": {
+        "re2ob": {
+          "cases": 5,
+          "acc@1": 1.0,
+          "acc@3": 1.0,
+          "acc@5": 1.0,
+          "mrr": 1.0,
+          "not_found": 0,
+          "no_ranking": 0
+        }
+      }
+    },
+    "critical_path_only": {
+      "cases": 5,
+      "acc@1": 1.0,
+      "acc@3": 1.0,
+      "acc@5": 1.0,
+      "mrr": 1.0,
+      "not_found": 0,
+      "no_ranking": 0,
+      "by_fault": {
+        "delay": {
+          "cases": 4,
+          "acc@1": 1.0,
+          "acc@3": 1.0,
+          "acc@5": 1.0,
+          "mrr": 1.0,
+          "not_found": 0,
+          "no_ranking": 0
+        },
+        "error": {
+          "cases": 1,
+          "acc@1": 1.0,
+          "acc@3": 1.0,
+          "acc@5": 1.0,
+          "mrr": 1.0,
+          "not_found": 0,
+          "no_ranking": 0
+        }
+      },
+      "by_benchmark": {
+        "re2ob": {
+          "cases": 5,
+          "acc@1": 1.0,
+          "acc@3": 1.0,
+          "acc@5": 1.0,
+          "mrr": 1.0,
+          "not_found": 0,
+          "no_ranking": 0
+        }
+      }
+    },
+    "tail_share_excess": {
+      "cases": 5,
+      "acc@1": 0.8,
+      "acc@3": 0.8,
+      "acc@5": 0.8,
+      "mrr": 0.8,
+      "not_found": 1,
+      "no_ranking": 1,
+      "by_fault": {
+        "delay": {
+          "cases": 4,
+          "acc@1": 1.0,
+          "acc@3": 1.0,
+          "acc@5": 1.0,
+          "mrr": 1.0,
+          "not_found": 0,
+          "no_ranking": 0
+        },
+        "error": {
+          "cases": 1,
+          "acc@1": 0.0,
+          "acc@3": 0.0,
+          "acc@5": 0.0,
+          "mrr": 0.0,
+          "not_found": 1,
+          "no_ranking": 1
+        }
+      },
+      "by_benchmark": {
+        "re2ob": {
+          "cases": 5,
+          "acc@1": 0.8,
+          "acc@3": 0.8,
+          "acc@5": 0.8,
+          "mrr": 0.8,
+          "not_found": 1,
+          "no_ranking": 1
+        }
+      }
+    },
+    "score_v2": {
+      "cases": 5,
+      "acc@1": 1.0,
+      "acc@3": 1.0,
+      "acc@5": 1.0,
+      "mrr": 1.0,
+      "not_found": 0,
+      "no_ranking": 0,
+      "by_fault": {
+        "delay": {
+          "cases": 4,
+          "acc@1": 1.0,
+          "acc@3": 1.0,
+          "acc@5": 1.0,
+          "mrr": 1.0,
+          "not_found": 0,
+          "no_ranking": 0
+        },
+        "error": {
+          "cases": 1,
+          "acc@1": 1.0,
+          "acc@3": 1.0,
+          "acc@5": 1.0,
+          "mrr": 1.0,
+          "not_found": 0,
+          "no_ranking": 0
+        }
+      },
+      "by_benchmark": {
+        "re2ob": {
+          "cases": 5,
+          "acc@1": 1.0,
+          "acc@3": 1.0,
+          "acc@5": 1.0,
+          "mrr": 1.0,
+          "not_found": 0,
+          "no_ranking": 0
+        }
+      }
+    },
+    "v1_measured": {
+      "cases": 5,
+      "acc@1": 0.0,
+      "acc@3": 0.0,
+      "acc@5": 0.0,
+      "mrr": 0.0,
+      "not_found": 5,
+      "no_ranking": 5,
+      "by_fault": {
+        "delay": {
+          "cases": 4,
+          "acc@1": 0.0,
+          "acc@3": 0.0,
+          "acc@5": 0.0,
+          "mrr": 0.0,
+          "not_found": 4,
+          "no_ranking": 4
+        },
+        "error": {
+          "cases": 1,
+          "acc@1": 0.0,
+          "acc@3": 0.0,
+          "acc@5": 0.0,
+          "mrr": 0.0,
+          "not_found": 1,
+          "no_ranking": 1
+        }
+      },
+      "by_benchmark": {
+        "re2ob": {
+          "cases": 5,
+          "acc@1": 0.0,
+          "acc@3": 0.0,
+          "acc@5": 0.0,
+          "mrr": 0.0,
+          "not_found": 5,
+          "no_ranking": 5
+        }
+      }
+    },
+    "v2_measured": {
+      "cases": 5,
+      "acc@1": 0.0,
+      "acc@3": 0.0,
+      "acc@5": 0.0,
+      "mrr": 0.0,
+      "not_found": 5,
+      "no_ranking": 5,
+      "by_fault": {
+        "delay": {
+          "cases": 4,
+          "acc@1": 0.0,
+          "acc@3": 0.0,
+          "acc@5": 0.0,
+          "mrr": 0.0,
+          "not_found": 4,
+          "no_ranking": 4
+        },
+        "error": {
+          "cases": 1,
+          "acc@1": 0.0,
+          "acc@3": 0.0,
+          "acc@5": 0.0,
+          "mrr": 0.0,
+          "not_found": 1,
+          "no_ranking": 1
+        }
+      },
+      "by_benchmark": {
+        "re2ob": {
+          "cases": 5,
+          "acc@1": 0.0,
+          "acc@3": 0.0,
+          "acc@5": 0.0,
+          "mrr": 0.0,
+          "not_found": 5,
+          "no_ranking": 5
+        }
+      }
+    }
+  },
+  "failed": []
+}

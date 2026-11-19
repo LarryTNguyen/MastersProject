@@ -10,7 +10,10 @@ from reconstruction.trace_reconstruction.topology import group_records
 
 
 def diagnose(records, *, window_seconds=300, min_samples=10, slow_ratio=1.5,
-             min_excess_ms=5.0, alert_delta=0.25, assume_synchronous=False):
+             min_excess_ms=5.0, alert_delta=0.25, assume_synchronous=False, timing_policy="measured"):
+    if timing_policy not in ("measured", "measured-or-derived"):
+        raise ValueError("invalid timing policy")
+    allowed = {"MEASURED"} if timing_policy == "measured" else {"MEASURED", "DERIVED"}
     if window_seconds <= 0 or min_samples < 2 or slow_ratio <= 1 or min_excess_ms < 0 or alert_delta < 0:
         raise ValueError('invalid diagnosis thresholds')
     buckets = defaultdict(list)
@@ -22,7 +25,7 @@ def diagnose(records, *, window_seconds=300, min_samples=10, slow_ratio=1.5,
             continue
         nodes = {s['span_id']: s for s in trace.spans}
         root = nodes[trace.root_span_id]
-        if root.get('time_domain') != 'UNIX' or any(s.get('timing_quality') != 'MEASURED' for s in trace.spans):
+        if root.get('time_domain') != 'UNIX' or any(s.get('timing_quality') not in allowed for s in trace.spans):
             excluded['requires_measured_unix_intervals'] += 1
             continue
         duration = int(root['end_time_ns']) - int(root['start_time_ns'])
@@ -105,5 +108,5 @@ def diagnose(records, *, window_seconds=300, min_samples=10, slow_ratio=1.5,
                             'Subtracting excess is an arithmetic consistency check, not an intervention.'],
             'configuration': {'window_seconds': window_seconds, 'min_samples': min_samples,
                               'slow_ratio': slow_ratio, 'min_excess_ms': min_excess_ms,
-                              'alert_delta': alert_delta, 'assume_synchronous': assume_synchronous},
+                              'timing_policy': timing_policy, 'alert_delta': alert_delta, 'assume_synchronous': assume_synchronous},
             'excluded_traces': dict(excluded), 'windows': windows}

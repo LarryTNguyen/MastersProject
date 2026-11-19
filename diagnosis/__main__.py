@@ -13,6 +13,7 @@ def main():
     parser.add_argument('input', type=Path)
     parser.add_argument('--output', type=Path, required=True)
     parser.add_argument('--assume-synchronous', action='store_true')
+    parser.add_argument('--timing-policy', choices=['measured', 'measured-or-derived'], default='measured')
     parser.add_argument('--synthetic', action='store_true', help='label output as synthetic, not a real case study')
     parser.add_argument('--window-seconds', type=int, default=300)
     parser.add_argument('--min-samples', type=int, default=10)
@@ -36,7 +37,7 @@ def main():
     result = diagnose(validated_records(),
                       assume_synchronous=args.assume_synchronous, window_seconds=args.window_seconds,
                       min_samples=args.min_samples, slow_ratio=args.slow_ratio,
-                      min_excess_ms=args.min_excess_ms, alert_delta=args.alert_delta)
+                      min_excess_ms=args.min_excess_ms, alert_delta=args.alert_delta, timing_policy=args.timing_policy)
     result['input_files'] = [{'path': str(p.resolve()), 'sha256': hashlib.sha256(p.read_bytes()).hexdigest()} for p in files]
     result['data_label'] = 'synthetic' if args.synthetic else 'user-provided; provenance requires review'
     args.output.mkdir(parents=True, exist_ok=True)

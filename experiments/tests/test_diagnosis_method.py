@@ -9,6 +9,25 @@ from experiments.tests.make_cases import make_case
 
 
 class RankWindowsTests(unittest.TestCase):
+    def test_adapter_never_relabels_derived_evidence(self):
+        import copy
+        from experiments.rcaeval_eval import split_case
+        from traceingest import rcaeval
+        spans, label = rcaeval.read_case('ingest/tests/fixtures/re2ob_checkoutservice_delay_1')
+        normal, anomalous = split_case([s.to_dict() for s in spans], label.inject_time_s)
+        before = copy.deepcopy(normal + anomalous)
+        self.assertEqual({r['timing_quality'] for r in dm._records(normal + anomalous, True)}, {'DERIVED'})
+        self.assertEqual(normal + anomalous, before)
+
+    def test_splits_keep_repetitions_together(self):
+        from experiments.rcaeval_eval import select_split
+        dirs = ['re2ob_payment_delay_1', 're2ob_payment_delay_2', 're2tt_cart_cpu_1']
+        validation = select_split(dirs, 'validation')
+        held = select_split(dirs, 'held-out')
+        self.assertEqual(set(validation) | set(held), set(dirs))
+        self.assertFalse(set(validation) & set(held))
+        self.assertEqual(dirs[0] in held, dirs[1] in held)
+
     def test_weights_by_slow_traces_and_skips_windows_before_the_fault(self):
         windows = [
             {"window_start_ns": "0", "window_end_ns": "300", "slow_traces": 50,

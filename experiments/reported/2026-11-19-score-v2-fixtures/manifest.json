@@ -1,0 +1,791 @@
+[
+  {
+    "case": "re2ob_cartservice_delay_1",
+    "method": "slowest_average",
+    "truth": "cartservice",
+    "truth_present": true,
+    "input_sha256": {
+      "inject_time.txt": "561a3aadd0bfa2f9423e821a352bf8fc367cab6247c6f312777915e017b94cde",
+      "traces.csv": "a9c6499b4d5c1ee0442a8b7a7343cbd33cba08103c10eded8bb1eb4e30c777d9"
+    },
+    "ranking": [
+      "frontend",
+      "checkoutservice",
+      "cartservice",
+      "paymentservice",
+      "shippingservice",
+      "productcatalogservice"
+    ],
+    "configuration": null,
+    "algorithm": null
+  },
+  {
+    "case": "re2ob_cartservice_delay_1",
+    "method": "longest_span",
+    "truth": "cartservice",
+    "truth_present": true,
+    "input_sha256": {
+      "inject_time.txt": "561a3aadd0bfa2f9423e821a352bf8fc367cab6247c6f312777915e017b94cde",
+      "traces.csv": "a9c6499b4d5c1ee0442a8b7a7343cbd33cba08103c10eded8bb1eb4e30c777d9"
+    },
+    "ranking": [
+      "cartservice"
+    ],
+    "configuration": null,
+    "algorithm": null
+  },
+  {
+    "case": "re2ob_cartservice_delay_1",
+    "method": "critical_path_only",
+    "truth": "cartservice",
+    "truth_present": true,
+    "input_sha256": {
+      "inject_time.txt": "561a3aadd0bfa2f9423e821a352bf8fc367cab6247c6f312777915e017b94cde",
+      "traces.csv": "a9c6499b4d5c1ee0442a8b7a7343cbd33cba08103c10eded8bb1eb4e30c777d9"
+    },
+    "ranking": [
+      "cartservice",
+      "paymentservice",
+      "frontend",
+      "checkoutservice",
+      "shippingservice",
+      "productcatalogservice"
+    ],
+    "configuration": null,
+    "algorithm": null
+  },
+  {
+    "case": "re2ob_cartservice_delay_1",
+    "method": "tail_share_excess",
+    "truth": "cartservice",
+    "truth_present": true,
+    "input_sha256": {
+      "inject_time.txt": "561a3aadd0bfa2f9423e821a352bf8fc367cab6247c6f312777915e017b94cde",
+      "traces.csv": "a9c6499b4d5c1ee0442a8b7a7343cbd33cba08103c10eded8bb1eb4e30c777d9"
+    },
+    "ranking": [
+      "cartservice"
+    ],
+    "configuration": {
+      "window_seconds": 300,
+      "min_samples": 10,
+      "slow_ratio": 1.5,
+      "min_excess_ms": 5.0,
+      "timing_policy": "measured-or-derived",
+      "alert_delta": 0.25,
+      "assume_synchronous": true
+    },
+    "algorithm": "tail-share-excess-v1"
+  },
+  {
+    "case": "re2ob_cartservice_delay_1",
+    "method": "score_v2",
+    "truth": "cartservice",
+    "truth_present": true,
+    "input_sha256": {
+      "inject_time.txt": "561a3aadd0bfa2f9423e821a352bf8fc367cab6247c6f312777915e017b94cde",
+      "traces.csv": "a9c6499b4d5c1ee0442a8b7a7343cbd33cba08103c10eded8bb1eb4e30c777d9"
+    },
+    "ranking": [
+      "cartservice",
+      "checkoutservice",
+      "frontend",
+      "shippingservice",
+      "paymentservice",
+      "productcatalogservice"
+    ],
+    "configuration": {
+      "window_seconds": 300,
+      "min_samples": 10,
+      "slow_ratio": 1.5,
+      "floor_ms": 1.0,
+      "timing_policy": "measured-or-derived",
+      "assume_synchronous": true,
+      "weights": {
+        "critical_path": 0.3,
+        "latency": 0.3,
+        "prevalence": 0.15,
+        "error": 0.25
+      }
+    },
+    "algorithm": "bottleneck-score-v2"
+  },
+  {
+    "case": "re2ob_cartservice_delay_1",
+    "method": "v1_measured",
+    "truth": "cartservice",
+    "truth_present": true,
+    "input_sha256": {
+      "inject_time.txt": "561a3aadd0bfa2f9423e821a352bf8fc367cab6247c6f312777915e017b94cde",
+      "traces.csv": "a9c6499b4d5c1ee0442a8b7a7343cbd33cba08103c10eded8bb1eb4e30c777d9"
+    },
+    "ranking": [],
+    "configuration": {
+      "window_seconds": 300,
+      "min_samples": 10,
+      "slow_ratio": 1.5,
+      "min_excess_ms": 5.0,
+      "timing_policy": "measured",
+      "alert_delta": 0.25,
+      "assume_synchronous": true
+    },
+    "algorithm": "tail-share-excess-v1"
+  },
+  {
+    "case": "re2ob_cartservice_delay_1",
+    "method": "v2_measured",
+    "truth": "cartservice",
+    "truth_present": true,
+    "input_sha256": {
+      "inject_time.txt": "561a3aadd0bfa2f9423e821a352bf8fc367cab6247c6f312777915e017b94cde",
+      "traces.csv": "a9c6499b4d5c1ee0442a8b7a7343cbd33cba08103c10eded8bb1eb4e30c777d9"
+    },
+    "ranking": [],
+    "configuration": {
+      "window_seconds": 300,
+      "min_samples": 10,
+      "slow_ratio": 1.5,
+      "floor_ms": 1.0,
+      "timing_policy": "measured",
+      "assume_synchronous": true,
+      "weights": {
+        "critical_path": 0.3,
+        "latency": 0.3,
+        "prevalence": 0.15,
+        "error": 0.25
+      }
+    },
+    "algorithm": "bottleneck-score-v2"
+  },
+  {
+    "case": "re2ob_paymentservice_delay_1",
+    "method": "slowest_average",
+    "truth": "paymentservice",
+    "truth_present": true,
+    "input_sha256": {
+      "inject_time.txt": "561a3aadd0bfa2f9423e821a352bf8fc367cab6247c6f312777915e017b94cde",
+      "traces.csv": "0235647f6e8f50122951e9bd6fd5b2aa95d84cf47f64819e44ca84e4c0df5129"
+    },
+    "ranking": [
+      "frontend",
+      "checkoutservice",
+      "paymentservice",
+      "shippingservice",
+      "productcatalogservice",
+      "cartservice"
+    ],
+    "configuration": null,
+    "algorithm": null
+  },
+  {
+    "case": "re2ob_paymentservice_delay_1",
+    "method": "longest_span",
+    "truth": "paymentservice",
+    "truth_present": true,
+    "input_sha256": {
+      "inject_time.txt": "561a3aadd0bfa2f9423e821a352bf8fc367cab6247c6f312777915e017b94cde",
+      "traces.csv": "0235647f6e8f50122951e9bd6fd5b2aa95d84cf47f64819e44ca84e4c0df5129"
+    },
+    "ranking": [
+      "paymentservice"
+    ],
+    "configuration": null,
+    "algorithm": null
+  },
+  {
+    "case": "re2ob_paymentservice_delay_1",
+    "method": "critical_path_only",
+    "truth": "paymentservice",
+    "truth_present": true,
+    "input_sha256": {
+      "inject_time.txt": "561a3aadd0bfa2f9423e821a352bf8fc367cab6247c6f312777915e017b94cde",
+      "traces.csv": "0235647f6e8f50122951e9bd6fd5b2aa95d84cf47f64819e44ca84e4c0df5129"
+    },
+    "ranking": [
+      "paymentservice",
+      "frontend",
+      "checkoutservice",
+      "cartservice",
+      "shippingservice",
+      "productcatalogservice"
+    ],
+    "configuration": null,
+    "algorithm": null
+  },
+  {
+    "case": "re2ob_paymentservice_delay_1",
+    "method": "tail_share_excess",
+    "truth": "paymentservice",
+    "truth_present": true,
+    "input_sha256": {
+      "inject_time.txt": "561a3aadd0bfa2f9423e821a352bf8fc367cab6247c6f312777915e017b94cde",
+      "traces.csv": "0235647f6e8f50122951e9bd6fd5b2aa95d84cf47f64819e44ca84e4c0df5129"
+    },
+    "ranking": [
+      "paymentservice"
+    ],
+    "configuration": {
+      "window_seconds": 300,
+      "min_samples": 10,
+      "slow_ratio": 1.5,
+      "min_excess_ms": 5.0,
+      "timing_policy": "measured-or-derived",
+      "alert_delta": 0.25,
+      "assume_synchronous": true
+    },
+    "algorithm": "tail-share-excess-v1"
+  },
+  {
+    "case": "re2ob_paymentservice_delay_1",
+    "method": "score_v2",
+    "truth": "paymentservice",
+    "truth_present": true,
+    "input_sha256": {
+      "inject_time.txt": "561a3aadd0bfa2f9423e821a352bf8fc367cab6247c6f312777915e017b94cde",
+      "traces.csv": "0235647f6e8f50122951e9bd6fd5b2aa95d84cf47f64819e44ca84e4c0df5129"
+    },
+    "ranking": [
+      "paymentservice",
+      "checkoutservice",
+      "frontend",
+      "productcatalogservice",
+      "cartservice",
+      "shippingservice"
+    ],
+    "configuration": {
+      "window_seconds": 300,
+      "min_samples": 10,
+      "slow_ratio": 1.5,
+      "floor_ms": 1.0,
+      "timing_policy": "measured-or-derived",
+      "assume_synchronous": true,
+      "weights": {
+        "critical_path": 0.3,
+        "latency": 0.3,
+        "prevalence": 0.15,
+        "error": 0.25
+      }
+    },
+    "algorithm": "bottleneck-score-v2"
+  },
+  {
+    "case": "re2ob_paymentservice_delay_1",
+    "method": "v1_measured",
+    "truth": "paymentservice",
+    "truth_present": true,
+    "input_sha256": {
+      "inject_time.txt": "561a3aadd0bfa2f9423e821a352bf8fc367cab6247c6f312777915e017b94cde",
+      "traces.csv": "0235647f6e8f50122951e9bd6fd5b2aa95d84cf47f64819e44ca84e4c0df5129"
+    },
+    "ranking": [],
+    "configuration": {
+      "window_seconds": 300,
+      "min_samples": 10,
+      "slow_ratio": 1.5,
+      "min_excess_ms": 5.0,
+      "timing_policy": "measured",
+      "alert_delta": 0.25,
+      "assume_synchronous": true
+    },
+    "algorithm": "tail-share-excess-v1"
+  },
+  {
+    "case": "re2ob_paymentservice_delay_1",
+    "method": "v2_measured",
+    "truth": "paymentservice",
+    "truth_present": true,
+    "input_sha256": {
+      "inject_time.txt": "561a3aadd0bfa2f9423e821a352bf8fc367cab6247c6f312777915e017b94cde",
+      "traces.csv": "0235647f6e8f50122951e9bd6fd5b2aa95d84cf47f64819e44ca84e4c0df5129"
+    },
+    "ranking": [],
+    "configuration": {
+      "window_seconds": 300,
+      "min_samples": 10,
+      "slow_ratio": 1.5,
+      "floor_ms": 1.0,
+      "timing_policy": "measured",
+      "assume_synchronous": true,
+      "weights": {
+        "critical_path": 0.3,
+        "latency": 0.3,
+        "prevalence": 0.15,
+        "error": 0.25
+      }
+    },
+    "algorithm": "bottleneck-score-v2"
+  },
+  {
+    "case": "re2ob_paymentservice_error_1",
+    "method": "slowest_average",
+    "truth": "paymentservice",
+    "truth_present": true,
+    "input_sha256": {
+      "inject_time.txt": "561a3aadd0bfa2f9423e821a352bf8fc367cab6247c6f312777915e017b94cde",
+      "traces.csv": "6df72f80491e17af8ecfff3bfbd68d2ab1e7597bd74bb4a11a32b870acda056d"
+    },
+    "ranking": [
+      "frontend",
+      "checkoutservice",
+      "paymentservice",
+      "shippingservice",
+      "productcatalogservice",
+      "cartservice"
+    ],
+    "configuration": null,
+    "algorithm": null
+  },
+  {
+    "case": "re2ob_paymentservice_error_1",
+    "method": "longest_span",
+    "truth": "paymentservice",
+    "truth_present": true,
+    "input_sha256": {
+      "inject_time.txt": "561a3aadd0bfa2f9423e821a352bf8fc367cab6247c6f312777915e017b94cde",
+      "traces.csv": "6df72f80491e17af8ecfff3bfbd68d2ab1e7597bd74bb4a11a32b870acda056d"
+    },
+    "ranking": [
+      "paymentservice",
+      "frontend"
+    ],
+    "configuration": null,
+    "algorithm": null
+  },
+  {
+    "case": "re2ob_paymentservice_error_1",
+    "method": "critical_path_only",
+    "truth": "paymentservice",
+    "truth_present": true,
+    "input_sha256": {
+      "inject_time.txt": "561a3aadd0bfa2f9423e821a352bf8fc367cab6247c6f312777915e017b94cde",
+      "traces.csv": "6df72f80491e17af8ecfff3bfbd68d2ab1e7597bd74bb4a11a32b870acda056d"
+    },
+    "ranking": [
+      "paymentservice",
+      "frontend",
+      "checkoutservice",
+      "cartservice",
+      "shippingservice",
+      "productcatalogservice"
+    ],
+    "configuration": null,
+    "algorithm": null
+  },
+  {
+    "case": "re2ob_paymentservice_error_1",
+    "method": "tail_share_excess",
+    "truth": "paymentservice",
+    "truth_present": true,
+    "input_sha256": {
+      "inject_time.txt": "561a3aadd0bfa2f9423e821a352bf8fc367cab6247c6f312777915e017b94cde",
+      "traces.csv": "6df72f80491e17af8ecfff3bfbd68d2ab1e7597bd74bb4a11a32b870acda056d"
+    },
+    "ranking": [],
+    "configuration": {
+      "window_seconds": 300,
+      "min_samples": 10,
+      "slow_ratio": 1.5,
+      "min_excess_ms": 5.0,
+      "timing_policy": "measured-or-derived",
+      "alert_delta": 0.25,
+      "assume_synchronous": true
+    },
+    "algorithm": "tail-share-excess-v1"
+  },
+  {
+    "case": "re2ob_paymentservice_error_1",
+    "method": "score_v2",
+    "truth": "paymentservice",
+    "truth_present": true,
+    "input_sha256": {
+      "inject_time.txt": "561a3aadd0bfa2f9423e821a352bf8fc367cab6247c6f312777915e017b94cde",
+      "traces.csv": "6df72f80491e17af8ecfff3bfbd68d2ab1e7597bd74bb4a11a32b870acda056d"
+    },
+    "ranking": [
+      "paymentservice",
+      "cartservice",
+      "productcatalogservice",
+      "checkoutservice",
+      "frontend",
+      "shippingservice"
+    ],
+    "configuration": {
+      "window_seconds": 300,
+      "min_samples": 10,
+      "slow_ratio": 1.5,
+      "floor_ms": 1.0,
+      "timing_policy": "measured-or-derived",
+      "assume_synchronous": true,
+      "weights": {
+        "critical_path": 0.3,
+        "latency": 0.3,
+        "prevalence": 0.15,
+        "error": 0.25
+      }
+    },
+    "algorithm": "bottleneck-score-v2"
+  },
+  {
+    "case": "re2ob_paymentservice_error_1",
+    "method": "v1_measured",
+    "truth": "paymentservice",
+    "truth_present": true,
+    "input_sha256": {
+      "inject_time.txt": "561a3aadd0bfa2f9423e821a352bf8fc367cab6247c6f312777915e017b94cde",
+      "traces.csv": "6df72f80491e17af8ecfff3bfbd68d2ab1e7597bd74bb4a11a32b870acda056d"
+    },
+    "ranking": [],
+    "configuration": {
+      "window_seconds": 300,
+      "min_samples": 10,
+      "slow_ratio": 1.5,
+      "min_excess_ms": 5.0,
+      "timing_policy": "measured",
+      "alert_delta": 0.25,
+      "assume_synchronous": true
+    },
+    "algorithm": "tail-share-excess-v1"
+  },
+  {
+    "case": "re2ob_paymentservice_error_1",
+    "method": "v2_measured",
+    "truth": "paymentservice",
+    "truth_present": true,
+    "input_sha256": {
+      "inject_time.txt": "561a3aadd0bfa2f9423e821a352bf8fc367cab6247c6f312777915e017b94cde",
+      "traces.csv": "6df72f80491e17af8ecfff3bfbd68d2ab1e7597bd74bb4a11a32b870acda056d"
+    },
+    "ranking": [],
+    "configuration": {
+      "window_seconds": 300,
+      "min_samples": 10,
+      "slow_ratio": 1.5,
+      "floor_ms": 1.0,
+      "timing_policy": "measured",
+      "assume_synchronous": true,
+      "weights": {
+        "critical_path": 0.3,
+        "latency": 0.3,
+        "prevalence": 0.15,
+        "error": 0.25
+      }
+    },
+    "algorithm": "bottleneck-score-v2"
+  },
+  {
+    "case": "re2ob_productcatalogservice_delay_1",
+    "method": "slowest_average",
+    "truth": "productcatalogservice",
+    "truth_present": true,
+    "input_sha256": {
+      "inject_time.txt": "561a3aadd0bfa2f9423e821a352bf8fc367cab6247c6f312777915e017b94cde",
+      "traces.csv": "114fe1d9172ebabffa0e018d6e84bf8b3404c54af2e45b5021d6128ff82be048"
+    },
+    "ranking": [
+      "frontend",
+      "productcatalogservice",
+      "checkoutservice",
+      "paymentservice",
+      "shippingservice",
+      "cartservice"
+    ],
+    "configuration": null,
+    "algorithm": null
+  },
+  {
+    "case": "re2ob_productcatalogservice_delay_1",
+    "method": "longest_span",
+    "truth": "productcatalogservice",
+    "truth_present": true,
+    "input_sha256": {
+      "inject_time.txt": "561a3aadd0bfa2f9423e821a352bf8fc367cab6247c6f312777915e017b94cde",
+      "traces.csv": "114fe1d9172ebabffa0e018d6e84bf8b3404c54af2e45b5021d6128ff82be048"
+    },
+    "ranking": [
+      "productcatalogservice"
+    ],
+    "configuration": null,
+    "algorithm": null
+  },
+  {
+    "case": "re2ob_productcatalogservice_delay_1",
+    "method": "critical_path_only",
+    "truth": "productcatalogservice",
+    "truth_present": true,
+    "input_sha256": {
+      "inject_time.txt": "561a3aadd0bfa2f9423e821a352bf8fc367cab6247c6f312777915e017b94cde",
+      "traces.csv": "114fe1d9172ebabffa0e018d6e84bf8b3404c54af2e45b5021d6128ff82be048"
+    },
+    "ranking": [
+      "productcatalogservice",
+      "paymentservice",
+      "frontend",
+      "checkoutservice",
+      "cartservice",
+      "shippingservice"
+    ],
+    "configuration": null,
+    "algorithm": null
+  },
+  {
+    "case": "re2ob_productcatalogservice_delay_1",
+    "method": "tail_share_excess",
+    "truth": "productcatalogservice",
+    "truth_present": true,
+    "input_sha256": {
+      "inject_time.txt": "561a3aadd0bfa2f9423e821a352bf8fc367cab6247c6f312777915e017b94cde",
+      "traces.csv": "114fe1d9172ebabffa0e018d6e84bf8b3404c54af2e45b5021d6128ff82be048"
+    },
+    "ranking": [
+      "productcatalogservice"
+    ],
+    "configuration": {
+      "window_seconds": 300,
+      "min_samples": 10,
+      "slow_ratio": 1.5,
+      "min_excess_ms": 5.0,
+      "timing_policy": "measured-or-derived",
+      "alert_delta": 0.25,
+      "assume_synchronous": true
+    },
+    "algorithm": "tail-share-excess-v1"
+  },
+  {
+    "case": "re2ob_productcatalogservice_delay_1",
+    "method": "score_v2",
+    "truth": "productcatalogservice",
+    "truth_present": true,
+    "input_sha256": {
+      "inject_time.txt": "561a3aadd0bfa2f9423e821a352bf8fc367cab6247c6f312777915e017b94cde",
+      "traces.csv": "114fe1d9172ebabffa0e018d6e84bf8b3404c54af2e45b5021d6128ff82be048"
+    },
+    "ranking": [
+      "productcatalogservice",
+      "frontend",
+      "paymentservice",
+      "cartservice",
+      "shippingservice",
+      "checkoutservice"
+    ],
+    "configuration": {
+      "window_seconds": 300,
+      "min_samples": 10,
+      "slow_ratio": 1.5,
+      "floor_ms": 1.0,
+      "timing_policy": "measured-or-derived",
+      "assume_synchronous": true,
+      "weights": {
+        "critical_path": 0.3,
+        "latency": 0.3,
+        "prevalence": 0.15,
+        "error": 0.25
+      }
+    },
+    "algorithm": "bottleneck-score-v2"
+  },
+  {
+    "case": "re2ob_productcatalogservice_delay_1",
+    "method": "v1_measured",
+    "truth": "productcatalogservice",
+    "truth_present": true,
+    "input_sha256": {
+      "inject_time.txt": "561a3aadd0bfa2f9423e821a352bf8fc367cab6247c6f312777915e017b94cde",
+      "traces.csv": "114fe1d9172ebabffa0e018d6e84bf8b3404c54af2e45b5021d6128ff82be048"
+    },
+    "ranking": [],
+    "configuration": {
+      "window_seconds": 300,
+      "min_samples": 10,
+      "slow_ratio": 1.5,
+      "min_excess_ms": 5.0,
+      "timing_policy": "measured",
+      "alert_delta": 0.25,
+      "assume_synchronous": true
+    },
+    "algorithm": "tail-share-excess-v1"
+  },
+  {
+    "case": "re2ob_productcatalogservice_delay_1",
+    "method": "v2_measured",
+    "truth": "productcatalogservice",
+    "truth_present": true,
+    "input_sha256": {
+      "inject_time.txt": "561a3aadd0bfa2f9423e821a352bf8fc367cab6247c6f312777915e017b94cde",
+      "traces.csv": "114fe1d9172ebabffa0e018d6e84bf8b3404c54af2e45b5021d6128ff82be048"
+    },
+    "ranking": [],
+    "configuration": {
+      "window_seconds": 300,
+      "min_samples": 10,
+      "slow_ratio": 1.5,
+      "floor_ms": 1.0,
+      "timing_policy": "measured",
+      "assume_synchronous": true,
+      "weights": {
+        "critical_path": 0.3,
+        "latency": 0.3,
+        "prevalence": 0.15,
+        "error": 0.25
+      }
+    },
+    "algorithm": "bottleneck-score-v2"
+  },
+  {
+    "case": "re2ob_shippingservice_delay_1",
+    "method": "slowest_average",
+    "truth": "shippingservice",
+    "truth_present": true,
+    "input_sha256": {
+      "inject_time.txt": "561a3aadd0bfa2f9423e821a352bf8fc367cab6247c6f312777915e017b94cde",
+      "traces.csv": "847c6afb2cd7cf9edb96ee16c6a73c7ff2ac1623a0ff74896cb4696ee5701b22"
+    },
+    "ranking": [
+      "frontend",
+      "checkoutservice",
+      "shippingservice",
+      "paymentservice",
+      "productcatalogservice",
+      "cartservice"
+    ],
+    "configuration": null,
+    "algorithm": null
+  },
+  {
+    "case": "re2ob_shippingservice_delay_1",
+    "method": "longest_span",
+    "truth": "shippingservice",
+    "truth_present": true,
+    "input_sha256": {
+      "inject_time.txt": "561a3aadd0bfa2f9423e821a352bf8fc367cab6247c6f312777915e017b94cde",
+      "traces.csv": "847c6afb2cd7cf9edb96ee16c6a73c7ff2ac1623a0ff74896cb4696ee5701b22"
+    },
+    "ranking": [
+      "shippingservice"
+    ],
+    "configuration": null,
+    "algorithm": null
+  },
+  {
+    "case": "re2ob_shippingservice_delay_1",
+    "method": "critical_path_only",
+    "truth": "shippingservice",
+    "truth_present": true,
+    "input_sha256": {
+      "inject_time.txt": "561a3aadd0bfa2f9423e821a352bf8fc367cab6247c6f312777915e017b94cde",
+      "traces.csv": "847c6afb2cd7cf9edb96ee16c6a73c7ff2ac1623a0ff74896cb4696ee5701b22"
+    },
+    "ranking": [
+      "shippingservice",
+      "paymentservice",
+      "frontend",
+      "checkoutservice",
+      "cartservice",
+      "productcatalogservice"
+    ],
+    "configuration": null,
+    "algorithm": null
+  },
+  {
+    "case": "re2ob_shippingservice_delay_1",
+    "method": "tail_share_excess",
+    "truth": "shippingservice",
+    "truth_present": true,
+    "input_sha256": {
+      "inject_time.txt": "561a3aadd0bfa2f9423e821a352bf8fc367cab6247c6f312777915e017b94cde",
+      "traces.csv": "847c6afb2cd7cf9edb96ee16c6a73c7ff2ac1623a0ff74896cb4696ee5701b22"
+    },
+    "ranking": [
+      "shippingservice"
+    ],
+    "configuration": {
+      "window_seconds": 300,
+      "min_samples": 10,
+      "slow_ratio": 1.5,
+      "min_excess_ms": 5.0,
+      "timing_policy": "measured-or-derived",
+      "alert_delta": 0.25,
+      "assume_synchronous": true
+    },
+    "algorithm": "tail-share-excess-v1"
+  },
+  {
+    "case": "re2ob_shippingservice_delay_1",
+    "method": "score_v2",
+    "truth": "shippingservice",
+    "truth_present": true,
+    "input_sha256": {
+      "inject_time.txt": "561a3aadd0bfa2f9423e821a352bf8fc367cab6247c6f312777915e017b94cde",
+      "traces.csv": "847c6afb2cd7cf9edb96ee16c6a73c7ff2ac1623a0ff74896cb4696ee5701b22"
+    },
+    "ranking": [
+      "shippingservice",
+      "frontend",
+      "checkoutservice",
+      "productcatalogservice",
+      "paymentservice",
+      "cartservice"
+    ],
+    "configuration": {
+      "window_seconds": 300,
+      "min_samples": 10,
+      "slow_ratio": 1.5,
+      "floor_ms": 1.0,
+      "timing_policy": "measured-or-derived",
+      "assume_synchronous": true,
+      "weights": {
+        "critical_path": 0.3,
+        "latency": 0.3,
+        "prevalence": 0.15,
+        "error": 0.25
+      }
+    },
+    "algorithm": "bottleneck-score-v2"
+  },
+  {
+    "case": "re2ob_shippingservice_delay_1",
+    "method": "v1_measured",
+    "truth": "shippingservice",
+    "truth_present": true,
+    "input_sha256": {
+      "inject_time.txt": "561a3aadd0bfa2f9423e821a352bf8fc367cab6247c6f312777915e017b94cde",
+      "traces.csv": "847c6afb2cd7cf9edb96ee16c6a73c7ff2ac1623a0ff74896cb4696ee5701b22"
+    },
+    "ranking": [],
+    "configuration": {
+      "window_seconds": 300,
+      "min_samples": 10,
+      "slow_ratio": 1.5,
+      "min_excess_ms": 5.0,
+      "timing_policy": "measured",
+      "alert_delta": 0.25,
+      "assume_synchronous": true
+    },
+    "algorithm": "tail-share-excess-v1"
+  },
+  {
+    "case": "re2ob_shippingservice_delay_1",
+    "method": "v2_measured",
+    "truth": "shippingservice",
+    "truth_present": true,
+    "input_sha256": {
+      "inject_time.txt": "561a3aadd0bfa2f9423e821a352bf8fc367cab6247c6f312777915e017b94cde",
+      "traces.csv": "847c6afb2cd7cf9edb96ee16c6a73c7ff2ac1623a0ff74896cb4696ee5701b22"
+    },
+    "ranking": [],
+    "configuration": {
+      "window_seconds": 300,
+      "min_samples": 10,
+      "slow_ratio": 1.5,
+      "floor_ms": 1.0,
+      "timing_policy": "measured",
+      "assume_synchronous": true,
+      "weights": {
+        "critical_path": 0.3,
+        "latency": 0.3,
+        "prevalence": 0.15,
+        "error": 0.25
+      }
+    },
+    "algorithm": "bottleneck-score-v2"
+  }
+]
