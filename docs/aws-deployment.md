@@ -38,6 +38,17 @@ security group `sg-005e91c6586e85336`, which also guards Aurora. An S3 gateway e
 purpose: it would cost about $30 a month while idle. The collector and adapter stay
 outside the VPC because they never talk to the database.
 
+## IAM roles (S3 access)
+
+| role | S3 permissions |
+|---|---|
+| `mal-collector-role` | `PutObject` on `live/*` (+ basic Lambda logging) |
+| `mal-dataset-adapter-role-31upqkjq` | `GetObject` on `uploads/*` and `live/*`, `PutObject` on `normalized/*` (+ logging, SQS) |
+
+A new raw prefix needs both an S3 event notification and a `GetObject` grant on the
+adapter role; without the grant the adapter logs `AccessDenied` and the batch waits in
+the queue until it goes to the dead-letter queue.
+
 ## Queues
 
 | queue | visibility timeout | dead-letter queue |
