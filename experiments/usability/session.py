@@ -47,7 +47,7 @@ def is_correct(answer: str, culprit: str) -> bool:
 
 def append_log(path: str, row: dict) -> None:
     new = not os.path.exists(path) or os.path.getsize(path) == 0
-    with open(path, "a", newline="") as f:
+    with open(path, "a", newline="", encoding="utf-8") as f:
         w = csv.DictWriter(f, fieldnames=LOG_FIELDS, lineterminator="\n")
         if new:
             w.writeheader()
@@ -97,7 +97,7 @@ def main(argv=None):
     ap.add_argument("--no-load", action="store_true", help="do not load episodes; you do it by hand")
     ap.add_argument("--dashboard-data", help="the dashboard's DATA_DIR (default <dir>/live_dashboard)")
     a = ap.parse_args(argv)
-    with open(os.path.join(a.dir, "answer_key.json")) as f:
+    with open(os.path.join(a.dir, "answer_key.json"), encoding="utf-8") as f:
         key = json.load(f)
     plan = sched.for_participant(sched.read(a.schedule), a.participant)
     loader = None if a.no_load else (

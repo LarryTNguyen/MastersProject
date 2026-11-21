@@ -48,7 +48,7 @@ def main(argv=None):
     ap.add_argument("log")
     ap.add_argument("--out")
     a = ap.parse_args(argv)
-    with open(a.log, newline="") as f:
+    with open(a.log, newline="", encoding="utf-8") as f:
         rows = [r for r in csv.DictReader(f) if r.get("seconds")]
     if not rows:
         print("no rows yet")
@@ -60,7 +60,7 @@ def main(argv=None):
         print(f"paired: {s['faster_with_dashboard']}/{s['paired_n']} participants faster with the dashboard, "
               f"mean difference {s['paired_mean_diff_s']:+.0f}s")
     if a.out:
-        with open(a.out, "w") as f:
+        with open(a.out, "w", encoding="utf-8") as f:
             json.dump(s, f, indent=2)
 
 

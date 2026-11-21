@@ -249,9 +249,9 @@ def run(args) -> dict:
             result["staleness_ms_values"] = [round(float(r[0]), 1) for r in cur.fetchall() if r[0] is not None]
     conn.close()
     store.close()
-    with open(os.path.join(out, "freshness.json"), "w") as f:
+    with open(os.path.join(out, "freshness.json"), "w", encoding="utf-8") as f:
         json.dump(result, f, indent=2)
-    with open(os.path.join(out, "summary.md"), "w") as f:
+    with open(os.path.join(out, "summary.md"), "w", encoding="utf-8") as f:
         f.write(summary_md(result))
     return result
 
