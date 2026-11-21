@@ -1,0 +1,14 @@
+{
+  "schema_version": 1,
+  "run_id": "c804b772-accc-40c0-a135-ada4d3fb5a00",
+  "demo_directory": "C:\\Users\\larry\\Classes\\MastersProject\\opentelemetry-demo",
+  "demo_version": "c803c129aa45ed1ba18e91a04ba45f59410d26c5",
+  "fault": "paymentFailure",
+  "fault_variant": "100%",
+  "root_cause_service": "payment",
+  "minimum_healthy_checkout_traces": 5,
+  "minimum_faulty_checkout_traces": 5,
+  "healthy_started_at_unix_ns": "1795132835405345000",
+  "injected_at_unix_ns": null,
+  "cleared_at_unix_ns": null
+}

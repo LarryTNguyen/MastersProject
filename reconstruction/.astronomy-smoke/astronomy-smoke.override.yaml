@@ -1,0 +1,4 @@
+services:
+  flagd:
+    volumes:
+      - ${STA_FLAG_CONFIG}:/etc/flagd/demo.flagd.json:ro
