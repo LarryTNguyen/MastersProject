@@ -41,7 +41,7 @@ def for_participant(rows: List[dict], participant: str) -> List[dict]:
 
 
 def read(path: str) -> List[dict]:
-    with open(path, newline="") as f:
+    with open(path, newline="", encoding="utf-8") as f:
         return list(csv.DictReader(f))
 
 

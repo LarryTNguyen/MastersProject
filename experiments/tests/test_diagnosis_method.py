@@ -66,6 +66,26 @@ class CaseTests(unittest.TestCase):
         self.assertEqual(dm.tail_share_excess(normal, anomalous, accept_derived=False), [])
         self.assertIn("requires_measured_unix_intervals", dm.LAST["excluded_traces"])
 
+    def test_sampled_validation_gives_the_same_v2_ranking(self):
+        from experiments.rcaeval_eval import split_case
+        from traceingest import rcaeval
+        import trace_schema.validate as schema
+        spans, label = rcaeval.read_case(self.case)
+        normal, anomalous = split_case([s.to_dict() for s in spans], label.inject_time_s)
+        real = schema.validate_record
+        fast = dm.score_v2_fast(normal, anomalous)
+        self.assertTrue(dm.LAST["validation"].startswith("sampled"))
+        self.assertIs(schema.validate_record, real)              # put back afterwards
+        self.assertEqual(fast, dm.score_v2(normal, anomalous))
+        self.assertEqual(fast[0], "paymentservice")
+
+    def test_an_invalid_sampled_record_keeps_full_validation(self):
+        records = dm._records([[{"trace_id": "t", "span_id": "s", "parent_span_id": None, "service": "a",
+                                  "operation": "op", "start_us": 1, "duration_us": 1}]], True)
+        records[0]["span_id"] = None                              # breaks the schema
+        with dm._sampled_validation(records) as skipped:
+            self.assertFalse(skipped)
+
 
 if __name__ == "__main__":
     unittest.main()
