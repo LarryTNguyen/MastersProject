@@ -20,12 +20,39 @@ def _p90(values):
 
 
 def _durations(traces):
+    """Collect service latency samples, including isolated child-call gaps.
+
+    When a span has exactly one cross-service child, its caller-to-child
+    interval is attributed to the child service. This captures delays that
+    inflate the caller's wall time while leaving the callee's own span length
+    unchanged.
+    """
     out = defaultdict(list)
     for trace in traces:
+        by_id = {s.get("span_id"): s for s in trace if s.get("span_id") is not None}
+        children = defaultdict(list)
+        for span in trace:
+            parent_id = span.get("parent_span_id")
+            if parent_id in by_id:
+                children[parent_id].append(span)
         for span in trace:
             svc, duration = span.get("service"), span.get("duration_us")
             if svc is not None and duration is not None and duration >= 0:
                 out[svc].append(float(duration))
+        for caller in trace:
+            child_spans = children.get(caller.get("span_id"), [])
+            if len(child_spans) != 1:
+                continue
+            callee = child_spans[0]
+            if caller.get("service") == callee.get("service") or callee.get("service") is None:
+                continue
+            caller_start, child_start = caller.get("start_us"), callee.get("start_us")
+            child_duration = callee.get("duration_us")
+            if caller_start is None or child_start is None or child_duration is None:
+                continue
+            # Parent and child start times are relative to the same trace clock.
+            gap_and_child = max(0.0, float(child_start) + float(child_duration) - float(caller_start))
+            out[callee["service"]].append(gap_and_child)
     return out
 
 
