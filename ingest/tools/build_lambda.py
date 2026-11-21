@@ -4,7 +4,8 @@
 
 Run it from ingest/. The adapter only uses the standard library (boto3 comes
 with the Lambda runtime), so the zip is just the traceingest package and works
-on arm64 and x86_64. Handler: traceingest.adapter_lambda.handler.
+on arm64 and x86_64. Handler: traceingest.adapter_lambda.handler; the same zip
+also serves the collector Lambda with traceingest.collector_lambda.handler.
 """
 from __future__ import annotations
 
