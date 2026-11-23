@@ -1,0 +1,481 @@
+case,method,seconds,peak_memory_mb,validation,loader
+re2ob_checkoutservice_cpu_1,microrca,17.3,1048,,standard
+re2ob_checkoutservice_cpu_2,microrca,5.3,617,,standard
+re2ob_checkoutservice_cpu_3,microrca,11.7,1109,,standard
+re2ob_checkoutservice_delay_1,microrca,12.7,1081,,standard
+re2ob_checkoutservice_delay_2,microrca,11.7,1080,,standard
+re2ob_checkoutservice_delay_3,microrca,12.0,1081,,standard
+re2ob_checkoutservice_disk_1,microrca,12.9,1045,,standard
+re2ob_checkoutservice_disk_2,microrca,13.4,1102,,standard
+re2ob_checkoutservice_disk_3,microrca,14.8,1105,,standard
+re2ob_checkoutservice_loss_1,microrca,12.1,1042,,standard
+re2ob_checkoutservice_loss_2,microrca,12.5,1077,,standard
+re2ob_checkoutservice_loss_3,microrca,14.7,1080,,standard
+re2ob_checkoutservice_mem_1,microrca,14.7,1082,,standard
+re2ob_checkoutservice_mem_2,microrca,9.7,904,,standard
+re2ob_checkoutservice_mem_3,microrca,14.2,1103,,standard
+re2ob_checkoutservice_socket_1,microrca,12.5,1077,,standard
+re2ob_checkoutservice_socket_2,microrca,14.1,1082,,standard
+re2ob_checkoutservice_socket_3,microrca,12.8,1110,,standard
+re2ob_currencyservice_cpu_1,microrca,12.9,1075,,standard
+re2ob_currencyservice_cpu_2,microrca,11.1,1073,,standard
+re2ob_currencyservice_cpu_3,microrca,11.4,1079,,standard
+re2ob_currencyservice_delay_1,microrca,10.3,1038,,standard
+re2ob_currencyservice_delay_2,microrca,10.4,1040,,standard
+re2ob_currencyservice_delay_3,microrca,10.0,1025,,standard
+re2ob_currencyservice_disk_1,microrca,10.8,989,,standard
+re2ob_currencyservice_disk_2,microrca,11.6,1065,,standard
+re2ob_currencyservice_disk_3,microrca,12.0,1081,,standard
+re2ob_currencyservice_loss_1,microrca,7.5,814,,standard
+re2ob_currencyservice_loss_2,microrca,10.0,993,,standard
+re2ob_currencyservice_loss_3,microrca,9.9,971,,standard
+re2ob_currencyservice_mem_1,microrca,11.8,1025,,standard
+re2ob_currencyservice_mem_2,microrca,12.1,1041,,standard
+re2ob_currencyservice_mem_3,microrca,12.5,1037,,standard
+re2ob_currencyservice_socket_1,microrca,11.6,1084,,standard
+re2ob_currencyservice_socket_2,microrca,12.1,1071,,standard
+re2ob_currencyservice_socket_3,microrca,12.1,1067,,standard
+re2ob_emailservice_cpu_1,microrca,12.1,1054,,standard
+re2ob_emailservice_cpu_2,microrca,11.4,1107,,standard
+re2ob_emailservice_cpu_3,microrca,13.1,1114,,standard
+re2ob_emailservice_delay_1,microrca,11.9,1083,,standard
+re2ob_emailservice_delay_2,microrca,12.1,1078,,standard
+re2ob_emailservice_delay_3,microrca,11.6,1099,,standard
+re2ob_emailservice_disk_1,microrca,11.1,1043,,standard
+re2ob_emailservice_disk_2,microrca,12.4,1106,,standard
+re2ob_emailservice_disk_3,microrca,9.4,1002,,standard
+re2ob_emailservice_loss_1,microrca,11.7,1046,,standard
+re2ob_emailservice_loss_2,microrca,12.0,1111,,standard
+re2ob_emailservice_loss_3,microrca,10.8,1077,,standard
+re2ob_emailservice_mem_1,microrca,11.9,1088,,standard
+re2ob_emailservice_mem_2,microrca,11.8,1081,,standard
+re2ob_emailservice_mem_3,microrca,10.3,1060,,standard
+re2ob_emailservice_socket_1,microrca,11.6,1102,,standard
+re2ob_emailservice_socket_2,microrca,10.8,1112,,standard
+re2ob_emailservice_socket_3,microrca,11.7,1088,,standard
+re2ob_productcatalogservice_cpu_1,microrca,10.6,1057,,standard
+re2ob_productcatalogservice_cpu_2,microrca,10.3,1072,,standard
+re2ob_productcatalogservice_cpu_3,microrca,11.6,1081,,standard
+re2ob_productcatalogservice_delay_1,microrca,11.4,996,,standard
+re2ob_productcatalogservice_delay_2,microrca,10.1,995,,standard
+re2ob_productcatalogservice_delay_3,microrca,9.1,999,,standard
+re2ob_productcatalogservice_disk_1,microrca,12.1,1040,,standard
+re2ob_productcatalogservice_disk_2,microrca,11.9,1078,,standard
+re2ob_productcatalogservice_disk_3,microrca,11.0,1077,,standard
+re2ob_productcatalogservice_loss_1,microrca,7.1,733,,standard
+re2ob_productcatalogservice_loss_2,microrca,6.5,742,,standard
+re2ob_productcatalogservice_loss_3,microrca,11.0,933,,standard
+re2ob_productcatalogservice_mem_1,microrca,10.1,882,,standard
+re2ob_productcatalogservice_mem_2,microrca,10.6,891,,standard
+re2ob_productcatalogservice_mem_3,microrca,8.1,780,,standard
+re2ob_productcatalogservice_socket_1,microrca,11.1,1038,,standard
+re2ob_productcatalogservice_socket_2,microrca,11.3,1080,,standard
+re2ob_productcatalogservice_socket_3,microrca,11.9,1094,,standard
+re2ob_recommendationservice_cpu_1,microrca,12.1,1047,,standard
+re2ob_recommendationservice_cpu_2,microrca,12.4,1085,,standard
+re2ob_recommendationservice_cpu_3,microrca,12.1,1113,,standard
+re2ob_recommendationservice_delay_1,microrca,11.0,1058,,standard
+re2ob_recommendationservice_delay_2,microrca,10.1,1063,,standard
+re2ob_recommendationservice_delay_3,microrca,11.1,1064,,standard
+re2ob_recommendationservice_disk_1,microrca,11.9,1051,,standard
+re2ob_recommendationservice_disk_2,microrca,12.5,1077,,standard
+re2ob_recommendationservice_disk_3,microrca,11.3,1110,,standard
+re2ob_recommendationservice_loss_1,microrca,9.4,842,,standard
+re2ob_recommendationservice_loss_2,microrca,10.1,1006,,standard
+re2ob_recommendationservice_loss_3,microrca,11.3,998,,standard
+re2ob_recommendationservice_mem_1,microrca,11.6,1072,,standard
+re2ob_recommendationservice_mem_2,microrca,15.0,1063,,standard
+re2ob_recommendationservice_mem_3,microrca,12.0,1062,,standard
+re2ob_recommendationservice_socket_1,microrca,8.7,857,,standard
+re2ob_recommendationservice_socket_2,microrca,12.1,1106,,standard
+re2ob_recommendationservice_socket_3,microrca,11.5,1098,,standard
+re2tt_ts-auth-service_cpu_1,microrca,27.6,2480,,standard
+re2tt_ts-auth-service_cpu_2,microrca,18.5,1877,,standard
+re2tt_ts-auth-service_cpu_3,microrca,21.8,1998,,standard
+re2tt_ts-auth-service_delay_1,microrca,29.7,2510,,standard
+re2tt_ts-auth-service_delay_2,microrca,16.3,1497,,standard
+re2tt_ts-auth-service_delay_3,microrca,18.5,1546,,standard
+re2tt_ts-auth-service_disk_1,microrca,16.4,1589,,standard
+re2tt_ts-auth-service_disk_2,microrca,17.4,1487,,standard
+re2tt_ts-auth-service_disk_3,microrca,17.2,1680,,standard
+re2tt_ts-auth-service_loss_1,microrca,23.4,2131,,standard
+re2tt_ts-auth-service_loss_2,microrca,20.1,1745,,standard
+re2tt_ts-auth-service_loss_3,microrca,15.1,1418,,standard
+re2tt_ts-auth-service_mem_1,microrca,25.9,2374,,standard
+re2tt_ts-auth-service_mem_2,microrca,27.8,2455,,standard
+re2tt_ts-auth-service_mem_3,microrca,15.6,1422,,standard
+re2tt_ts-auth-service_socket_1,microrca,20.3,1861,,standard
+re2tt_ts-auth-service_socket_2,microrca,18.4,1690,,standard
+re2tt_ts-auth-service_socket_3,microrca,22.2,2090,,standard
+re2tt_ts-order-service_cpu_1,microrca,14.6,1442,,standard
+re2tt_ts-order-service_cpu_2,microrca,19.6,1814,,standard
+re2tt_ts-order-service_cpu_3,microrca,19.6,1893,,standard
+re2tt_ts-order-service_delay_1,microrca,19.6,1750,,standard
+re2tt_ts-order-service_delay_2,microrca,3.1,401,,standard
+re2tt_ts-order-service_delay_3,microrca,3.2,406,,standard
+re2tt_ts-order-service_disk_1,microrca,26.7,2329,,standard
+re2tt_ts-order-service_disk_2,microrca,2.6,404,,standard
+re2tt_ts-order-service_disk_3,microrca,3.1,406,,standard
+re2tt_ts-order-service_loss_1,microrca,31.8,2793,,standard
+re2tt_ts-order-service_loss_2,microrca,3.4,408,,standard
+re2tt_ts-order-service_loss_3,microrca,3.0,409,,standard
+re2tt_ts-order-service_mem_1,microrca,15.2,1404,,standard
+re2tt_ts-order-service_mem_2,microrca,16.0,1524,,standard
+re2tt_ts-order-service_mem_3,microrca,15.9,1601,,standard
+re2tt_ts-order-service_socket_1,microrca,31.4,2604,,standard
+re2tt_ts-order-service_socket_2,microrca,2.8,400,,standard
+re2tt_ts-order-service_socket_3,microrca,25.9,2127,,standard
+re2tt_ts-route-service_cpu_1,microrca,19.1,1705,,standard
+re2tt_ts-route-service_cpu_2,microrca,3.4,406,,standard
+re2tt_ts-route-service_cpu_3,microrca,2.9,406,,standard
+re2tt_ts-route-service_delay_1,microrca,20.6,1752,,standard
+re2tt_ts-route-service_delay_2,microrca,17.3,1686,,standard
+re2tt_ts-route-service_delay_3,microrca,20.5,1927,,standard
+re2tt_ts-route-service_disk_1,microrca,32.2,2845,,standard
+re2tt_ts-route-service_disk_2,microrca,7.9,824,,standard
+re2tt_ts-route-service_disk_3,microrca,13.4,1282,,standard
+re2tt_ts-route-service_loss_1,microrca,29.0,2593,,standard
+re2tt_ts-route-service_loss_2,microrca,19.3,1943,,standard
+re2tt_ts-route-service_loss_3,microrca,14.6,1437,,standard
+re2tt_ts-route-service_mem_1,microrca,15.5,1575,,standard
+re2tt_ts-route-service_mem_2,microrca,15.9,1437,,standard
+re2tt_ts-route-service_mem_3,microrca,15.9,1681,,standard
+re2tt_ts-route-service_socket_1,microrca,35.4,3276,,standard
+re2tt_ts-route-service_socket_2,microrca,15.2,1508,,standard
+re2tt_ts-route-service_socket_3,microrca,18.8,1741,,standard
+re2tt_ts-train-service_cpu_1,microrca,24.7,2292,,standard
+re2tt_ts-train-service_cpu_2,microrca,19.8,1809,,standard
+re2tt_ts-train-service_cpu_3,microrca,21.2,2070,,standard
+re2tt_ts-train-service_delay_1,microrca,24.2,2206,,standard
+re2tt_ts-train-service_delay_2,microrca,15.5,1539,,standard
+re2tt_ts-train-service_delay_3,microrca,19.5,1782,,standard
+re2tt_ts-train-service_disk_1,microrca,18.7,1746,,standard
+re2tt_ts-train-service_disk_2,microrca,22.7,1932,,standard
+re2tt_ts-train-service_disk_3,microrca,26.3,2205,,standard
+re2tt_ts-train-service_loss_1,microrca,26.9,2243,,standard
+re2tt_ts-train-service_loss_2,microrca,23.4,2167,,standard
+re2tt_ts-train-service_loss_3,microrca,25.7,2272,,standard
+re2tt_ts-train-service_mem_1,microrca,17.7,1469,,standard
+re2tt_ts-train-service_mem_2,microrca,16.9,1445,,standard
+re2tt_ts-train-service_mem_3,microrca,21.1,1716,,standard
+re2tt_ts-train-service_socket_1,microrca,11.5,932,,standard
+re2tt_ts-train-service_socket_2,microrca,32.0,2409,,standard
+re2tt_ts-train-service_socket_3,microrca,19.8,1513,,standard
+re2tt_ts-travel-service_cpu_1,microrca,20.9,1663,,standard
+re2tt_ts-travel-service_cpu_2,microrca,20.9,1799,,standard
+re2tt_ts-travel-service_cpu_3,microrca,19.1,1794,,standard
+re2tt_ts-travel-service_delay_1,microrca,22.2,2052,,standard
+re2tt_ts-travel-service_delay_2,microrca,23.7,1841,,standard
+re2tt_ts-travel-service_delay_3,microrca,25.4,2079,,standard
+re2tt_ts-travel-service_disk_1,microrca,20.9,1994,,standard
+re2tt_ts-travel-service_disk_2,microrca,4.1,497,,standard
+re2tt_ts-travel-service_disk_3,microrca,3.7,498,,standard
+re2tt_ts-travel-service_loss_1,microrca,22.5,1944,,standard
+re2tt_ts-travel-service_loss_2,microrca,31.7,2623,,standard
+re2tt_ts-travel-service_loss_3,microrca,29.6,2219,,standard
+re2tt_ts-travel-service_mem_1,microrca,22.5,1836,,standard
+re2tt_ts-travel-service_mem_2,microrca,20.9,1975,,standard
+re2tt_ts-travel-service_mem_3,microrca,13.6,1370,,standard
+re2tt_ts-travel-service_socket_1,microrca,4.1,492,,standard
+re2tt_ts-travel-service_socket_2,microrca,16.0,1532,,standard
+re2tt_ts-travel-service_socket_3,microrca,19.6,1770,,standard
+re3ob_adservice_f3_1,microrca,4.2,533,,standard
+re3ob_adservice_f3_2,microrca,5.1,526,,standard
+re3ob_adservice_f3_3,microrca,5.1,530,,standard
+re3ob_adservice_f4_1,microrca,4.0,529,,standard
+re3ob_adservice_f4_2,microrca,3.7,531,,standard
+re3ob_adservice_f4_3,microrca,4.8,536,,standard
+re3ob_adservice_f5_1,microrca,4.8,524,,standard
+re3ob_adservice_f5_2,microrca,4.5,528,,standard
+re3ob_adservice_f5_3,microrca,4.7,528,,standard
+re3ob_cartservice_f1_1,microrca,4.4,497,,standard
+re3ob_cartservice_f1_2,microrca,3.5,500,,standard
+re3ob_cartservice_f1_3,microrca,3.8,503,,standard
+re3ob_currencyservice_f1_1,microrca,3.0,415,,standard
+re3ob_currencyservice_f1_2,microrca,3.8,421,,standard
+re3ob_currencyservice_f1_3,microrca,3.7,419,,standard
+re3ob_emailservice_f1_1,microrca,4.0,536,,standard
+re3ob_emailservice_f1_2,microrca,5.2,531,,standard
+re3ob_emailservice_f1_3,microrca,4.3,521,,standard
+re3ob_emailservice_f2_1,microrca,4.2,537,,standard
+re3ob_emailservice_f2_2,microrca,4.2,532,,standard
+re3ob_emailservice_f2_3,microrca,5.6,529,,standard
+re3ob_emailservice_f3_1,microrca,5.2,529,,standard
+re3ob_emailservice_f3_2,microrca,4.6,535,,standard
+re3ob_emailservice_f3_3,microrca,4.1,540,,standard
+re3ob_emailservice_f4_1,microrca,4.5,533,,standard
+re3ob_emailservice_f4_2,microrca,4.4,541,,standard
+re3ob_emailservice_f4_3,microrca,4.1,525,,standard
+re3ob_emailservice_f5_1,microrca,5.5,534,,standard
+re3ob_emailservice_f5_2,microrca,4.0,535,,standard
+re3ob_emailservice_f5_3,microrca,4.5,524,,standard
+re3tt_ts-auth-service_f1_1,microrca,2.1,329,,standard
+re3tt_ts-auth-service_f1_2,microrca,2.2,323,,standard
+re3tt_ts-auth-service_f1_3,microrca,2.3,338,,standard
+re3tt_ts-auth-service_f1_4,microrca,1.1,218,,standard
+re3tt_ts-auth-service_f2_1,microrca,2.6,355,,standard
+re3tt_ts-auth-service_f2_2,microrca,2.6,340,,standard
+re3tt_ts-auth-service_f2_3,microrca,2.2,335,,standard
+re3tt_ts-auth-service_f2_4,microrca,1.0,223,,standard
+re3tt_ts-auth-service_f3_1,microrca,2.4,336,,standard
+re3tt_ts-auth-service_f3_2,microrca,2.3,345,,standard
+re3tt_ts-auth-service_f3_3,microrca,2.1,342,,standard
+re3tt_ts-auth-service_f3_4,microrca,0.9,232,,standard
+re3tt_ts-auth-service_f4_1,microrca,2.0,343,,standard
+re3tt_ts-auth-service_f4_2,microrca,2.5,354,,standard
+re3tt_ts-auth-service_f4_3,microrca,1.9,357,,standard
+re3tt_ts-route-service_f1_1,microrca,4.1,510,,standard
+re3tt_ts-route-service_f1_2,microrca,4.6,540,,standard
+re3tt_ts-route-service_f1_3,microrca,4.0,531,,standard
+re3tt_ts-route-service_f2_1,microrca,4.5,532,,standard
+re3tt_ts-route-service_f2_2,microrca,4.7,530,,standard
+re3tt_ts-route-service_f2_3,microrca,4.0,535,,standard
+re3tt_ts-route-service_f3_1,microrca,4.6,545,,standard
+re3tt_ts-route-service_f3_2,microrca,3.9,534,,standard
+re3tt_ts-route-service_f3_3,microrca,4.2,566,,standard
+re3tt_ts-route-service_f3_4,microrca,4.3,535,,standard
+re3tt_ts-route-service_f3_5,microrca,4.8,585,,standard
+re3tt_ts-route-service_f3_6,microrca,5.5,651,,standard
+re3tt_ts-route-service_f4_1,microrca,4.3,524,,standard
+re3tt_ts-route-service_f4_2,microrca,4.9,564,,standard
+re3tt_ts-route-service_f4_3,microrca,4.9,581,,standard
+re2ob_checkoutservice_cpu_1,score_v2_fast,146.3,3305,"sampled (1000 records, all valid)",standard
+re2ob_checkoutservice_cpu_2,score_v2_fast,72.6,2112,"sampled (1000 records, all valid)",standard
+re2ob_checkoutservice_cpu_3,score_v2_fast,150.8,3457,"sampled (1000 records, all valid)",standard
+re2ob_checkoutservice_delay_1,score_v2_fast,141.7,3413,"sampled (1000 records, all valid)",standard
+re2ob_checkoutservice_delay_2,score_v2_fast,139.0,3396,"sampled (1000 records, all valid)",standard
+re2ob_checkoutservice_delay_3,score_v2_fast,134.9,3415,"sampled (1000 records, all valid)",standard
+re2ob_checkoutservice_disk_1,score_v2_fast,144.7,3323,"sampled (1000 records, all valid)",standard
+re2ob_checkoutservice_disk_2,score_v2_fast,149.5,3454,"sampled (1000 records, all valid)",standard
+re2ob_checkoutservice_disk_3,score_v2_fast,149.5,3490,"sampled (1000 records, all valid)",standard
+re2ob_checkoutservice_loss_1,score_v2_fast,139.6,3276,"sampled (1000 records, all valid)",standard
+re2ob_checkoutservice_loss_2,score_v2_fast,141.5,3414,"sampled (1000 records, all valid)",standard
+re2ob_checkoutservice_loss_3,score_v2_fast,141.2,3418,"sampled (1000 records, all valid)",standard
+re2ob_checkoutservice_mem_1,score_v2_fast,144.5,3416,"sampled (1000 records, all valid)",standard
+re2ob_checkoutservice_mem_2,score_v2_fast,117.7,2926,"sampled (1000 records, all valid)",standard
+re2ob_checkoutservice_mem_3,score_v2_fast,143.6,3446,"sampled (1000 records, all valid)",standard
+re2ob_checkoutservice_socket_1,score_v2_fast,144.5,3406,"sampled (1000 records, all valid)",standard
+re2ob_checkoutservice_socket_2,score_v2_fast,146.8,3411,"sampled (1000 records, all valid)",standard
+re2ob_checkoutservice_socket_3,score_v2_fast,157.2,3471,"sampled (1000 records, all valid)",standard
+re2ob_currencyservice_cpu_1,score_v2_fast,150.4,3398,"sampled (1000 records, all valid)",standard
+re2ob_currencyservice_cpu_2,score_v2_fast,144.6,3377,"sampled (1000 records, all valid)",standard
+re2ob_currencyservice_cpu_3,score_v2_fast,141.3,3415,"sampled (1000 records, all valid)",standard
+re2ob_currencyservice_delay_1,score_v2_fast,134.5,3288,"sampled (1000 records, all valid)",standard
+re2ob_currencyservice_delay_2,score_v2_fast,133.3,3318,"sampled (1000 records, all valid)",standard
+re2ob_currencyservice_delay_3,score_v2_fast,132.6,3288,"sampled (1000 records, all valid)",standard
+re2ob_currencyservice_disk_1,score_v2_fast,127.6,3139,"sampled (1000 records, all valid)",standard
+re2ob_currencyservice_disk_2,score_v2_fast,142.8,3358,"sampled (1000 records, all valid)",standard
+re2ob_currencyservice_disk_3,score_v2_fast,138.8,3412,"sampled (1000 records, all valid)",standard
+re2ob_currencyservice_loss_1,score_v2_fast,100.1,2710,"sampled (1000 records, all valid)",standard
+re2ob_currencyservice_loss_2,score_v2_fast,123.0,3170,"sampled (1000 records, all valid)",standard
+re2ob_currencyservice_loss_3,score_v2_fast,124.4,3115,"sampled (1000 records, all valid)",standard
+re2ob_currencyservice_mem_1,score_v2_fast,127.9,3292,"sampled (1000 records, all valid)",standard
+re2ob_currencyservice_mem_2,score_v2_fast,140.6,3328,"sampled (1000 records, all valid)",standard
+re2ob_currencyservice_mem_3,score_v2_fast,130.3,3302,"sampled (1000 records, all valid)",standard
+re2ob_currencyservice_socket_1,score_v2_fast,142.4,3399,"sampled (1000 records, all valid)",standard
+re2ob_currencyservice_socket_2,score_v2_fast,139.8,3387,"sampled (1000 records, all valid)",standard
+re2ob_currencyservice_socket_3,score_v2_fast,140.6,3372,"sampled (1000 records, all valid)",standard
+re2ob_emailservice_cpu_1,score_v2_fast,139.5,3305,"sampled (1000 records, all valid)",standard
+re2ob_emailservice_cpu_2,score_v2_fast,141.2,3484,"sampled (1000 records, all valid)",standard
+re2ob_emailservice_cpu_3,score_v2_fast,135.4,3482,"sampled (1000 records, all valid)",standard
+re2ob_emailservice_delay_1,score_v2_fast,140.1,3446,"sampled (1000 records, all valid)",standard
+re2ob_emailservice_delay_2,score_v2_fast,136.3,3434,"sampled (1000 records, all valid)",standard
+re2ob_emailservice_delay_3,score_v2_fast,135.7,3444,"sampled (1000 records, all valid)",standard
+re2ob_emailservice_disk_1,score_v2_fast,140.3,3273,"sampled (1000 records, all valid)",standard
+re2ob_emailservice_disk_2,score_v2_fast,133.9,3458,"sampled (1000 records, all valid)",standard
+re2ob_emailservice_disk_3,score_v2_fast,123.9,3199,"sampled (1000 records, all valid)",standard
+re2ob_emailservice_loss_1,score_v2_fast,129.6,3260,"sampled (1000 records, all valid)",standard
+re2ob_emailservice_loss_2,score_v2_fast,134.5,3461,"sampled (1000 records, all valid)",standard
+re2ob_emailservice_loss_3,score_v2_fast,134.9,3393,"sampled (1000 records, all valid)",standard
+re2ob_emailservice_mem_1,score_v2_fast,131.9,3405,"sampled (1000 records, all valid)",standard
+re2ob_emailservice_mem_2,score_v2_fast,136.2,3441,"sampled (1000 records, all valid)",standard
+re2ob_emailservice_mem_3,score_v2_fast,127.4,3337,"sampled (1000 records, all valid)",standard
+re2ob_emailservice_socket_1,score_v2_fast,138.7,3450,"sampled (1000 records, all valid)",standard
+re2ob_emailservice_socket_2,score_v2_fast,138.7,3483,"sampled (1000 records, all valid)",standard
+re2ob_emailservice_socket_3,score_v2_fast,144.0,3447,"sampled (1000 records, all valid)",standard
+re2ob_productcatalogservice_cpu_1,score_v2_fast,136.2,3322,"sampled (1000 records, all valid)",standard
+re2ob_productcatalogservice_cpu_2,score_v2_fast,138.3,3381,"sampled (1000 records, all valid)",standard
+re2ob_productcatalogservice_cpu_3,score_v2_fast,135.1,3410,"sampled (1000 records, all valid)",standard
+re2ob_productcatalogservice_delay_1,score_v2_fast,123.4,3199,"sampled (1000 records, all valid)",standard
+re2ob_productcatalogservice_delay_2,score_v2_fast,120.6,3192,"sampled (1000 records, all valid)",standard
+re2ob_productcatalogservice_delay_3,score_v2_fast,123.0,3203,"sampled (1000 records, all valid)",standard
+re2ob_productcatalogservice_disk_1,score_v2_fast,126.4,3267,"sampled (1000 records, all valid)",standard
+re2ob_productcatalogservice_disk_2,score_v2_fast,135.5,3419,"sampled (1000 records, all valid)",standard
+re2ob_productcatalogservice_disk_3,score_v2_fast,130.7,3407,"sampled (1000 records, all valid)",standard
+re2ob_productcatalogservice_loss_1,score_v2_fast,87.1,2486,"sampled (1000 records, all valid)",standard
+re2ob_productcatalogservice_loss_2,score_v2_fast,88.8,2588,"sampled (1000 records, all valid)",standard
+re2ob_productcatalogservice_loss_3,score_v2_fast,118.5,3050,"sampled (1000 records, all valid)",standard
+re2ob_productcatalogservice_mem_1,score_v2_fast,115.1,2882,"sampled (1000 records, all valid)",standard
+re2ob_productcatalogservice_mem_2,score_v2_fast,115.0,2788,"sampled (1000 records, all valid)",standard
+re2ob_productcatalogservice_mem_3,score_v2_fast,95.6,2689,"sampled (1000 records, all valid)",standard
+re2ob_productcatalogservice_socket_1,score_v2_fast,136.4,3314,"sampled (1000 records, all valid)",standard
+re2ob_productcatalogservice_socket_2,score_v2_fast,140.4,3390,"sampled (1000 records, all valid)",standard
+re2ob_productcatalogservice_socket_3,score_v2_fast,138.9,3439,"sampled (1000 records, all valid)",standard
+re2ob_recommendationservice_cpu_1,score_v2_fast,136.0,3320,"sampled (1000 records, all valid)",standard
+re2ob_recommendationservice_cpu_2,score_v2_fast,141.5,3418,"sampled (1000 records, all valid)",standard
+re2ob_recommendationservice_cpu_3,score_v2_fast,146.5,3475,"sampled (1000 records, all valid)",standard
+re2ob_recommendationservice_delay_1,score_v2_fast,142.1,3373,"sampled (1000 records, all valid)",standard
+re2ob_recommendationservice_delay_2,score_v2_fast,136.9,3365,"sampled (1000 records, all valid)",standard
+re2ob_recommendationservice_delay_3,score_v2_fast,134.1,3357,"sampled (1000 records, all valid)",standard
+re2ob_recommendationservice_disk_1,score_v2_fast,136.1,3307,"sampled (1000 records, all valid)",standard
+re2ob_recommendationservice_disk_2,score_v2_fast,136.1,3408,"sampled (1000 records, all valid)",standard
+re2ob_recommendationservice_disk_3,score_v2_fast,134.5,3458,"sampled (1000 records, all valid)",standard
+re2ob_recommendationservice_loss_1,score_v2_fast,96.2,2789,"sampled (1000 records, all valid)",standard
+re2ob_recommendationservice_loss_2,score_v2_fast,124.7,3214,"sampled (1000 records, all valid)",standard
+re2ob_recommendationservice_loss_3,score_v2_fast,127.3,3202,"sampled (1000 records, all valid)",standard
+re2ob_recommendationservice_mem_1,score_v2_fast,138.8,3405,"sampled (1000 records, all valid)",standard
+re2ob_recommendationservice_mem_2,score_v2_fast,137.6,3346,"sampled (1000 records, all valid)",standard
+re2ob_recommendationservice_mem_3,score_v2_fast,132.3,3350,"sampled (1000 records, all valid)",standard
+re2ob_recommendationservice_socket_1,score_v2_fast,105.8,2817,"sampled (1000 records, all valid)",standard
+re2ob_recommendationservice_socket_2,score_v2_fast,134.6,3470,"sampled (1000 records, all valid)",standard
+re2ob_recommendationservice_socket_3,score_v2_fast,139.4,3470,"sampled (1000 records, all valid)",standard
+re2tt_ts-auth-service_cpu_1,score_v2_fast,63.1,,,out of memory
+re2tt_ts-auth-service_cpu_2,score_v2_fast,255.3,5786,"sampled (1000 records, all valid)",standard
+re2tt_ts-auth-service_cpu_3,score_v2_fast,291.0,5395,"sampled (1000 records, all valid)",lean
+re2tt_ts-auth-service_delay_1,score_v2_fast,58.8,,,out of memory
+re2tt_ts-auth-service_delay_2,score_v2_fast,193.4,4572,"sampled (1000 records, all valid)",standard
+re2tt_ts-auth-service_delay_3,score_v2_fast,199.4,4822,"sampled (1000 records, all valid)",standard
+re2tt_ts-auth-service_disk_1,score_v2_fast,205.1,4985,"sampled (1000 records, all valid)",standard
+re2tt_ts-auth-service_disk_2,score_v2_fast,184.8,4565,"sampled (1000 records, all valid)",standard
+re2tt_ts-auth-service_disk_3,score_v2_fast,222.0,5212,"sampled (1000 records, all valid)",standard
+re2tt_ts-auth-service_loss_1,score_v2_fast,303.7,5711,"sampled (1000 records, all valid)",lean
+re2tt_ts-auth-service_loss_2,score_v2_fast,226.5,5435,"sampled (1000 records, all valid)",standard
+re2tt_ts-auth-service_loss_3,score_v2_fast,161.2,4296,"sampled (1000 records, all valid)",standard
+re2tt_ts-auth-service_mem_1,score_v2_fast,62.8,,,out of memory
+re2tt_ts-auth-service_mem_2,score_v2_fast,59.9,,,out of memory
+re2tt_ts-auth-service_mem_3,score_v2_fast,184.6,4330,"sampled (1000 records, all valid)",standard
+re2tt_ts-auth-service_socket_1,score_v2_fast,248.3,5836,"sampled (1000 records, all valid)",standard
+re2tt_ts-auth-service_socket_2,score_v2_fast,218.6,5194,"sampled (1000 records, all valid)",standard
+re2tt_ts-auth-service_socket_3,score_v2_fast,305.6,5629,"sampled (1000 records, all valid)",lean
+re2tt_ts-order-service_cpu_1,score_v2_fast,195.0,4438,"sampled (1000 records, all valid)",standard
+re2tt_ts-order-service_cpu_2,score_v2_fast,244.5,5669,"sampled (1000 records, all valid)",standard
+re2tt_ts-order-service_cpu_3,score_v2_fast,277.9,5169,"sampled (1000 records, all valid)",lean
+re2tt_ts-order-service_delay_1,score_v2_fast,216.8,5696,"sampled (1000 records, all valid)",standard
+re2tt_ts-order-service_delay_2,score_v2_fast,37.7,1019,"sampled (1000 records, all valid)",standard
+re2tt_ts-order-service_delay_3,score_v2_fast,37.8,1003,"sampled (1000 records, all valid)",standard
+re2tt_ts-order-service_disk_1,score_v2_fast,66.5,,,out of memory
+re2tt_ts-order-service_disk_2,score_v2_fast,39.4,997,"sampled (1000 records, all valid)",standard
+re2tt_ts-order-service_disk_3,score_v2_fast,38.5,1013,"sampled (1000 records, all valid)",standard
+re2tt_ts-order-service_loss_1,score_v2_fast,60.1,,,out of memory
+re2tt_ts-order-service_loss_2,score_v2_fast,39.4,1003,"sampled (1000 records, all valid)",standard
+re2tt_ts-order-service_loss_3,score_v2_fast,38.7,1070,"sampled (1000 records, all valid)",standard
+re2tt_ts-order-service_mem_1,score_v2_fast,186.3,4319,"sampled (1000 records, all valid)",standard
+re2tt_ts-order-service_mem_2,score_v2_fast,203.3,4631,"sampled (1000 records, all valid)",standard
+re2tt_ts-order-service_mem_3,score_v2_fast,210.4,4947,"sampled (1000 records, all valid)",standard
+re2tt_ts-order-service_socket_1,score_v2_fast,58.7,,,out of memory
+re2tt_ts-order-service_socket_2,score_v2_fast,37.1,997,"sampled (1000 records, all valid)",standard
+re2tt_ts-order-service_socket_3,score_v2_fast,310.2,5772,"sampled (1000 records, all valid)",lean
+re2tt_ts-route-service_cpu_1,score_v2_fast,232.1,5433,"sampled (1000 records, all valid)",standard
+re2tt_ts-route-service_cpu_2,score_v2_fast,40.6,1000,"sampled (1000 records, all valid)",standard
+re2tt_ts-route-service_cpu_3,score_v2_fast,39.0,999,"sampled (1000 records, all valid)",standard
+re2tt_ts-route-service_delay_1,score_v2_fast,253.4,5658,"sampled (1000 records, all valid)",standard
+re2tt_ts-route-service_delay_2,score_v2_fast,229.9,5358,"sampled (1000 records, all valid)",standard
+re2tt_ts-route-service_delay_3,score_v2_fast,274.4,5955,"sampled (1000 records, all valid)",standard
+re2tt_ts-route-service_disk_1,score_v2_fast,59.5,,,out of memory
+re2tt_ts-route-service_disk_2,score_v2_fast,85.0,2542,"sampled (1000 records, all valid)",standard
+re2tt_ts-route-service_disk_3,score_v2_fast,165.7,4098,"sampled (1000 records, all valid)",standard
+re2tt_ts-route-service_loss_1,score_v2_fast,59.9,,,out of memory
+re2tt_ts-route-service_loss_2,score_v2_fast,229.6,5957,"sampled (1000 records, all valid)",standard
+re2tt_ts-route-service_loss_3,score_v2_fast,194.2,4403,"sampled (1000 records, all valid)",standard
+re2tt_ts-route-service_mem_1,score_v2_fast,220.8,4813,"sampled (1000 records, all valid)",standard
+re2tt_ts-route-service_mem_2,score_v2_fast,188.9,4496,"sampled (1000 records, all valid)",standard
+re2tt_ts-route-service_mem_3,score_v2_fast,214.3,5138,"sampled (1000 records, all valid)",standard
+re2tt_ts-route-service_socket_1,score_v2_fast,60.0,,,out of memory
+re2tt_ts-route-service_socket_2,score_v2_fast,198.4,4648,"sampled (1000 records, all valid)",standard
+re2tt_ts-route-service_socket_3,score_v2_fast,235.7,5441,"sampled (1000 records, all valid)",standard
+re2tt_ts-train-service_cpu_1,score_v2_fast,60.3,,,out of memory
+re2tt_ts-train-service_cpu_2,score_v2_fast,237.8,5686,"sampled (1000 records, all valid)",standard
+re2tt_ts-train-service_cpu_3,score_v2_fast,303.5,5588,"sampled (1000 records, all valid)",lean
+re2tt_ts-train-service_delay_1,score_v2_fast,335.1,5938,"sampled (1000 records, all valid)",lean
+re2tt_ts-train-service_delay_2,score_v2_fast,194.5,4886,"sampled (1000 records, all valid)",standard
+re2tt_ts-train-service_delay_3,score_v2_fast,234.3,5676,"sampled (1000 records, all valid)",standard
+re2tt_ts-train-service_disk_1,score_v2_fast,230.4,5466,"sampled (1000 records, all valid)",standard
+re2tt_ts-train-service_disk_2,score_v2_fast,260.8,5953,"sampled (1000 records, all valid)",standard
+re2tt_ts-train-service_disk_3,score_v2_fast,326.2,5766,"sampled (1000 records, all valid)",lean
+re2tt_ts-train-service_loss_1,score_v2_fast,327.9,5907,"sampled (1000 records, all valid)",lean
+re2tt_ts-train-service_loss_2,score_v2_fast,326.6,5827,"sampled (1000 records, all valid)",lean
+re2tt_ts-train-service_loss_3,score_v2_fast,338.8,5953,"sampled (1000 records, all valid)",lean
+re2tt_ts-train-service_mem_1,score_v2_fast,189.7,4520,"sampled (1000 records, all valid)",standard
+re2tt_ts-train-service_mem_2,score_v2_fast,185.6,4409,"sampled (1000 records, all valid)",standard
+re2tt_ts-train-service_mem_3,score_v2_fast,223.5,5291,"sampled (1000 records, all valid)",standard
+re2tt_ts-train-service_socket_1,score_v2_fast,102.6,3432,"sampled (1000 records, all valid)",standard
+re2tt_ts-train-service_socket_2,score_v2_fast,60.4,,,out of memory
+re2tt_ts-train-service_socket_3,score_v2_fast,193.4,4655,"sampled (1000 records, all valid)",standard
+re2tt_ts-travel-service_cpu_1,score_v2_fast,212.3,5168,"sampled (1000 records, all valid)",standard
+re2tt_ts-travel-service_cpu_2,score_v2_fast,239.0,5582,"sampled (1000 records, all valid)",standard
+re2tt_ts-travel-service_cpu_3,score_v2_fast,206.4,5499,"sampled (1000 records, all valid)",standard
+re2tt_ts-travel-service_delay_1,score_v2_fast,304.1,5500,"sampled (1000 records, all valid)",lean
+re2tt_ts-travel-service_delay_2,score_v2_fast,250.3,5696,"sampled (1000 records, all valid)",standard
+re2tt_ts-travel-service_delay_3,score_v2_fast,309.6,5539,"sampled (1000 records, all valid)",lean
+re2tt_ts-travel-service_disk_1,score_v2_fast,291.6,5385,"sampled (1000 records, all valid)",lean
+re2tt_ts-travel-service_disk_2,score_v2_fast,50.3,1346,"sampled (1000 records, all valid)",standard
+re2tt_ts-travel-service_disk_3,score_v2_fast,49.5,1358,"sampled (1000 records, all valid)",standard
+re2tt_ts-travel-service_loss_1,score_v2_fast,283.7,5250,"sampled (1000 records, all valid)",lean
+re2tt_ts-travel-service_loss_2,score_v2_fast,59.6,,,out of memory
+re2tt_ts-travel-service_loss_3,score_v2_fast,348.6,5954,"sampled (1000 records, all valid)",lean
+re2tt_ts-travel-service_mem_1,score_v2_fast,239.2,5702,"sampled (1000 records, all valid)",standard
+re2tt_ts-travel-service_mem_2,score_v2_fast,287.2,5314,"sampled (1000 records, all valid)",lean
+re2tt_ts-travel-service_mem_3,score_v2_fast,170.0,4143,"sampled (1000 records, all valid)",standard
+re2tt_ts-travel-service_socket_1,score_v2_fast,46.5,1326,"sampled (1000 records, all valid)",standard
+re2tt_ts-travel-service_socket_2,score_v2_fast,192.4,4825,"sampled (1000 records, all valid)",standard
+re2tt_ts-travel-service_socket_3,score_v2_fast,222.7,5447,"sampled (1000 records, all valid)",standard
+re3ob_adservice_f3_1,score_v2_fast,54.7,1502,"sampled (1000 records, all valid)",standard
+re3ob_adservice_f3_2,score_v2_fast,53.7,1467,"sampled (1000 records, all valid)",standard
+re3ob_adservice_f3_3,score_v2_fast,52.5,1486,"sampled (1000 records, all valid)",standard
+re3ob_adservice_f4_1,score_v2_fast,54.4,1496,"sampled (1000 records, all valid)",standard
+re3ob_adservice_f4_2,score_v2_fast,56.3,1499,"sampled (1000 records, all valid)",standard
+re3ob_adservice_f4_3,score_v2_fast,58.1,1507,"sampled (1000 records, all valid)",standard
+re3ob_adservice_f5_1,score_v2_fast,59.1,1487,"sampled (1000 records, all valid)",standard
+re3ob_adservice_f5_2,score_v2_fast,56.6,1498,"sampled (1000 records, all valid)",standard
+re3ob_adservice_f5_3,score_v2_fast,55.8,1490,"sampled (1000 records, all valid)",standard
+re3ob_cartservice_f1_1,score_v2_fast,52.9,1431,"sampled (1000 records, all valid)",standard
+re3ob_cartservice_f1_2,score_v2_fast,53.0,1448,"sampled (1000 records, all valid)",standard
+re3ob_cartservice_f1_3,score_v2_fast,50.4,1439,"sampled (1000 records, all valid)",standard
+re3ob_currencyservice_f1_1,score_v2_fast,39.5,1247,"sampled (1000 records, all valid)",standard
+re3ob_currencyservice_f1_2,score_v2_fast,42.4,1260,"sampled (1000 records, all valid)",standard
+re3ob_currencyservice_f1_3,score_v2_fast,42.2,1266,"sampled (1000 records, all valid)",standard
+re3ob_emailservice_f1_1,score_v2_fast,55.1,1504,"sampled (1000 records, all valid)",standard
+re3ob_emailservice_f1_2,score_v2_fast,55.0,1480,"sampled (1000 records, all valid)",standard
+re3ob_emailservice_f1_3,score_v2_fast,55.1,1477,"sampled (1000 records, all valid)",standard
+re3ob_emailservice_f2_1,score_v2_fast,54.7,1503,"sampled (1000 records, all valid)",standard
+re3ob_emailservice_f2_2,score_v2_fast,52.6,1499,"sampled (1000 records, all valid)",standard
+re3ob_emailservice_f2_3,score_v2_fast,55.0,1484,"sampled (1000 records, all valid)",standard
+re3ob_emailservice_f3_1,score_v2_fast,55.6,1479,"sampled (1000 records, all valid)",standard
+re3ob_emailservice_f3_2,score_v2_fast,56.2,1504,"sampled (1000 records, all valid)",standard
+re3ob_emailservice_f3_3,score_v2_fast,54.2,1532,"sampled (1000 records, all valid)",standard
+re3ob_emailservice_f4_1,score_v2_fast,56.2,1509,"sampled (1000 records, all valid)",standard
+re3ob_emailservice_f4_2,score_v2_fast,53.1,1521,"sampled (1000 records, all valid)",standard
+re3ob_emailservice_f4_3,score_v2_fast,50.0,1482,"sampled (1000 records, all valid)",standard
+re3ob_emailservice_f5_1,score_v2_fast,55.7,1493,"sampled (1000 records, all valid)",standard
+re3ob_emailservice_f5_2,score_v2_fast,55.2,1499,"sampled (1000 records, all valid)",standard
+re3ob_emailservice_f5_3,score_v2_fast,51.9,1495,"sampled (1000 records, all valid)",standard
+re3tt_ts-auth-service_f1_1,score_v2_fast,25.2,928,"sampled (1000 records, all valid)",standard
+re3tt_ts-auth-service_f1_2,score_v2_fast,24.9,930,"sampled (1000 records, all valid)",standard
+re3tt_ts-auth-service_f1_3,score_v2_fast,26.6,1049,"sampled (1000 records, all valid)",standard
+re3tt_ts-auth-service_f1_4,score_v2_fast,11.4,478,"sampled (1000 records, all valid)",standard
+re3tt_ts-auth-service_f2_1,score_v2_fast,28.6,1027,"sampled (1000 records, all valid)",standard
+re3tt_ts-auth-service_f2_2,score_v2_fast,28.0,1089,"sampled (1000 records, all valid)",standard
+re3tt_ts-auth-service_f2_3,score_v2_fast,26.9,1037,"sampled (1000 records, all valid)",standard
+re3tt_ts-auth-service_f2_4,score_v2_fast,11.4,459,"sampled (1000 records, all valid)",standard
+re3tt_ts-auth-service_f3_1,score_v2_fast,27.5,1050,"sampled (1000 records, all valid)",standard
+re3tt_ts-auth-service_f3_2,score_v2_fast,27.9,1111,"sampled (1000 records, all valid)",standard
+re3tt_ts-auth-service_f3_3,score_v2_fast,28.4,1093,"sampled (1000 records, all valid)",standard
+re3tt_ts-auth-service_f3_4,score_v2_fast,11.3,485,"sampled (1000 records, all valid)",standard
+re3tt_ts-auth-service_f4_1,score_v2_fast,27.8,1093,"sampled (1000 records, all valid)",standard
+re3tt_ts-auth-service_f4_2,score_v2_fast,29.3,1155,"sampled (1000 records, all valid)",standard
+re3tt_ts-auth-service_f4_3,score_v2_fast,29.7,1068,"sampled (1000 records, all valid)",standard
+re3tt_ts-route-service_f1_1,score_v2_fast,52.7,1509,"sampled (1000 records, all valid)",standard
+re3tt_ts-route-service_f1_2,score_v2_fast,57.1,1575,"sampled (1000 records, all valid)",standard
+re3tt_ts-route-service_f1_3,score_v2_fast,56.6,1572,"sampled (1000 records, all valid)",standard
+re3tt_ts-route-service_f2_1,score_v2_fast,54.5,1496,"sampled (1000 records, all valid)",standard
+re3tt_ts-route-service_f2_2,score_v2_fast,53.4,1479,"sampled (1000 records, all valid)",standard
+re3tt_ts-route-service_f2_3,score_v2_fast,53.4,1547,"sampled (1000 records, all valid)",standard
+re3tt_ts-route-service_f3_1,score_v2_fast,57.2,1579,"sampled (1000 records, all valid)",standard
+re3tt_ts-route-service_f3_2,score_v2_fast,54.6,1451,"sampled (1000 records, all valid)",standard
+re3tt_ts-route-service_f3_3,score_v2_fast,59.8,1671,"sampled (1000 records, all valid)",standard
+re3tt_ts-route-service_f3_4,score_v2_fast,53.6,1453,"sampled (1000 records, all valid)",standard
+re3tt_ts-route-service_f3_5,score_v2_fast,60.8,1592,"sampled (1000 records, all valid)",standard
+re3tt_ts-route-service_f3_6,score_v2_fast,72.9,1836,"sampled (1000 records, all valid)",standard
+re3tt_ts-route-service_f4_1,score_v2_fast,54.7,1392,"sampled (1000 records, all valid)",standard
+re3tt_ts-route-service_f4_2,score_v2_fast,61.1,1605,"sampled (1000 records, all valid)",standard
+re3tt_ts-route-service_f4_3,score_v2_fast,63.9,1608,"sampled (1000 records, all valid)",standard

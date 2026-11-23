@@ -78,6 +78,8 @@ check the plumbing.
 | | | longest_span | 0.36 | 0.63 | 0.51 |
 | | | critical_path_only | 0.24 | 0.55 | 0.45 |
 | 2026-11-10 diagnosis score | same 240 | tail_share_excess (diagnosis v1) | 0.15 | 0.31 | 0.23 |
+| 2026-11-22 v2 and MicroRCA | 227 shared (MicroRCA all 240) | score_v2 (diagnosis v2) | 0.53 | 0.70 | 0.66 |
+| | | microrca | 0.58 (0.60 on 240) | 0.64 | 0.64 |
 
 The diagnosis package's ranking is scored through `diagnosis_method.py`
 (`"extra_methods": ["experiments.diagnosis_method:tail_share_excess"]`), which runs
@@ -87,6 +89,12 @@ loses cases: it leaves the true service out of its ranking in 152 of 240 cases, 
 caller takes the blame for a slow callee in Online Boutique, half of the Train Ticket
 traces fail the interval-containment check, and RCAEval intervals count as derived
 rather than measured.
+
+`reported/2026-11-22-v2-and-microrca/summary.md` has the per-benchmark split: v2 gets 29 of 30
+RE3 Train Ticket code faults (best other method: longest_span, 18 of 30; MicroRCA 0),
+helped by its error-rate signal, while MicroRCA is much better on RE2 Online Boutique, where v2 still blames the
+caller for a slow callee. 13 large Train Ticket cases need more than 8 GB for v2 and are
+listed there.
 
 Two things to keep in mind when reading those: on a single-root shop the front end is on
 every critical path and takes rank 1 in 114 of the 120 Online Boutique cases for the
