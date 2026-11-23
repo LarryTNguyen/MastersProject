@@ -207,6 +207,24 @@ def _presign_put(bucket: str, key: str, content_type: str, expires: int) -> str:
                                      ExpiresIn=expires)
 
 
+@app.get("/api/uploads/status")
+def upload_status(key: str = Query(..., min_length=1, max_length=1024)):
+    bucket = os.environ.get("RAW_BUCKET")
+    prefix = os.environ.get("RAW_PREFIX", "uploads/").rstrip("/") + "/"
+    if not bucket:
+        raise HTTPException(503, "uploads are not configured on this deployment")
+    if not key.startswith(prefix) or any(part in (".", "..") for part in key.split("/")):
+        raise HTTPException(400, "invalid upload key")
+    store = get_store()
+    check = getattr(store, "uploaded_dataset", None)
+    if check is None:
+        return {"state": "unavailable", "spans": 0, "traces": 0}
+    counts = check(f"s3://{bucket}/{key}")
+    # Reconstruction commits a whole normalized file in one transaction.
+    # Visibility here means traces are available; diagnosis may still be running.
+    return {"state": "ready" if counts["spans"] else "processing", **counts}
+
+
 @app.get("/", include_in_schema=False)
 def index():
     return FileResponse(os.path.join(STATIC_DIR, "index.html"))

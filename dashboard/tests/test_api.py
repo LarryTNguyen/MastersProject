@@ -1,5 +1,6 @@
 import os
 import unittest
+from unittest.mock import Mock, patch
 
 from fastapi.testclient import TestClient
 
@@ -83,6 +84,22 @@ class ApiTests(unittest.TestCase):
         finally:
             main._presign_put = real
             os.environ.pop("RAW_BUCKET", None)
+
+    def test_upload_processing_status(self):
+        store = Mock()
+        store.uploaded_dataset.return_value = {"spans": 0, "traces": 0}
+        with patch.dict(os.environ, {"RAW_BUCKET": "raw", "RAW_PREFIX": "uploads/"}), patch.object(main, "get_store", return_value=store):
+            self.assertEqual(self.c.get('/api/uploads/status', params={"key": "uploads/a.json"}).json()["state"], "processing")
+            store.uploaded_dataset.assert_called_with("s3://raw/uploads/a.json")
+            store.uploaded_dataset.return_value = {"spans": 12, "traces": 3}
+            self.assertEqual(self.c.get('/api/uploads/status', params={"key": "uploads/a.json"}).json(),
+                             {"state": "ready", "spans": 12, "traces": 3})
+            for key in ("other/a.json", "uploads/../a.json"):
+                self.assertEqual(self.c.get('/api/uploads/status', params={"key": key}).status_code, 400)
+
+    def test_upload_status_unavailable_for_local_store(self):
+        with patch.dict(os.environ, {"RAW_BUCKET": "raw", "RAW_PREFIX": "uploads/"}):
+            self.assertEqual(self.c.get('/api/uploads/status', params={"key": "uploads/a.json"}).json()["state"], "unavailable")
 
     def test_compare(self):
         c = self.c.get("/api/compare", params={"threshold_ms": 100}).json()

@@ -118,6 +118,44 @@ class UiSmokeTests(unittest.TestCase):
         self.assertEqual(pg.eval_on_selector("#fl-endpoint", "e => e.value"), "HTTP POST /cart/checkout")
         self.assertEqual(errors, [])
 
+    def mock_upload(self, pg, *, fail=False):
+        base = f"http://127.0.0.1:{self.port}"
+        pg.route("**/api/uploads", lambda route: route.fulfill(json={
+            "url": base + "/test-upload", "key": "uploads/test.json", "method": "PUT", "headers": {}}))
+        pg.route("**/test-upload", lambda route: route.fulfill(status=500 if fail else 200, body=""))
+
+    def test_upload_waits_for_its_dataset(self):
+        pg, errors = self.page()
+        self.mock_upload(pg)
+        checks = []
+        def status(route):
+            checks.append(route.request.url)
+            ready = len(checks) > 1
+            route.fulfill(json={"state": "ready" if ready else "processing", "spans": 12 if ready else 0, "traces": 3 if ready else 0})
+        pg.route("**/api/uploads/status?*", status)
+        pg.goto(f"http://127.0.0.1:{self.port}/#upload")
+        pg.set_input_files("#file", {"name": "test.json", "mimeType": "application/json", "buffer": b'{}'})
+        pg.wait_for_selector("#upload-status .spinner")
+        self.assertIn("Upload complete (100%)", pg.inner_text("#upload-status"))
+        pg.wait_for_selector('#upload-status a[href="#traces"]')
+        self.assertIn("3 traces (12 spans)", pg.inner_text("#upload-status"))
+        self.assertEqual(pg.locator("#upload-status .spinner").count(), 0)
+        self.assertIn("key=uploads%2Ftest.json", checks[0])
+        self.assertEqual(errors, [])
+        pg.close()
+
+    def test_failed_upload_never_starts_processing(self):
+        pg, _ = self.page()
+        self.mock_upload(pg, fail=True)
+        checks = []
+        pg.route("**/api/uploads/status?*", lambda route: (checks.append(route.request.url), route.fulfill(json={})))
+        pg.goto(f"http://127.0.0.1:{self.port}/#upload")
+        pg.set_input_files("#file", {"name": "test.json", "mimeType": "application/json", "buffer": b'{}'})
+        pg.wait_for_function("document.querySelector('#upload-status').textContent.includes('Upload failed: HTTP 500')")
+        self.assertEqual(checks, [])
+        self.assertFalse(pg.is_disabled("#file"))
+        pg.close()
+
 
 @unittest.skipIf(sync_playwright is None, "playwright not installed")
 class UiStaleDataTests(unittest.TestCase):

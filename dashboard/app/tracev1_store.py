@@ -81,6 +81,13 @@ class TraceV1Store(Store):
                     "r.created_at, (SELECT count(*) FROM trace_v1.traces t WHERE t.run_id = r.run_id) "
                     "FROM trace_v1.ingestion_runs r ORDER BY r.created_at DESC")]
 
+    def uploaded_dataset(self, raw_reference: str) -> dict:
+        # Match the exact input object, independently of the displayed run.
+        spans, traces = self._rows(
+            "SELECT count(*), count(DISTINCT (run_id, trace_id)) FROM trace_v1.spans "
+            "WHERE data #>> '{source,raw_reference}' = %s", (raw_reference,))[0]
+        return {"spans": spans, "traces": traces}
+
     def _spans_by_trace(self, trace_ids: List[str]) -> Dict[str, List[dict]]:
         run = self.run_id()
         out: Dict[str, List[dict]] = {t: [] for t in trace_ids}

@@ -74,6 +74,7 @@ All responses are JSON. Shapes are in `app/models.py`.
 | `GET /api/flame?endpoint&subset&limit` | merged tree: `{name, service, value, total, count, children}` |
 | `GET /api/pipeline?window_s` | staleness/lag percentiles, incomplete rate, ingest rate, per-minute series |
 | `POST /api/uploads` `{filename, content_type}` | `{url, key, method, headers, expires_in}` |
+| `GET /api/uploads/status?key=...` | `{state, spans, traces}` for the exact raw object; `processing`, `ready`, or `unavailable` |
 | `GET /` | the page |
 
 `sort` is one of `start_desc` (default), `start_asc`, `duration_desc`, `duration_asc`.
@@ -152,6 +153,14 @@ as-is. A window with an empty `rankings` list and a `note` is the honest
 - Presigned URLs expire after `UPLOAD_EXPIRES` seconds (default 900). Filenames are
   sanitized and prefixed with the date and a random id, so uploads never overwrite
   each other.
+- The upload view shows transfer percentage, then a processing spinner and elapsed
+  time. With `STORE=trace_v1`, it checks every three seconds for spans whose
+  `source.raw_reference` matches the uploaded S3 object, regardless of the displayed
+  run. It announces when traces are available; settlement and diagnosis can continue
+  afterward. Other stores report that status tracking is unavailable. After ten
+  minutes without confirmation, automatic checks stop and a **Check again** button
+  appears. Empty or rejected datasets currently reach this unconfirmed state;
+  worker failures are not exposed by this endpoint.
 
 ## Header freshness pill
 

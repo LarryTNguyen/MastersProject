@@ -69,6 +69,9 @@
   .drop { border: 2px dashed var(--line); border-radius: 8px; padding: 24px; text-align: center; color: var(--muted); }
   .drop.over { border-color: var(--accent); background: #f0f4ff; }
   progress { width: 100%; }
+  .spinner { display: inline-block; width: 16px; height: 16px; border: 2px solid var(--line); border-top-color: var(--accent); border-radius: 50%; animation: spin 1s linear infinite; vertical-align: -3px; margin-right: 6px; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  @media (prefers-reduced-motion: reduce) { .spinner { animation: none; } }
   .flame { position: relative; overflow: hidden; }
   .flame .fr { display: block; position: relative; height: 22px; margin-bottom: 1px; }
   .flame .fb { position: absolute; top: 0; height: 20px; border-radius: 2px; font-size: 11px; line-height: 20px; padding: 0 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: #1f2328; cursor: pointer; box-sizing: border-box; border: 1px solid rgba(255,255,255,.7); }
@@ -217,7 +220,7 @@
       <h2>Upload a trace file</h2>
       <p class="muted" style="margin-top:0">Accepted: OTLP JSON, common-span JSONL, Alibaba CSV, RCAEval CSV. The file goes straight to S3 with a presigned URL; the pipeline picks it up from there.</p>
       <div class="drop" id="drop">drop a file here or <label><a class="link">choose one</a><input type="file" id="file" hidden></label></div>
-      <div id="upload-status" style="margin-top:10px"></div>
+      <div id="upload-status" role="status" aria-live="polite" aria-atomic="true" style="margin-top:10px"></div>
     </div>
   </section>
 </main>
@@ -510,28 +513,88 @@
 
   // ---------- upload ----------
   const drop = $('drop');
+  let uploading = false, uploadWatch = 0;
   ['dragenter', 'dragover'].forEach(ev => drop.addEventListener(ev, e => { e.preventDefault(); drop.classList.add('over'); }));
   ['dragleave', 'drop'].forEach(ev => drop.addEventListener(ev, e => { e.preventDefault(); drop.classList.remove('over'); }));
   drop.addEventListener('drop', e => { if (e.dataTransfer.files[0]) upload(e.dataTransfer.files[0]); });
   $('file').onchange = () => { if ($('file').files[0]) upload($('file').files[0]); };
   async function upload(file) {
+    if (uploading) return;
+    uploading = true;
+    const watch = ++uploadWatch; // a new upload replaces the previous processing watch
+    $('file').disabled = true;
     const st = $('upload-status');
     const type = file.name.endsWith('.csv') ? 'text/csv' : file.name.endsWith('.jsonl') ? 'application/x-ndjson' : 'application/json';
     st.innerHTML = `Preparing upload of <b>${esc(file.name)}</b> (${(file.size / 1e6).toFixed(1)} MB)…`;
     let ticket;
     try {
       ticket = await api('/api/uploads', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ filename: file.name, content_type: type }) });
-    } catch (e) { st.innerHTML = `<span style="color:var(--err)">${esc(e.message)}</span>`; return; }
-    st.innerHTML = `Uploading to <span class="mono">${esc(ticket.key)}</span><progress id="prog" max="100" value="0"></progress>`;
-    await new Promise((resolve) => {
+    } catch (e) {
+      st.innerHTML = `<span style="color:var(--err)">${esc(e.message)}</span>`;
+      uploading = false; $('file').disabled = false; $('file').value = ''; return;
+    }
+    st.innerHTML = `Uploading <b>${esc(file.name)}</b> — <span id="upload-percent">0%</span><progress id="prog" aria-label="File upload progress" max="100" value="0"></progress>`;
+    const uploaded = await new Promise((resolve) => {
       const x = new XMLHttpRequest();
       x.open(ticket.method, ticket.url);
+      x.timeout = 15 * 60 * 1000;
       Object.entries(ticket.headers || {}).forEach(([k, v]) => x.setRequestHeader(k, v));
-      x.upload.onprogress = (e) => { if (e.lengthComputable) $('prog').value = 100 * e.loaded / e.total; };
-      x.onload = () => { st.innerHTML = x.status < 300 ? `Uploaded <b>${esc(file.name)}</b>. It will show up under Traces once the pipeline has processed it.` : `<span style="color:var(--err)">upload failed: HTTP ${x.status}</span>`; resolve(); };
-      x.onerror = () => { st.innerHTML = '<span style="color:var(--err)">upload failed (network or CORS error)</span>'; resolve(); };
-      x.send(file);
+      x.upload.onprogress = (e) => {
+        if (e.lengthComputable) {
+          const pct = Math.floor(100 * e.loaded / e.total);
+          $('prog').value = pct; $('upload-percent').textContent = `${pct}%`;
+        } else { $('prog').removeAttribute('value'); $('upload-percent').textContent = 'transferring…'; }
+      };
+      const failed = message => { st.innerHTML = `<span style="color:var(--err)">${esc(message)}</span>`; resolve(false); };
+      x.onload = () => { if (x.status >= 200 && x.status < 300) resolve(true); else failed(`Upload failed: HTTP ${x.status}`); };
+      x.onerror = () => failed('Upload failed (network or CORS error). Please try again.');
+      x.ontimeout = () => failed('Upload timed out. Please try again.');
+      x.onabort = () => failed('Upload canceled.');
+      try { x.send(file); } catch (e) { failed(`Upload failed: ${e.message}`); }
     });
+    uploading = false; $('file').disabled = false; $('file').value = '';
+    if (uploaded) watchProcessing(ticket.key, file.name, watch);
+  }
+
+  async function watchProcessing(key, filename, watch) {
+    const started = Date.now();
+    const st = $('upload-status');
+    function render(message, busy = false) {
+      st.innerHTML = `${busy ? '<span class="spinner" aria-hidden="true"></span>' : ''}<b>${esc(filename)}</b>: ${esc(message)}`;
+    }
+    async function poll() {
+      if (watch !== uploadWatch) return;
+      const elapsed = Math.floor((Date.now() - started) / 1000);
+      render(`Upload complete (100%). Processing dataset… ${elapsed}s elapsed.`, true);
+      const controller = new AbortController();
+      const timeout = setTimeout(() => controller.abort(), 10000);
+      try {
+        const result = await api(`/api/uploads/status?key=${encodeURIComponent(key)}`, { signal: controller.signal });
+        if (watch !== uploadWatch) return;
+        if (result.state === 'ready') {
+          render(`${result.traces} traces (${result.spans} spans) are now available. Analysis and rankings may continue processing.`);
+          st.insertAdjacentHTML('beforeend', ' <a class="link" href="#traces">View traces</a>');
+          return;
+        }
+        if (result.state === 'unavailable') {
+          render('Upload complete. Processing status is unavailable on this deployment. Check Traces for results.');
+          return;
+        }
+      } catch (e) {
+        if (watch !== uploadWatch) return;
+        render('Upload complete. Unable to check processing status; retrying…', true);
+      } finally { clearTimeout(timeout); }
+      if (Date.now() - started >= 10 * 60 * 1000) {
+        render('Upload complete. Processing has not been confirmed after 10 minutes. Check Pipeline health or retry the status check.');
+        const retry = document.createElement('button');
+        retry.className = 'ghost'; retry.textContent = 'Check again';
+        retry.onclick = () => watchProcessing(key, filename, ++uploadWatch);
+        st.append(' ', retry);
+        return;
+      }
+      setTimeout(poll, 3000);
+    }
+    poll();
   }
 
   // ---------- header freshness pill ----------
