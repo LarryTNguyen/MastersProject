@@ -17,6 +17,10 @@ do not establish blocking dependencies. Worker versions are `timing-v1` and
 See [the sprint 4 runbook](../docs/sprint-4.md) for episode diagnosis, the case-study
 report, and the normalized S3/SQS consumer.
 
+The AWS zip is `python tools/build_lambda.py` from this directory (Linux wheels for
+`psycopg` and `jsonschema`, plus `trace_schema/validate.py` and the JSON schema).
+Handler: `trace_reconstruction.lambda_handler.handler`.
+
 ## Local setup
 
 Start a fresh PostgreSQL database from the repository root:

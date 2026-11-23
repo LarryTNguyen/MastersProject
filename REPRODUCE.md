@@ -118,6 +118,9 @@ python -m experiments.usability.usability_stats experiments/usability/timing_log
 ## Lambda archives
 
 ```bash
-(cd dashboard && python tools/build_lambda.py)    # dashboard/dist/dashboard-lambda.zip
-(cd ingest && python tools/build_lambda.py)       # ingest/dist/adapter-lambda.zip
+(cd dashboard && python tools/build_lambda.py)         # dashboard/dist/dashboard-lambda.zip
+(cd ingest && python tools/build_lambda.py)            # ingest/dist/adapter-lambda.zip
+(cd reconstruction && python tools/build_lambda.py)    # reconstruction/dist/reconstruction-lambda.zip
+(cd diagnosis && python tools/build_lambda.py)         # diagnosis/dist/diagnosis-lambda.zip
 ```
+

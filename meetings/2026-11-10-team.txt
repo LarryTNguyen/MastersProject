@@ -1,0 +1,32 @@
+Meeting Type: Team-Only
+Date: 2026-11-10
+Start–End Time: (add if this was a live Discord call)
+Location/Mode: Discord / async
+Attendees:
+- Matthew
+- (add Larry / Anukrithi if they joined)
+1) Accomplished Since Last Meeting
+Matthew:
+- Dataset ingest path on AWS is working end to end: S3 uploads/ → ObjectCreated → SQS → mal-dataset-adapter Lambda (zip from ingest/tools/build_lambda.py, handler traceingest.adapter_lambda.handler) → nonempty normalized/uploads/alibaba_small.jsonl
+- Raw bucket in use: mal-tracing-raw-us-west-1 (us-west-1)
+- Downloaded that normalized object and ran Larry's reconstruction locally (Docker Postgres on :55432)
+- inspect: T1 CONNECTED, T2 INCOMPLETE (missing parent 749f61b5ccf38280 in the small Alibaba fixture; not an AWS failure)
+- init-run + ingest: 7 spans INSERTED; finish: settled 2, analyzed 2, stale 0 (run_id efdd6fb5-9421-5dce-bdaa-b164c7d47c95)
+- Dashboard Overview with STORE=trace_v1 against local Postgres showed the same run
+- Reconstruction Lambda is not deployed yet: it needs DATABASE_URL (Aurora). Live OTLP collector was not in this slice
+Larry: [add]
+Anukrithi: [add]
+2) Accomplished During This Meeting
+- [add if the team met live]
+3) Issues / Blockers
+- Aurora Serverless v2 is not up; reconstruction and dashboard on AWS cannot connect until it is
+- Workbook stack region is us-west-2; current S3/Lambda/SQS are us-west-1 — keep Aurora in us-west-1 with the existing ingest, or move everything
+- reconstruction/ has lambda_handler.py but no tools/build_lambda.py (zip must include trace_reconstruction/, trace_schema/, and Linux psycopg)
+4) Action Items
+- Action: Create Aurora Serverless v2 (PostgreSQL 16), apply trace_schema/schema.sql, store DATABASE_URL in Secrets Manager | Owner: Matthew | Due: 11/10
+- Action: Deploy reconstruction Lambda (trace_reconstruction.lambda_handler.handler) on a dedicated SQS queue for prefix normalized/; EventBridge poll for quiet window | Owner: Matthew | Due: after Aurora
+- Action: Do not reuse the adapter SQS queue for normalized/ events | Owner: Matthew | Due: with reconstruction deploy
+- Action: Measure freshness on AWS once Aurora and the reconstruction Lambda are up | Owner: Anukrithi | Due: after AWS setup
+5) Plans / Goals for Next Meeting
+- Aurora reachable from reconstruction (and later dashboard) Lambda
+- Same alibaba_small.jsonl path without downloading to a laptop: normalized/ → reconstruction Lambda → Aurora → dashboard
