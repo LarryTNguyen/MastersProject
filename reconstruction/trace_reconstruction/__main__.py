@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
 import sys
 from pathlib import Path
 
@@ -11,9 +12,31 @@ from .topology import group_records
 from .worker import ReconstructionWorker
 
 
+def schema_dir(start: Path | None = None) -> Path:
+    """Locate trace_schema/ for the validator.
+
+    Repo layout: reconstruction/trace_reconstruction/__main__.py → ../../trace_schema
+    Lambda zip:  /var/task/trace_reconstruction/__main__.py → ../trace_schema
+    Override:    TRACE_SCHEMA_DIR
+    """
+    start = (start or Path(__file__)).resolve()
+    env = os.environ.get("TRACE_SCHEMA_DIR")
+    if env:
+        path = Path(env)
+        if (path / "validate.py").is_file():
+            return path
+    for up in (2, 1):
+        if len(start.parents) <= up:
+            continue
+        path = start.parents[up] / "trace_schema"
+        if (path / "validate.py").is_file():
+            return path
+    raise FileNotFoundError("trace_schema/validate.py not found; set TRACE_SCHEMA_DIR")
+
+
 def _validator():
-    schema_dir = Path(__file__).resolve().parents[2] / "trace_schema"
-    sys.path.insert(0, str(schema_dir))
+    schema = schema_dir()
+    sys.path.insert(0, str(schema))
     from validate import validate_record
     return validate_record
 

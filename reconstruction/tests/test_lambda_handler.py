@@ -1,7 +1,10 @@
 import io
 import json
+import tempfile
 import unittest
+from pathlib import Path
 
+from trace_reconstruction.__main__ import schema_dir
 from trace_reconstruction.lambda_handler import handler
 from tests.helpers import fixture
 from tests.test_worker import FakeStore
@@ -58,3 +61,20 @@ class LambdaTests(unittest.TestCase):
                                         message('valid', 'normalized/spans.jsonl')]}, s3=MixedS3(), store=store)
         self.assertEqual(response['batchItemFailures'], [{'itemIdentifier': 'invalid'}])
         self.assertEqual(len(store.ingested), 3)
+
+
+class SchemaDirTests(unittest.TestCase):
+    def test_repo_layout(self):
+        self.assertTrue((schema_dir() / "validate.py").is_file())
+        self.assertTrue((schema_dir() / "canonical-span.schema.json").is_file())
+
+    def test_lambda_zip_layout(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            pkg = root / "trace_reconstruction"
+            pkg.mkdir()
+            (pkg / "__main__.py").write_text("")
+            schema = root / "trace_schema"
+            schema.mkdir()
+            (schema / "validate.py").write_text("")
+            self.assertEqual(schema_dir(pkg / "__main__.py"), schema)
