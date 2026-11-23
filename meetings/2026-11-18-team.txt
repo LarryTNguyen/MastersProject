@@ -1,0 +1,42 @@
+Meeting Type: Team-Only
+Date: 2026-11-18
+Start–End Time: 9:40 pm – 10:30 pm
+Location/Mode: Discord
+Attendees:
+- Larry
+- Anukrithi
+- Matthew
+1) Accomplished Since Last Meeting
+Anukrithi:
+- Scored Larry's diagnosis on all 240 RCAEval trace cases next to the naive baselines
+- Diagnosis rankings now show up in the usability study episodes
+- Wrote the freshness measurement script for the AWS pipeline (runs once AWS is up end to end)
+- Updated CI action versions; all suites run on every push
+Larry:
+- Sprint 5 pushed: input reliability checks, fault report, reliability CLI, Astronomy Shop smoke updates
+- Started reworking the scoring formula (score v2) after the v1 results
+Matthew:
+- Aurora Serverless v2 set up and schema.sql loaded into it
+- Working on the VPC networking so the Lambdas can reach the private Aurora DB
+- Uploaded the project workbook to the repo
+2) Accomplished During This Meeting
+- Went through the status check: what's left this semester is finishing AWS end to end, the score fixes + MicroRCA, the freshness test on AWS, the report and the prototype demo for Prof. Trivedi
+- Demo scope: start from the dashboard, upload a dataset (and replay traces live through the collector), then show reconstruction, the trace waterfall and the bottleneck rankings
+- Confirmed bottleneck rankings are this semester; suggested fixes on top of the rankings move to next semester (295B)
+- MicroRCA comparison stays offline on the RCAEval cases (same harness as the baselines), so it doesn't need OpenTelemetry running
+- Matthew to give Anukrithi AWS access so she can review the setup and help finish the live path
+- Couldn't find an advisor slot the week of Nov 11 (travel); plan to show Prof. Trivedi the demo once AWS works end to end
+3) Issues / Blockers
+- Collector Lambda for the live path not deployed/committed yet, and the AWS setup steps aren't written down
+- Workbook PDF in the repo is an older draft
+- Full RCAEval rerun for v2 takes hours, so it has to start as soon as the score fixes are pushed
+4) Action Items
+- Action: Push the score v2 fixes | Owner: Larry | Due: 11/19
+- Action: Implement trace-only MicroRCA as an experiments method | Owner: Larry | Due: 11/20
+- Action: Send AWS (IAM Identity Center) access to Anukrithi | Owner: Matthew | Due: 11/19
+- Action: Commit the collector Lambda code and write down the AWS setup steps | Owner: Matthew | Due: 11/20
+- Action: Swap in the final workbook PDF | Owner: Matthew | Due: 11/20
+- Action: Rerun RCAEval with score v2 and MicroRCA once pushed | Owner: Anukrithi | Due: 11/23
+- Action: Run the freshness test on AWS once the pipeline works end to end | Owner: Anukrithi | Due: after AWS works
+5) Plans / Goals for Next Meeting
+- AWS working end to end, v2 + MicroRCA results in, demo run-through before Sprint 6 ends (Nov 27)
