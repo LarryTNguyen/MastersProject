@@ -132,9 +132,20 @@ aws lambda update-function-code --function-name mal-collector       --zip-file f
 aws lambda update-function-code --function-name dashboard-lambda --zip-file fileb://dashboard/dist/dashboard-lambda.zip
 ```
 
-`mal-reconstrution` and `mal-diagnosis` are zips of `trace_reconstruction/` or
-`diagnosis/` + `reconstruction/trace_reconstruction/`, plus `trace_schema/` and Linux
-(aarch64) wheels of psycopg[binary] and jsonschema. There is no build script for them yet.
+`mal-reconstrution` and `mal-diagnosis` each have a build script (Linux wheels of
+psycopg[binary] and jsonschema, plus the trace_schema files):
+
+```bash
+(cd reconstruction && python tools/build_lambda.py)
+aws lambda update-function-code --function-name mal-reconstrution --zip-file fileb://reconstruction/dist/reconstruction-lambda.zip
+(cd diagnosis && python tools/build_lambda.py)
+aws lambda update-function-code --function-name mal-diagnosis --zip-file fileb://diagnosis/dist/diagnosis-lambda.zip
+```
+
+The diagnosis Lambda runs score v2 (`bottleneck-score-v2`) by default. v2 needs a healthy
+reference capture, so for an uploaded file the earliest traces (the first 30% of the file's
+time span, `REFERENCE_FRACTION`) are the reference and the rest is scored. Set
+`DIAGNOSIS_METHOD=v1` on the function to go back to `tail-share-excess-v1`.
 
 ## Checks
 
