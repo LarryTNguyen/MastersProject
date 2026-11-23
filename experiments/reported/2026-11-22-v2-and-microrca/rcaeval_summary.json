@@ -1,0 +1,335 @@
+{
+  "summary": {
+    "microrca": {
+      "cases": 240,
+      "acc@1": 0.6,
+      "acc@3": 0.6625,
+      "acc@5": 0.7166666666666667,
+      "mrr": 0.6583967414066729,
+      "not_found": 24,
+      "by_fault": {
+        "cpu": {
+          "cases": 30,
+          "acc@1": 1.0,
+          "acc@3": 1.0,
+          "acc@5": 1.0,
+          "mrr": 1.0,
+          "not_found": 0
+        },
+        "delay": {
+          "cases": 30,
+          "acc@1": 0.6,
+          "acc@3": 0.8,
+          "acc@5": 1.0,
+          "mrr": 0.7283333333333334,
+          "not_found": 0
+        },
+        "disk": {
+          "cases": 30,
+          "acc@1": 0.9,
+          "acc@3": 0.9333333333333333,
+          "acc@5": 0.9333333333333333,
+          "mrr": 0.9133333333333333,
+          "not_found": 1
+        },
+        "f1": {
+          "cases": 16,
+          "acc@1": 0.0,
+          "acc@3": 0.0,
+          "acc@5": 0.1875,
+          "mrr": 0.09915674603174603,
+          "not_found": 5
+        },
+        "f2": {
+          "cases": 10,
+          "acc@1": 0.0,
+          "acc@3": 0.0,
+          "acc@5": 0.1,
+          "mrr": 0.08810457516339869,
+          "not_found": 3
+        },
+        "f3": {
+          "cases": 16,
+          "acc@1": 0.0,
+          "acc@3": 0.0,
+          "acc@5": 0.0,
+          "mrr": 0.05174521014546169,
+          "not_found": 7
+        },
+        "f4": {
+          "cases": 12,
+          "acc@1": 0.0,
+          "acc@3": 0.0,
+          "acc@5": 0.0,
+          "mrr": 0.06044973544973545,
+          "not_found": 5
+        },
+        "f5": {
+          "cases": 6,
+          "acc@1": 0.0,
+          "acc@3": 0.0,
+          "acc@5": 0.0,
+          "mrr": 0.07539682539682539,
+          "not_found": 3
+        },
+        "loss": {
+          "cases": 30,
+          "acc@1": 0.5666666666666667,
+          "acc@3": 0.7666666666666667,
+          "acc@5": 0.8,
+          "mrr": 0.6877272727272727,
+          "not_found": 0
+        },
+        "mem": {
+          "cases": 30,
+          "acc@1": 1.0,
+          "acc@3": 1.0,
+          "acc@5": 1.0,
+          "mrr": 1.0,
+          "not_found": 0
+        },
+        "socket": {
+          "cases": 30,
+          "acc@1": 0.7333333333333333,
+          "acc@3": 0.8,
+          "acc@5": 0.8666666666666667,
+          "mrr": 0.7886714975845411,
+          "not_found": 0
+        }
+      },
+      "by_benchmark": {
+        "re2ob": {
+          "cases": 90,
+          "acc@1": 0.7,
+          "acc@3": 0.8333333333333334,
+          "acc@5": 0.9333333333333333,
+          "mrr": 0.7851851851851852,
+          "not_found": 0
+        },
+        "re2tt": {
+          "cases": 90,
+          "acc@1": 0.9,
+          "acc@3": 0.9333333333333333,
+          "acc@5": 0.9333333333333333,
+          "mrr": 0.9208366271409749,
+          "not_found": 1
+        },
+        "re3ob": {
+          "cases": 30,
+          "acc@1": 0.0,
+          "acc@3": 0.0,
+          "acc@5": 0.1,
+          "mrr": 0.10436507936507937,
+          "not_found": 12
+        },
+        "re3tt": {
+          "cases": 30,
+          "acc@1": 0.0,
+          "acc@3": 0.0,
+          "acc@5": 0.03333333333333333,
+          "mrr": 0.04474341490982358,
+          "not_found": 11
+        }
+      }
+    },
+    "score_v2_fast": {
+      "cases": 227,
+      "acc@1": 0.5330396475770925,
+      "acc@3": 0.7048458149779736,
+      "acc@5": 0.8590308370044053,
+      "mrr": 0.6595867421858611,
+      "not_found": 16,
+      "by_fault": {
+        "cpu": {
+          "cases": 28,
+          "acc@1": 0.5714285714285714,
+          "acc@3": 0.8214285714285714,
+          "acc@5": 0.9642857142857143,
+          "mrr": 0.7303571428571428,
+          "not_found": 0
+        },
+        "delay": {
+          "cases": 29,
+          "acc@1": 0.5862068965517241,
+          "acc@3": 0.7586206896551724,
+          "acc@5": 0.9310344827586207,
+          "mrr": 0.711247947454844,
+          "not_found": 0
+        },
+        "disk": {
+          "cases": 28,
+          "acc@1": 0.5,
+          "acc@3": 0.7142857142857143,
+          "acc@5": 0.9642857142857143,
+          "mrr": 0.6660714285714285,
+          "not_found": 1
+        },
+        "f1": {
+          "cases": 16,
+          "acc@1": 0.375,
+          "acc@3": 0.6875,
+          "acc@5": 0.75,
+          "mrr": 0.5291666666666667,
+          "not_found": 3
+        },
+        "f2": {
+          "cases": 10,
+          "acc@1": 0.7,
+          "acc@3": 0.7,
+          "acc@5": 0.8,
+          "mrr": 0.7535714285714286,
+          "not_found": 0
+        },
+        "f3": {
+          "cases": 16,
+          "acc@1": 0.625,
+          "acc@3": 0.625,
+          "acc@5": 0.6875,
+          "mrr": 0.6568452380952381,
+          "not_found": 3
+        },
+        "f4": {
+          "cases": 12,
+          "acc@1": 0.5,
+          "acc@3": 0.5833333333333334,
+          "acc@5": 0.75,
+          "mrr": 0.5791666666666667,
+          "not_found": 3
+        },
+        "f5": {
+          "cases": 6,
+          "acc@1": 0.0,
+          "acc@3": 0.0,
+          "acc@5": 0.0,
+          "mrr": 0.027777777777777776,
+          "not_found": 5
+        },
+        "loss": {
+          "cases": 27,
+          "acc@1": 0.5185185185185185,
+          "acc@3": 0.6666666666666666,
+          "acc@5": 0.9259259259259259,
+          "mrr": 0.654673721340388,
+          "not_found": 0
+        },
+        "mem": {
+          "cases": 28,
+          "acc@1": 0.5714285714285714,
+          "acc@3": 0.7857142857142857,
+          "acc@5": 0.8571428571428571,
+          "mrr": 0.7159013605442176,
+          "not_found": 0
+        },
+        "socket": {
+          "cases": 27,
+          "acc@1": 0.5555555555555556,
+          "acc@3": 0.7407407407407407,
+          "acc@5": 0.9259259259259259,
+          "mrr": 0.6907407407407407,
+          "not_found": 1
+        }
+      },
+      "by_benchmark": {
+        "re2ob": {
+          "cases": 90,
+          "acc@1": 0.26666666666666666,
+          "acc@3": 0.5888888888888889,
+          "acc@5": 0.9,
+          "mrr": 0.5074603174603175,
+          "not_found": 0
+        },
+        "re2tt": {
+          "cases": 77,
+          "acc@1": 0.8831168831168831,
+          "acc@3": 0.935064935064935,
+          "acc@5": 0.961038961038961,
+          "mrr": 0.914625850340136,
+          "not_found": 2
+        },
+        "re3ob": {
+          "cases": 30,
+          "acc@1": 0.0,
+          "acc@3": 0.2,
+          "acc@5": 0.36666666666666664,
+          "mrr": 0.15095238095238095,
+          "not_found": 14
+        },
+        "re3tt": {
+          "cases": 30,
+          "acc@1": 0.9666666666666667,
+          "acc@3": 0.9666666666666667,
+          "acc@5": 0.9666666666666667,
+          "mrr": 0.9700000000000001,
+          "not_found": 0
+        }
+      }
+    }
+  },
+  "failed": [
+    {
+      "case": "re2tt_ts-auth-service_cpu_1",
+      "method": "score_v2_fast",
+      "error": "out of memory (8 GB machine)"
+    },
+    {
+      "case": "re2tt_ts-auth-service_delay_1",
+      "method": "score_v2_fast",
+      "error": "out of memory (8 GB machine)"
+    },
+    {
+      "case": "re2tt_ts-auth-service_mem_1",
+      "method": "score_v2_fast",
+      "error": "out of memory (8 GB machine)"
+    },
+    {
+      "case": "re2tt_ts-auth-service_mem_2",
+      "method": "score_v2_fast",
+      "error": "out of memory (8 GB machine)"
+    },
+    {
+      "case": "re2tt_ts-order-service_disk_1",
+      "method": "score_v2_fast",
+      "error": "out of memory (8 GB machine)"
+    },
+    {
+      "case": "re2tt_ts-order-service_loss_1",
+      "method": "score_v2_fast",
+      "error": "out of memory (8 GB machine)"
+    },
+    {
+      "case": "re2tt_ts-order-service_socket_1",
+      "method": "score_v2_fast",
+      "error": "out of memory (8 GB machine)"
+    },
+    {
+      "case": "re2tt_ts-route-service_disk_1",
+      "method": "score_v2_fast",
+      "error": "out of memory (8 GB machine)"
+    },
+    {
+      "case": "re2tt_ts-route-service_loss_1",
+      "method": "score_v2_fast",
+      "error": "out of memory (8 GB machine)"
+    },
+    {
+      "case": "re2tt_ts-route-service_socket_1",
+      "method": "score_v2_fast",
+      "error": "out of memory (8 GB machine)"
+    },
+    {
+      "case": "re2tt_ts-train-service_cpu_1",
+      "method": "score_v2_fast",
+      "error": "out of memory (8 GB machine)"
+    },
+    {
+      "case": "re2tt_ts-train-service_socket_2",
+      "method": "score_v2_fast",
+      "error": "out of memory (8 GB machine)"
+    },
+    {
+      "case": "re2tt_ts-travel-service_loss_2",
+      "method": "score_v2_fast",
+      "error": "out of memory (8 GB machine)"
+    }
+  ]
+}

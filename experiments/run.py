@@ -58,7 +58,7 @@ def step_rcaeval(cfg: dict, out: str, log) -> dict:
     rc = cfg.get("rcaeval")
     if not rc:
         return {}
-    dirs = rcaeval_eval.expand(rc["cases"])
+    dirs = rcaeval_eval.select_split(rcaeval_eval.expand(rc["cases"]), rc.get("split", "all"))
     if not dirs:
         log("rcaeval: no case folders matched, skipping")
         return {}

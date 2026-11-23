@@ -96,9 +96,9 @@ def write(stats: dict, out: str, command: str) -> None:
     os.makedirs(out, exist_ok=True)
     stats = {k: v for k, v in stats.items() if k != "series"}
     stats.update({"target_p95_ms": TARGET_P95_MS, "where": "AWS", "command": command})
-    with open(os.path.join(out, "freshness.json"), "w") as f:
+    with open(os.path.join(out, "freshness.json"), "w", encoding="utf-8") as f:
         json.dump(stats, f, indent=2)
-    with open(os.path.join(out, "summary.md"), "w") as f:
+    with open(os.path.join(out, "summary.md"), "w", encoding="utf-8") as f:
         f.write(summary_md(stats, command))
 
 

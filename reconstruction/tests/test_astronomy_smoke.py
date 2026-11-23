@@ -6,6 +6,8 @@ import copy
 import io
 import json
 import tempfile
+import subprocess
+import sys
 import unittest
 from pathlib import Path
 
@@ -54,6 +56,7 @@ class AstronomySmokeTests(unittest.TestCase):
                 "run_id": run_id,
                 "injected_at_unix_ns": str(injection_ns),
                 "cleared_at_unix_ns": "5000000000",
+                "root_cause_service": "payment",
                 "minimum_healthy_checkout_traces": 5,
                 "minimum_faulty_checkout_traces": 5,
             }
@@ -88,6 +91,16 @@ class AstronomySmokeTests(unittest.TestCase):
             self.assertTrue(result["passed"])
             self.assertEqual(result["healthy_checkout_traces"], 5)
             self.assertEqual(result["faulty_checkout_traces"], 5)
+            process = subprocess.run([sys.executable, '-X', 'utf8', '-m', 'diagnosis.fault_report',
+                                      '--runtime', str(runtime), '--input', str(capture),
+                                      '--output', str(root_dir / 'report')],
+                                     cwd=Path(__file__).resolve().parents[2], capture_output=True, text=True)
+            self.assertEqual(process.returncode, 0, process.stderr)
+            report = json.loads((root_dir / 'report' / 'reliability.json').read_text())
+            self.assertIn('payment', report['diagnosis']['top_ranked_services'])
+            self.assertEqual(report['score_comparison']['v2']['method'], 'bottleneck-score-v2')
+            for name in ('capture.jsonl', 'manifest.json', 'verification.json', 'scores.json'):
+                self.assertTrue((root_dir / 'report' / name).exists())
             for change in ('after_clear', 'incomplete', 'synthetic', 'unknown_healthy'):
                 changed = copy.deepcopy(records)
                 if change == 'after_clear':

@@ -79,3 +79,16 @@ Sprint 5 error-anomaly diagnosis and injected-service comparison:
 ```
 
 See [Sprint 5 policy and limitations](../../docs/sprint-5.md).
+
+## Versioned scores in the verified report
+
+The fault-report command now saves `scores.json` with v1 (fault-window traces)
+and v2 (verified healthy reference versus fault-window traces), alongside a copy
+of the capture, manifest and verification. Its detailed reliability report retains
+the capture SHA-256 and the injected-service error comparison. Both scoring runs
+record their configurations; the controlled experiment uses five samples. Treat
+this payment failure as an error-signal check unless latency actually increased.
+Before prepare, resolve the upstream checkout to an exact commit with
+`git rev-parse HEAD` and pass that commit as `--demo-version`; the controller records
+this string but does not verify it. All captured spans must use the shared run ID.
+See [v2 formula, limitations and run status](../../docs/score-v2.md).

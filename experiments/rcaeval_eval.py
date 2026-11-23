@@ -11,6 +11,8 @@ import argparse
 import csv
 import glob
 import json
+import hashlib
+import inspect
 import os
 import sys
 from typing import Dict, List, Optional
@@ -38,13 +40,30 @@ def split_case(spans: List[dict], inject_time_s: Optional[int]):
     return normal, anomalous
 
 
+def file_sha256(path):
+    digest = hashlib.sha256()
+    with open(path, 'rb') as stream:
+        for block in iter(lambda: stream.read(1024 * 1024), b''):
+            digest.update(block)
+    return digest.hexdigest()
+
+
 def evaluate_case(case_dir: str, methods: Dict[str, object]) -> List[dict]:
     spans, label = rcaeval.read_case(case_dir)
     normal, anomalous = split_case([s.to_dict() for s in spans], label.inject_time_s)
     rows = []
+    observed = sorted({s["service"] if "service" in s else s.get("service_name", "") for t in normal + anomalous for s in t})
+    hashes = {os.path.basename(p): file_sha256(p)
+              for p in sorted(glob.glob(os.path.join(case_dir, '*'))) if os.path.isfile(p)}
     for name, fn in methods.items():
         ranking = fn(normal, anomalous) if anomalous else []
-        rows.append({"case": label.case, "benchmark": label.benchmark, "fault": label.fault,
+        module = inspect.getmodule(fn)
+        details = (getattr(module, 'LAST', {}) if module else {}) if anomalous else {}
+        rows.append({"ranking_count": len(ranking), "ranking": ranking,
+                     "details": dict(details), "observed_services": observed,
+                     "truth_present": rank_of(label.root_cause_service, observed) is not None,
+                     "limitation": None if rank_of(label.root_cause_service, observed) is not None else "Faulted service has no spans in this input; it cannot be diagnosed from these traces.",
+                     "input_sha256": hashes, "case": label.case, "benchmark": label.benchmark, "fault": label.fault,
                      "truth": label.root_cause_service, "method": name,
                      "rank": rank_of(label.root_cause_service, ranking),
                      "top3": ";".join(ranking[:3]), "normal_traces": len(normal), "anomalous_traces": len(anomalous)})
@@ -82,12 +101,15 @@ def evaluate(case_dirs: List[str], method_specs: List[str], log=print, workers: 
     for name in names:
         ranks = [r["rank"] for r in rows if r["method"] == name]
         summary[name] = summarize(ranks)
+        summary[name]["no_ranking"] = sum(r["ranking_count"] == 0 for r in rows if r["method"] == name)
         for key, field in (("by_fault", "fault"), ("by_benchmark", "benchmark")):
             groups: Dict[str, list] = {}
             for r in rows:
                 if r["method"] == name:
                     groups.setdefault(r[field], []).append(r["rank"])
-            summary[name][key] = {g: summarize(v) for g, v in sorted(groups.items())}
+            summary[name][key] = {g: {**summarize(v), "no_ranking": sum(
+                r["ranking_count"] == 0 for r in rows if r["method"] == name and r[field] == g)}
+                for g, v in sorted(groups.items())}
     return {"rows": rows, "summary": summary, "failed": failed}
 
 
@@ -112,9 +134,11 @@ def write_results(result: dict, out_dir: str) -> None:
     os.makedirs(out_dir, exist_ok=True)
     with open(os.path.join(out_dir, "rcaeval_results.csv"), "w", newline="") as f:
         cols = ["case", "benchmark", "fault", "truth", "method", "rank", "top3", "normal_traces", "anomalous_traces"]
-        w = csv.DictWriter(f, fieldnames=cols)
+        w = csv.DictWriter(f, fieldnames=cols, extrasaction="ignore")
         w.writeheader()
         w.writerows(result["rows"])
+    with open(os.path.join(out_dir, "rcaeval_evidence.json"), "w") as f:
+        json.dump(result["rows"], f, indent=2)
     with open(os.path.join(out_dir, "rcaeval_summary.json"), "w") as f:
         json.dump({"summary": result["summary"], "failed": result["failed"]}, f, indent=2)
 
@@ -125,8 +149,9 @@ def main(argv=None):
     ap.add_argument("--methods", nargs="+", default=["slowest_average", "longest_span", "critical_path_only"])
     ap.add_argument("--out", default="experiments/results/latest")
     ap.add_argument("--workers", type=int, default=1, help="cases evaluated in parallel")
+    ap.add_argument("--split", choices=["all", "validation", "held-out"], default="all")
     a = ap.parse_args(argv)
-    dirs = expand(a.cases)
+    dirs = select_split(expand(a.cases), a.split)
     if not dirs:
         sys.exit("no case folders matched")
     result = evaluate(dirs, a.methods, workers=a.workers)
@@ -135,6 +160,19 @@ def main(argv=None):
         print(f"{name:22s} cases={s['cases']:4d} acc@1={s['acc@1']:.3f} acc@3={s['acc@3']:.3f} mrr={s['mrr']:.3f}")
     if result["failed"]:
         print(f"{len(result['failed'])} case(s) skipped, see rcaeval_summary.json")
+
+
+
+def select_split(dirs, split="all"):
+    """Hold out whole benchmark/service/fault groups, including all repetitions."""
+    if split not in ("all", "validation", "held-out"):
+        raise ValueError("invalid split")
+    if split == "all":
+        return dirs
+    def validation(path):
+        group = os.path.basename(path).rsplit("_", 1)[0]
+        return int(hashlib.sha256(group.encode()).hexdigest()[:8], 16) % 5 == 0
+    return [p for p in dirs if validation(p) == (split == "validation")]
 
 
 if __name__ == "__main__":

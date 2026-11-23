@@ -1,0 +1,24 @@
+{
+  "out": "experiments/results/score-comparison",
+  "rcaeval": {
+    "cases": [
+      "data/rcaeval/re2ob_*",
+      "data/rcaeval/re2tt_*",
+      "data/rcaeval/re3ob_*",
+      "data/rcaeval/re3tt_*"
+    ],
+    "workers": 1,
+    "split": "all",
+    "methods": [
+      "slowest_average",
+      "longest_span",
+      "critical_path_only"
+    ],
+    "extra_methods": [
+      "experiments.diagnosis_method:tail_share_excess",
+      "experiments.diagnosis_method:score_v2",
+      "experiments.diagnosis_method:v1_measured",
+      "experiments.diagnosis_method:v2_measured"
+    ]
+  }
+}

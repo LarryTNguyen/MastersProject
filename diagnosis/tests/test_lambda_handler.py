@@ -1,87 +1,61 @@
 import io
 import json
+import os
 import unittest
-from unittest.mock import MagicMock
+from unittest import mock
 
-from diagnosis import lambda_handler as lh
-from diagnosis.lambda_handler import _promote_synthetic_measured, handler
-
-
-def _span(**overrides):
-    base = {
-        "schema_version": "1.0.0",
-        "run_id": "baf0b700-7910-5fcb-a776-37e042145d18",
-        "identity_kind": "OTEL",
-        "record_kind": "SPAN",
-        "trace_id": "1",
-        "span_id": "a",
-        "parent_span_id": None,
-        "parent_relation": "ROOT",
-        "service_namespace": "shop",
-        "service_name": "checkout",
-        "operation_name": "POST /checkout",
-        "start_time_ns": "1791936000000000000",
-        "end_time_ns": "1791936000100000000",
-        "duration_ns": "100000000",
-        "time_domain": "UNIX",
-        "timing_quality": "DERIVED",
-        "quality_flags": ["synthetic_demo"],
-        "status": {"code": "UNSET", "message": None},
-        "attributes": {},
-        "resource": {"attributes": {}, "schema_url": None},
-        "scope": {"name": None, "version": None, "attributes": {}, "schema_url": None},
-        "events": [],
-        "links": [],
-        "dropped_counts": {},
-        "source": {"format": "otlp_json", "adapter_version": "t", "record_key": "a",
-                   "raw_reference": None, "details": {}},
-    }
-    base.update(overrides)
-    return base
+from diagnosis import lambda_handler
+from diagnosis.demo import records
 
 
-class PromoteTests(unittest.TestCase):
-    def test_synthetic_derived_becomes_measured(self):
-        records = _promote_synthetic_measured([_span()])
-        self.assertEqual(records[0]["timing_quality"], "MEASURED")
+class FakeS3:
+    def __init__(self, objects):
+        self.objects = objects
+
+    def get_object(self, Bucket, Key):
+        return {"Body": io.BytesIO(self.objects[(Bucket, Key)])}
 
 
-class HandlerTests(unittest.TestCase):
-    def test_direct_invoke_publishes(self):
-        s3 = MagicMock()
-        s3.get_object.return_value = {"Body": io.BytesIO((json.dumps(_span()) + "\n").encode())}
-        conn = MagicMock()
-        conn.cursor.return_value.__enter__.return_value.fetchall.return_value = []
+def jsonl(rows):
+    return "\n".join(json.dumps(r) for r in rows).encode()
 
-        def fake_diagnose(records, **kwargs):
-            return {
-                "method": "tail-share-excess-v1",
-                "configuration": kwargs,
-                "windows": [{
-                    "run_id": "baf0b700-7910-5fcb-a776-37e042145d18",
-                    "window_start_ns": "1791936000000000000",
-                    "window_end_ns": "1791936300000000000",
-                    "root_operation": "POST /checkout",
-                    "rankings": [{
-                        "rank": 1, "service": "shop/payment", "service_name": "payment",
-                        "score": 1.0, "excess_ms": 200.0, "supporting_trace_ids": ["t1"],
-                    }],
-                }],
-                "excluded_traces": {},
-            }
 
-        real = lh.diagnose
-        lh.diagnose = fake_diagnose
-        try:
-            response = handler(
-                {"bucket": "b", "key": "normalized/uploads/spans.jsonl"},
-                s3=s3, conn=conn,
-            )
-        finally:
-            lh.diagnose = real
-        self.assertTrue(response["ok"])
-        self.assertEqual(response["published"], 1)
-        self.assertEqual(response["windows"], 1)
+class LambdaHandlerTests(unittest.TestCase):
+    def setUp(self):
+        self.rows = list(records())
+        self.s3 = FakeS3({("raw", "normalized/uploads/demo.jsonl"): jsonl(self.rows)})
+        published = mock.patch.object(lambda_handler, "publish", side_effect=lambda conn, result: len(result["windows"]))
+        self.publish = published.start()
+        self.addCleanup(published.stop)
+        env = mock.patch.dict(os.environ, {"ASSUME_SYNCHRONOUS": "true", "DATA_LABEL": "synthetic"})
+        env.start()
+        self.addCleanup(env.stop)
+
+    def test_direct_event_diagnoses_and_publishes(self):
+        out = lambda_handler.handler({"bucket": "raw", "key": "normalized/uploads/demo.jsonl"}, s3=self.s3, conn=object())
+        self.assertTrue(out["ok"])
+        self.assertGreater(out["windows"], 0)
+        result = self.publish.call_args[0][1]
+        self.assertEqual(result["data_label"], "synthetic")
+        self.assertEqual(result["input_files"][0]["path"], "s3://raw/normalized/uploads/demo.jsonl")
+        self.assertEqual(result["windows"][0]["rankings"][0]["service_name"], "payment")
+
+    def test_sqs_messages_and_per_message_failures(self):
+        good = {"messageId": "1", "body": json.dumps({"Records": [
+            {"s3": {"bucket": {"name": "raw"}, "object": {"key": "normalized/uploads/demo.jsonl"}}}]})}
+        bad = {"messageId": "2", "body": json.dumps({"Records": [
+            {"s3": {"bucket": {"name": "raw"}, "object": {"key": "uploads/not-normalized.json"}}}]})}
+        out = lambda_handler.handler({"Records": [good, bad]}, s3=self.s3, conn=object())
+        self.assertEqual(out["batchItemFailures"], [{"itemIdentifier": "2"}])
+        self.assertEqual(len(out["results"]), 1)
+
+    def test_only_flagged_synthetic_records_are_promoted(self):
+        rows = [{"timing_quality": "DERIVED", "quality_flags": ["synthetic_demo"]},
+                {"timing_quality": "DERIVED", "quality_flags": []}]
+        out = lambda_handler._promote_synthetic_measured(rows)
+        self.assertEqual([r["timing_quality"] for r in out], ["MEASURED", "DERIVED"])
+        with mock.patch.dict(os.environ, {"SYNTHETIC_AS_MEASURED": "false"}):
+            self.assertEqual(lambda_handler._promote_synthetic_measured(rows)[0]["timing_quality"], "DERIVED")
 
 
 if __name__ == "__main__":

@@ -1,0 +1,36 @@
+Meeting Type: Team-Only
+Date: 2026-11-22
+Start–End Time: [start] – [end]
+Location/Mode: Discord
+Attendees:
+- Larry
+- Anukrithi
+- Matthew
+1) Accomplished Since Last Meeting
+Anukrithi:
+- Reviewed the AWS setup and finished the live path: collector Lambda (Function URL + token in SSM) deployed and committed
+- AWS fixes: adapter can read live/, batch item failures on, reconstruction DLQ, EventBridge rule so diagnosis runs on every upload, optional 1-min settle schedule (off by default for cost)
+- Tested replay -> collector -> S3 -> adapter -> reconstruction -> Aurora -> dashboard end to end
+- Wrote up the AWS setup in docs/aws-deployment.md and committed the diagnosis Lambda code that was only in AWS
+- Ran score v2 and MicroRCA on the RCAEval cases and pushed the results: v2 0.53 / 0.70 acc@1 / acc@3, MicroRCA 0.58 / 0.64, best naive (longest span) 0.34 / 0.61
+- Updated report ch. 1-2 (MicroRCA implemented + results, AWS status, suggested fixes in 295B, 248 tests) and made the results slides
+Larry:
+- Pushed score v2 (new scoring formula, tests, docs/score-v2.md, fixture results)
+- Implemented trace-only MicroRCA (experiments/microrca.py) and the Astronomy Shop fault flags for the live demo
+- [add anything else]
+Matthew:
+- Sent AWS access (IAM Identity Center) so the setup could be reviewed
+- [add: Aurora / VPC / Lambda work since 11/18]
+2) Accomplished During This Meeting
+- [fill in after the meeting]
+3) Issues / Blockers
+- 13 RE2 Train Ticket cases need more than 8 GB of memory for v2 (MicroRCA ran all 240)
+- Freshness on AWS still to be measured
+4) Action Items
+- Action: Sign off on report ch. 1-2 and submit | Owner: everyone | Due: 12/4
+- Action: Record the prototype demo for Prof. Trivedi | Owner: [owner] | Due: 12/4
+- Action: Submit Meeting Log 2 (link to /meetings/) | Owner: [owner] | Due: 12/4
+- Action: Each person submits their own Project Contribution form | Owner: everyone | Due: 12/4
+- Action: Run the freshness test on AWS (settle rule on, then off) | Owner: Anukrithi | Due: [date]
+5) Plans / Goals for Next Meeting
+- Demo to Prof. Trivedi, then plan Spring: suggested fixes on top of the rankings, sampling curve (RQ3), cost vs always-on (RQ4)

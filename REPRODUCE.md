@@ -19,7 +19,7 @@ Python 3.12. The browser tests also need `pip install playwright && python -m pl
 
 | number | saved in | command |
 |---|---|---|
-| 221 tests passing | CI (`.github/workflows/tests.yml`) | [Tests](#tests) |
+| 248 tests passing | CI (`.github/workflows/tests.yml`) | [Tests](#tests) |
 | naive baselines on 240 RCAEval cases (best acc@1 0.36) | `experiments/reported/2026-10-23-naive-baselines/` | [RCAEval baselines](#rcaeval-baselines) |
 | diagnosis score v1 on the same 240 cases (acc@1 0.15) | `experiments/reported/2026-11-10-diagnosis-score/` | [RCAEval baselines](#rcaeval-baselines) |
 | local freshness on RCAEval, p95 1.10 s | `experiments/reported/2026-11-02-local-freshness/` | [Local freshness](#local-freshness-rcaeval) |
@@ -32,11 +32,11 @@ CI runs these on every push and pull request. Locally, with `TEST_DATABASE_URL` 
 (the PostgreSQL tests are skipped without it, the browser tests without Playwright):
 
 ```bash
-python -m unittest discover -s diagnosis/tests -t .               # 19
-(cd ingest && python -m unittest discover -s tests -t .)           # 52
+python -m unittest discover -s diagnosis/tests -t .               # 34
+(cd ingest && python -m unittest discover -s tests -t .)           # 60
 (cd reconstruction && python -m unittest discover -s tests -t .)   # 34
 (cd dashboard && python -m unittest discover -s tests -t .)        # 81 (8 PostgreSQL, 6 browser)
-python -m unittest discover -s experiments/tests -t .              # 35
+python -m unittest discover -s experiments/tests -t .              # 39
 ```
 
 ## RCAEval baselines
@@ -94,6 +94,9 @@ The 2% sample is the freshness number; the 5% sample is where one process stops
 keeping up (see the saved summary).
 
 ## Freshness on AWS
+
+The deployed resources, their settings and how to redeploy them are in
+`docs/aws-deployment.md`.
 
 Once the collector, the queue and the adapter Lambda are deployed, replay 3 minutes
 at 1x into the collector and read the stamps back from the normalized bucket (before

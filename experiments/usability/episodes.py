@@ -180,7 +180,7 @@ def task_sentence(ep: dict, clock: str = "HH:MM") -> str:
 
 
 def write_sheets(episodes: Dict[str, dict], out_dir: str) -> None:
-    with open(os.path.join(out_dir, "answer_key.json"), "w") as f:
+    with open(os.path.join(out_dir, "answer_key.json"), "w", encoding="utf-8") as f:
         json.dump(episodes, f, indent=2, sort_keys=True)
     lines = ["# Usability study: task sheet", "",
              "Read the sentence for the episode aloud. `load` prints it again with the real clock",
@@ -191,7 +191,7 @@ def write_sheets(episodes: Dict[str, dict], out_dir: str) -> None:
                   f"- Data: {round(ep['data_s'] / 60)} minutes, {ep['traces']:,} traces; the slowdown starts "
                   f"about {round(ep['slow_after_s'] / 60)} minutes in.",
                   f"- Read aloud: {task_sentence(ep)}", ""]
-    with open(os.path.join(out_dir, "task_sheet.md"), "w") as f:
+    with open(os.path.join(out_dir, "task_sheet.md"), "w", encoding="utf-8") as f:
         f.write("\n".join(lines))
 
 
@@ -250,7 +250,7 @@ def write_dashboard(spans: List[spanio.Span], data_dir: str, episode: str,
 def load(episode: str, ep_dir: str, tool: str = "both", otlp_url: str = "http://localhost:4318",
          jaeger_query: str = "http://localhost:16686", dashboard_dir: Optional[str] = None,
          force: bool = False, now_us: Optional[int] = None, sink=None, opener=urllib.request.urlopen) -> dict:
-    with open(os.path.join(ep_dir, "answer_key.json")) as f:
+    with open(os.path.join(ep_dir, "answer_key.json"), encoding="utf-8") as f:
         ep = json.load(f)[episode]
     with open(os.path.join(ep_dir, episode, "spans.jsonl"), encoding="utf-8") as f:
         spans = list(spanio.read_jsonl(f))
